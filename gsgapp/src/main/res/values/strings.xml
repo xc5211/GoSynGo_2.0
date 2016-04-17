@@ -1,0 +1,14 @@
+<resources>
+    <!-- Login page -->
+    <string name="app_name">GoSynGo</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="button_login">Log In</string>
+    <string name="button_register">Register</string>
+    <string name="toast_login_success">You have successfully logged in</string>
+
+    <!-- Register page -->
+
+    <!-- Dashboard page -->
+
+</resources>
