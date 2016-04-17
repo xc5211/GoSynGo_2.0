@@ -117,7 +117,7 @@ public class LoginActivity extends GsgBaseActivity {
         });
     }
 
-    public void login(View view) {
+    public void login() {
         String email = this.emailEdit.getText().toString();
         String password = this.passwordEdit.getText().toString();
         this.loginButton.setEnabled(false);
