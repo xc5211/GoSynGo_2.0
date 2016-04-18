@@ -22,8 +22,7 @@ public class LoginActivity extends GsgBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        initViews();
-        initListeners();
+        validateLogin();
 
         /*
         Toolbar toolBar = (Toolbar) findViewById(R.id.button_register);
@@ -40,37 +39,27 @@ public class LoginActivity extends GsgBaseActivity {
                         .setAction("Action", null).show();
             }
         });
-
-
-        String userEmail1 = "huangsichao2015@gmail.com";
-        String password1 = "test";
-        String name1 = "Sichao";
-
-        String userEmail2 = "whairong2011@gmail.com";
-        String password2 = "test";
-        String name2 = "Hairong";
-        Backendless.initApp(this, BackendlessSettings.APP_ID, BackendlessSettings.SECRET_KEY_ANDROID, BackendlessSettings.APP_VERSION);
-
-
-        ApiResponse<String> response = null;
-        BackendlessUser user = new BackendlessUser();
-        user.setEmail(userEmail1);
-        user.setPassword(password1);
-        user.setProperty("name", name1);
-        user.setProperty("isGoogleCalendarImported", false);
-
-        try {
-            user = Backendless.UserService.register(user);
-        } catch(BackendlessException exception) {
-            Log.i(">>>>>>>>>>>>>>>>>>>>>>", exception.getCode());
-        }
-
-        assert response.getObj() != null;
-        assert response.getObj() instanceof String;
-        assert response.getObjLists() == null;
-        assert response.getEvent() == "0";
-        assert response.getMsg() == "Registration is successful";
         */
+    }
+
+    private void validateLogin() {
+        super.appAction.validateLogin(new ActionCallbackListener<Void>() {
+
+            @Override
+            public void onSuccess(Void data) {
+                Toast.makeText(context, R.string.toast_login_success, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onFailure(String message) {
+                initViews();
+                initListeners();
+            }
+
+        });
     }
 
     /*
@@ -123,11 +112,12 @@ public class LoginActivity extends GsgBaseActivity {
         this.loginButton.setEnabled(false);
 
         boolean stayLoggedIn = true;
-        super.appAction.login(email, password, stayLoggedIn, new ActionCallbackListener<Void>() {
+        super.appAction.login(email, password, stayLoggedIn, new ActionCallbackListener<String>() {
+
             @Override
-            public void onSuccess(Void data) {
+            public void onSuccess(String data) {
                 Toast.makeText(context, R.string.toast_login_success, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(context, DashboardActivity.class);
+                Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -137,8 +127,8 @@ public class LoginActivity extends GsgBaseActivity {
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
                 loginButton.setEnabled(true);
             }
+
         });
     }
 
 }
-

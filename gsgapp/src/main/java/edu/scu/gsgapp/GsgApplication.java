@@ -20,6 +20,7 @@ public class GsgApplication extends Application {
         super.onCreate();
         appAction = new AppActionImpl(this);
 
+        // Init 3rd party API
         Backendless.initApp(this, BackendlessSettings.APP_ID, BackendlessSettings.SECRET_KEY_ANDROID, BackendlessSettings.APP_VERSION);
     }
 

@@ -1,13 +1,12 @@
 package edu.scu.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by chuanxu on 4/13/16.
  */
-public class Person implements Serializable {
+public class Person {
 
     private String objectId;
     private String email;
@@ -77,6 +76,16 @@ public class Person implements Serializable {
             }
         }
         return declinedEvents;
+    }
+
+    public List<Event> getLeaderEventsAsTentative() {
+        List<Event> tentativeEvents = new ArrayList<>();
+        for (Event event : this.getEventsAsLeader()) {
+            if (event.getStatus().equals(StatusEvent.Tentative)) {
+                tentativeEvents.add(event);
+            }
+        }
+        return tentativeEvents;
     }
 
     public List<Event> getMemberEventsAsPending() {

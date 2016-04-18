@@ -1,6 +1,9 @@
 <resources>
-    <!-- Login page -->
+
+    <!-- Theme -->
     <string name="app_name">GoSynGo</string>
+
+    <!-- Login page -->
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
     <string name="button_login">Log In</string>
@@ -8,7 +11,9 @@
     <string name="toast_login_success">You have successfully logged in</string>
 
     <!-- Register page -->
+    <string name="title_register_display_message">Registration</string>
 
     <!-- Dashboard page -->
+    <string name="title_dashboard_display_message">GoSynGo</string>
 
 </resources>

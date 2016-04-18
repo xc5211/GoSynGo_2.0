@@ -3,6 +3,8 @@ package edu.scu.api;
 import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
 import com.backendless.exceptions.BackendlessException;
+import com.backendless.persistence.local.UserIdStorageFactory;
+import com.backendless.persistence.local.UserTokenStorageFactory;
 
 import org.w3c.dom.Text;
 
@@ -16,8 +18,6 @@ public class ApiImpl implements Api {
 
     private final static String SUCCESS_EVENT = "0";
     private final static String FAIL_EVENT = "1";
-    private final static String TIME_OUT_EVENT = "CONNECT_TIME_OUT";
-    private final static String TIME_OUT_EVENT_MSG = "Server connection has a problem";
 
     @Override
     public ApiResponse<String> register(String userEmail, String password, String name) {
@@ -31,16 +31,27 @@ public class ApiImpl implements Api {
         try {
             user = Backendless.UserService.register(user);
         } catch(BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, exception.getCode());
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Registration is successful", user.getUserId());
+        return new ApiResponse<>(SUCCESS_EVENT, "You have successfully registered", user.getUserId());
     }
 
     @Override
-    public ApiResponse<Void> login(String userEmail, String password, boolean stayLoggedIn) {
+    public ApiResponse<String> login(String userEmail, String password, boolean stayLoggedIn) {
+        // Step 1: start login process
+        BackendlessUser user = null;
+        try {
+            user = Backendless.UserService.login(userEmail, password, stayLoggedIn);
+        } catch( BackendlessException exception ) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
 
-        BackendlessUser loggedinUser = Backendless.UserService.CurrentUser();
-        return null;
+        // Step 2: validate login
+        boolean isValidLogin = Backendless.UserService.isValidLogin();
+        if (isValidLogin) {
+            return new ApiResponse<>(SUCCESS_EVENT, "You have successfully logged in", user.getUserId());
+        }
+        return new ApiResponse<>(FAIL_EVENT, "Invalid login information");
     }
 
     @Override

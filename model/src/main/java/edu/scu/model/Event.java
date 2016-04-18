@@ -2,7 +2,6 @@ package edu.scu.model;
 
 import org.w3c.dom.Text;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +16,7 @@ import edu.scu.util.TimestampComparator;
 /**
  * Created by chuanxu on 4/13/16.
  */
-public class Event implements Serializable {
+public class Event {
 
     private String objectId;
     private String name;

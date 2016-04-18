@@ -50,7 +50,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
             @Override
             public void onSuccess(List<Date> data) {
                 if (!data.isEmpty()) {
-                    // TODO: fill data in calendar data
+                    // TODO: fill data in calendar view
                 }
                 swipeRefreshLayout.setEnabled(false);
             }

@@ -1,6 +1,5 @@
 package edu.scu.model;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +10,7 @@ import edu.scu.util.TimestampComparator;
 /**
  * Created by chuanxu on 4/13/16.
  */
-public class EventMemberDetail implements Serializable {
+public class EventMemberDetail {
 
     private StatusMember status;
     private boolean isCheckedIn;
