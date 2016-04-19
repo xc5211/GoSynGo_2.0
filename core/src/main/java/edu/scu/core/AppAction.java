@@ -12,7 +12,7 @@ public interface AppAction {
     public void register(String userEmail, String password, String name, ActionCallbackListener<String> listener);
     public void validateLogin(ActionCallbackListener<Void> listener);
     public void login(String userEmail, String password, boolean stayLoggedIn, ActionCallbackListener<String> listener);
-    public void logout(ActionCallbackListener<String> listener);
+    public void logout(ActionCallbackListener<Void> listener);
     public void getMonthlyScheduledDates(ActionCallbackListener<List<Date>> listener);
 
 

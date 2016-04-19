@@ -13,6 +13,7 @@ public interface Api {
     // As user
     public ApiResponse<String> register(String userEmail, String password, String name);
     public ApiResponse<String> login(String userEmail, String password, boolean stayLoggedIn);
+    public ApiResponse<Void> logout();
     public ApiResponse<Void> isGoogleCalendarImported(String userId);
     public ApiResponse<Void> importGoogleCalendar(String userId);
     public ApiResponse<Void> getMonthlyScheduledDates(String userId);

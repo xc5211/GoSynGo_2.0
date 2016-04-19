@@ -55,6 +55,23 @@ public class ApiImpl implements Api {
     }
 
     @Override
+    public ApiResponse<Void> logout() {
+        // Step 1: validate login
+        boolean isValidLogin = Backendless.UserService.isValidLogin();
+        if (!isValidLogin) {
+            return new ApiResponse<>(FAIL_EVENT, "");
+        }
+
+        // Step 2: start logout process
+        try {
+            Backendless.UserService.logout();
+        } catch( BackendlessException exception ) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "You have successfully logged out");
+    }
+
+    @Override
     public ApiResponse<Void> isGoogleCalendarImported(String userId) {
         return null;
     }

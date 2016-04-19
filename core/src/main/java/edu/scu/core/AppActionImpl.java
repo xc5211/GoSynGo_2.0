@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
-import com.backendless.Backendless;
-import com.backendless.exceptions.BackendlessException;
 import com.backendless.persistence.local.UserIdStorageFactory;
 import com.backendless.persistence.local.UserTokenStorageFactory;
 
@@ -130,15 +128,28 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void logout(final ActionCallbackListener<String> listener) {
+    public void logout(final ActionCallbackListener<Void> listener) {
 
-        try {
-            Backendless.UserService.logout();
-        } catch( BackendlessException exception ) {
-            // logout failed, to get the error code, call exception.getFault().getCode()
-            listener.onFailure(exception.getMessage());
-        }
-        listener.onSuccess("You have successfully logged out");
+        AsyncTask<Void, Void, ApiResponse<Void>> asyncTask = new AsyncTask<Void, Void, ApiResponse<Void>>() {
+
+            @Override
+            protected ApiResponse<Void> doInBackground(Void... params) {
+                return api.logout();
+            }
+
+            @Override
+            protected void onPostExecute(ApiResponse<Void> response) {
+                if (listener != null && response != null) {
+                    if (response.isSuccess()) {
+                        listener.onSuccess(null);
+                    } else {
+                        listener.onFailure(response.getMsg());
+                    }
+                }
+            }
+
+        };
+        asyncTask.execute();
     }
 
     @Override

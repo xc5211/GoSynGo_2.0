@@ -22,6 +22,8 @@ public class LoginActivity extends GsgBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        initViews();
+        initListeners();
         validateLogin();
 
         /*
@@ -42,6 +44,13 @@ public class LoginActivity extends GsgBaseActivity {
         */
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        validateLogin();
+    }
+
     private void validateLogin() {
         super.appAction.validateLogin(new ActionCallbackListener<Void>() {
 
@@ -50,13 +59,11 @@ public class LoginActivity extends GsgBaseActivity {
                 Toast.makeText(context, R.string.toast_login_success, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
                 startActivity(intent);
-                finish();
             }
 
             @Override
             public void onFailure(String message) {
-                initViews();
-                initListeners();
+                // Do nothing
             }
 
         });
@@ -101,7 +108,6 @@ public class LoginActivity extends GsgBaseActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), RegisterActivity.class);
                 startActivityForResult(intent, 0);
-                finish();
             }
         });
     }
@@ -119,7 +125,6 @@ public class LoginActivity extends GsgBaseActivity {
                 Toast.makeText(context, R.string.toast_login_success, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
                 startActivity(intent);
-                finish();
             }
 
             @Override
