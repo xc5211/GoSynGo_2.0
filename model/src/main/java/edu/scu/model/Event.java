@@ -32,7 +32,8 @@ public class Event {
     private Map<Person, EventMemberDetail> eventMembersMap;
 
     public Event() {
-
+        this.proposedTimestamps = new ArrayList<>();
+        this.eventMembersMap = new HashMap<>();
     }
 
     public String getObjectId() {

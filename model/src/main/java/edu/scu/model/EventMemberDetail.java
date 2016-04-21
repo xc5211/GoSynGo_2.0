@@ -19,7 +19,8 @@ public class EventMemberDetail {
     private List<Timestamp> selectedTimestamps;
 
     public EventMemberDetail() {
-
+        this.proposedTimestamps = new ArrayList<>();
+        this.selectedTimestamps = new ArrayList<>();
     }
 
     public int getStatus() {

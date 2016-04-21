@@ -14,9 +14,12 @@ public class Person {
     private boolean hasGoogleCalendarImported;
     private List<Event> eventsAsLeader;
     private List<Event> eventsAsMemeber;
+    private List<Person> contacts;
 
     public Person() {
-
+        this.eventsAsLeader = new ArrayList<>();
+        this.eventsAsMemeber = new ArrayList<>();
+        this.contacts = new ArrayList<>();
     }
 
     public String getObjectId() {
@@ -41,6 +44,10 @@ public class Person {
 
     public boolean hasGoogleCalendarImported() {
         return this.hasGoogleCalendarImported;
+    }
+
+    public List<Person> getContacts() {
+        return this.contacts;
     }
 
     public List<Event> getLeaderEventsAsPending() {
@@ -123,6 +130,21 @@ public class Person {
 
     public void setGoogleCalendarImported(Boolean imported) {
         this.hasGoogleCalendarImported = imported;
+    }
+
+    public void setContacts(List<Person> contacts) {
+        this.contacts = contacts;
+    }
+
+    public void addContact(Person contact) {
+        this.contacts.add(contact);
+    }
+
+    public boolean removeContact(Person person) {
+        if (!this.contacts.contains(person)) {
+            this.contacts.remove(this.contacts.indexOf(person));
+        }
+        return true;
     }
 
     public boolean addEventAsLeader(Event event) {
