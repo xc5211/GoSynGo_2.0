@@ -19,6 +19,7 @@ public class EventMemberDetail {
     private List<Timestamp> selectedTimestamps;
 
     public EventMemberDetail() {
+        this.status = StatusMember.Pending.getStatus();
         this.proposedTimestamps = new ArrayList<>();
         this.selectedTimestamps = new ArrayList<>();
     }

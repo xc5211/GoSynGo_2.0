@@ -32,6 +32,7 @@ public class Event {
     private Map<Person, EventMemberDetail> eventMembersMap;
 
     public Event() {
+        this.setStatus(StatusEvent.Tentative.getStatus());
         this.proposedTimestamps = new ArrayList<>();
         this.eventMembersMap = new HashMap<>();
     }
@@ -183,6 +184,10 @@ public class Event {
         this.objectId = objectId;
     }
 
+    public void setLeader(Person person) {
+        this.leader = person;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -222,8 +227,8 @@ public class Event {
         this.timestamp = timestamp;
     }
 
-    public void setStatus(StatusEvent status) {
-        this.status = status.getStatus();
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     /**
