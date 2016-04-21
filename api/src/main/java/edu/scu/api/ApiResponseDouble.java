@@ -68,7 +68,7 @@ public class ApiResponseDouble<T, E> {
         this.obj2 = obj2;
         this.objLists2 = objLists2;
     }
-    
+
     public ApiResponseDouble(String event, String msg, T obj, List<T> objLists, E obj2, List<E> objLists2) {
         this(event, msg);
         this.obj = obj;

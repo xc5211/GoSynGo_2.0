@@ -17,6 +17,8 @@ public interface AppAction {
 
 
     // As leader
+    public void proposeEvent(String leaderId, ActionCallbackListener<String> listener);
+    public void addEventMember(String leaderId, String eventId, String memberEmail, ActionCallbackListener<String> listener);
 
     // As member
 
