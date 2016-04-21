@@ -12,21 +12,17 @@ import edu.scu.util.TimestampComparator;
  */
 public class EventMemberDetail {
 
-    private StatusMember status;
-    private boolean isCheckedIn;
-    private int estimateInMin;
+    private int status;    // set default to 0
+    private boolean isCheckedIn;    // set default to false
+    private int estimateInMin;  // set default to -1
     private List<Timestamp> proposedTimestamps;
     private List<Timestamp> selectedTimestamps;
 
     public EventMemberDetail() {
-        this.status = StatusMember.Pending;
-        this.isCheckedIn = false;
-        this.estimateInMin = -1;
-        this.proposedTimestamps = new ArrayList<>();
-        this.selectedTimestamps = new ArrayList<>();
+
     }
 
-    public StatusMember getStatus() {
+    public int getStatus() {
         return this.status;
     }
 
@@ -46,7 +42,7 @@ public class EventMemberDetail {
         return this.selectedTimestamps;
     }
 
-    public void setStatus(StatusMember status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
