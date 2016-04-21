@@ -157,4 +157,33 @@ public class AppActionImpl implements AppAction {
 
     }
 
+    @Override
+    public void proposeEvent(final String leaderId, final ActionCallbackListener<String> listener) {
+        AsyncTask<Void, Void, ApiResponse<String>> asyncTask = new AsyncTask<Void, Void, ApiResponse<String>>() {
+
+            @Override
+            protected ApiResponse<String> doInBackground(Void... params) {
+                return api.proposeEvent(leaderId);
+            }
+
+            @Override
+            protected void onPostExecute(ApiResponse<String> response) {
+                if (listener != null && response != null) {
+                    if (response.isSuccess()) {
+                        listener.onSuccess(response.getObj());
+                    } else {
+                        listener.onFailure(response.getMsg());
+                    }
+                }
+            }
+
+        };
+        asyncTask.execute();
+    }
+
+    @Override
+    public void addEventMember(String leaderId, String eventId, String memberEmail,ActionCallbackListener<String> listener) {
+
+    }
+
 }

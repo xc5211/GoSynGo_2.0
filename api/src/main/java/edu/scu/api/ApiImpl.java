@@ -97,7 +97,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Void> proposeEvent(String leaderId) {
+    public ApiResponse<String> proposeEvent(String leaderId) {
         return null;
     }
 

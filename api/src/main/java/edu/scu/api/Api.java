@@ -21,7 +21,7 @@ public interface Api {
     public ApiResponse<Void> getEventsAsMember(String userId);
 
     // As leader
-    public ApiResponse<Void> proposeEvent(String leaderId);
+    public ApiResponse<String> proposeEvent(String leaderId);
     public ApiResponse<Void> addEventMember(String leaderId, String eventId, String memberEmail);
     public ApiResponse<Void> removeEventMember(String leaderId, String eventId, String memberEmail);
     public ApiResponse<Void> sendEventInvitation(String leaderId, String name, int durationInMin, boolean hasReminder, int reminderInMin, Text location, List<Timestamp> proposedTimestamps);
