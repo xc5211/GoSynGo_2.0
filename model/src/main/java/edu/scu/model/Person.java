@@ -17,9 +17,9 @@ public class Person {
     private List<Person> contacts;
 
     public Person() {
-        this.eventsAsLeader = new ArrayList<>();
-        this.eventsAsMemeber = new ArrayList<>();
-        this.contacts = new ArrayList<>();
+        //this.eventsAsLeader = new ArrayList<>();
+        //this.eventsAsMemeber = new ArrayList<>();
+        //this.contacts = new ArrayList<>();
     }
 
     public String getObjectId() {
@@ -130,6 +130,14 @@ public class Person {
 
     public void setGoogleCalendarImported(Boolean imported) {
         this.hasGoogleCalendarImported = imported;
+    }
+
+    public void setEventsAsLeader(List<Event> eventsAsLeader) {
+        this.eventsAsLeader = eventsAsLeader;
+    }
+
+    public void setEventsAsMemeber(List<Event> eventsAsMemeber) {
+        this.eventsAsMemeber = eventsAsMemeber;
     }
 
     public void setContacts(List<Person> contacts) {
