@@ -14,14 +14,12 @@ public class Person {
     private boolean hasGoogleCalendarImported;
     private List<Event> eventsAsLeader;
     private List<Event> eventsAsMemeber;
+    private List<Person> contacts;
 
-    public Person(String objectId, String email, String name, boolean hasGoogleCalendarImported) {
-        this.objectId = objectId;
-        this.email = email;
-        this.name = name;
-        this.hasGoogleCalendarImported = hasGoogleCalendarImported;
+    public Person() {
         this.eventsAsLeader = new ArrayList<>();
         this.eventsAsMemeber = new ArrayList<>();
+        this.contacts = new ArrayList<>();
     }
 
     public String getObjectId() {
@@ -48,10 +46,14 @@ public class Person {
         return this.hasGoogleCalendarImported;
     }
 
+    public List<Person> getContacts() {
+        return this.contacts;
+    }
+
     public List<Event> getLeaderEventsAsPending() {
         List<Event> pendingEvents = new ArrayList<>();
         for (Event event : this.getEventsAsLeader()) {
-            if (event.getStatus().equals(StatusEvent.Pending)) {
+            if (event.getStatus() == StatusEvent.Pending.getStatus()) {
                 pendingEvents.add(event);
             }
         }
@@ -61,7 +63,7 @@ public class Person {
     public List<Event> getLeaderEventsAsReady() {
         List<Event> readyEvents = new ArrayList<>();
         for (Event event : this.getEventsAsLeader()) {
-            if (event.getStatus().equals(StatusEvent.Ready)) {
+            if (event.getStatus() == StatusEvent.Ready.getStatus()) {
                 readyEvents.add(event);
             }
         }
@@ -71,7 +73,7 @@ public class Person {
     public List<Event> getLeaderEventsAsCancelled() {
         List<Event> declinedEvents = new ArrayList<>();
         for (Event event : this.getEventsAsLeader()) {
-            if (event.getStatus().equals(StatusEvent.Cancelled)) {
+            if (event.getStatus() == StatusEvent.Cancelled.getStatus()) {
                 declinedEvents.add(event);
             }
         }
@@ -81,7 +83,7 @@ public class Person {
     public List<Event> getLeaderEventsAsTentative() {
         List<Event> tentativeEvents = new ArrayList<>();
         for (Event event : this.getEventsAsLeader()) {
-            if (event.getStatus().equals(StatusEvent.Tentative)) {
+            if (event.getStatus() == StatusEvent.Tentative.getStatus()) {
                 tentativeEvents.add(event);
             }
         }
@@ -91,7 +93,7 @@ public class Person {
     public List<Event> getMemberEventsAsPending() {
         List<Event> pendingEvents = new ArrayList<>();
         for (Event event : this.getEventsAsMemeber()) {
-            if (event.getStatus().equals(StatusEvent.Pending)) {
+            if (event.getStatus() == StatusEvent.Pending.getStatus()) {
                 pendingEvents.add(event);
             }
         }
@@ -101,7 +103,7 @@ public class Person {
     public List<Event> getMemberEventsAsReady() {
         List<Event> readyEvents = new ArrayList<>();
         for (Event event : this.getEventsAsMemeber()) {
-            if (event.getStatus().equals(StatusEvent.Ready)) {
+            if (event.getStatus() == StatusEvent.Ready.getStatus()) {
                 readyEvents.add(event);
             }
         }
@@ -111,7 +113,7 @@ public class Person {
     public List<Event> getMemberEventsAsCancelled() {
         List<Event> declinedEvents = new ArrayList<>();
         for (Event event : this.getEventsAsMemeber()) {
-            if (event.getStatus().equals(StatusEvent.Cancelled)) {
+            if (event.getStatus() == StatusEvent.Cancelled.getStatus()) {
                 declinedEvents.add(event);
             }
         }
@@ -128,6 +130,21 @@ public class Person {
 
     public void setGoogleCalendarImported(Boolean imported) {
         this.hasGoogleCalendarImported = imported;
+    }
+
+    public void setContacts(List<Person> contacts) {
+        this.contacts = contacts;
+    }
+
+    public void addContact(Person contact) {
+        this.contacts.add(contact);
+    }
+
+    public boolean removeContact(Person person) {
+        if (!this.contacts.contains(person)) {
+            this.contacts.remove(this.contacts.indexOf(person));
+        }
+        return true;
     }
 
     public boolean addEventAsLeader(Event event) {

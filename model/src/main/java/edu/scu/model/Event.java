@@ -26,33 +26,15 @@ public class Event {
     private boolean hasReminder;
     private int reminderInMin;
     private Timestamp timestamp;
-    private StatusEvent status;
+    private int status;
     private Person leader;
     private List<Timestamp> proposedTimestamps;
     private Map<Person, EventMemberDetail> eventMembersMap;
 
-    public Event(String name, int durationInMin, boolean hasReminder, int reminderInMin, Person leader) {
-        this.name = name;
-        this.note = null;
-        this.location = null;
-        this.durationInMin = durationInMin;
-        this.hasReminder = hasReminder;
-        this.reminderInMin = reminderInMin;
-        this.timestamp = null;
-        this.status = StatusEvent.Pending;
-        this.leader = leader;
+    public Event() {
+        this.setStatus(StatusEvent.Tentative.getStatus());
         this.proposedTimestamps = new ArrayList<>();
         this.eventMembersMap = new HashMap<>();
-    }
-
-    public Event(String name, Text note, int durationInMin, boolean hasReminder, int reminderInMin, Person leader) {
-        this(name, durationInMin, hasReminder, reminderInMin, leader);
-        this.note = note;
-    }
-
-    public Event(String name, Text note, Text location, int durationInMin, boolean hasReminder, int reminderInMin, Person leader) {
-        this(name, note, durationInMin, hasReminder, reminderInMin, leader);
-        this.location = location;
     }
 
     public String getObjectId() {
@@ -87,7 +69,7 @@ public class Event {
         return this.timestamp;
     }
 
-    public StatusEvent getStatus() {
+    public int getStatus() {
         return this.status;
     }
 
@@ -133,9 +115,9 @@ public class Event {
         return this.eventMembersMap.get(person);
     }
 
-    public StatusMember getMemberStatus(Person member) {
+    public int getMemberStatus(Person member) {
         if (!this.hasMember(member)) {
-            return null;
+            return -1;
         }
         return this.eventMembersMap.get(member).getStatus();
     }
@@ -171,7 +153,7 @@ public class Event {
     public List<Person> getMembersAsPending() {
         List<Person> pendingMembers = new ArrayList<>();
         for (Map.Entry<Person, EventMemberDetail> memberInfo : this.eventMembersMap.entrySet()) {
-            if (memberInfo.getValue().getStatus().equals(StatusMember.Pending)) {
+            if (memberInfo.getValue().getStatus() == StatusMember.Pending.getStatus()) {
                 pendingMembers.add(memberInfo.getKey());
             }
         }
@@ -181,7 +163,7 @@ public class Event {
     public List<Person> getMembersAsAccepted() {
         List<Person> readyMembers = new ArrayList<>();
         for (Map.Entry<Person, EventMemberDetail> memberInfo : this.eventMembersMap.entrySet()) {
-            if (memberInfo.getValue().getStatus().equals(StatusMember.Accept)) {
+            if (memberInfo.getValue().getStatus() == StatusMember.Accept.getStatus()) {
                 readyMembers.add(memberInfo.getKey());
             }
         }
@@ -191,7 +173,7 @@ public class Event {
     public List<Person> getMembersAsDeclined() {
         List<Person> declinedMembers = new ArrayList<>();
         for (Map.Entry<Person, EventMemberDetail> memberInfo : this.eventMembersMap.entrySet()) {
-            if (memberInfo.getValue().getStatus().equals(StatusMember.Declined)) {
+            if (memberInfo.getValue().getStatus() == StatusMember.Declined.getStatus()) {
                 declinedMembers.add(memberInfo.getKey());
             }
         }
@@ -200,6 +182,10 @@ public class Event {
 
     public void setObjectId(String objectId) {
         this.objectId = objectId;
+    }
+
+    public void setLeader(Person person) {
+        this.leader = person;
     }
 
     public void setName(String name) {
@@ -241,7 +227,7 @@ public class Event {
         this.timestamp = timestamp;
     }
 
-    public void setStatus(StatusEvent status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
