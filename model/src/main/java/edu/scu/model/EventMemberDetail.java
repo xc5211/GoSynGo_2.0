@@ -1,100 +1,146 @@
 package edu.scu.model;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
-import edu.scu.util.TimestampComparator;
+public class EventMemberDetail
+{
+    private String ownerId;
+    private Integer minsToArrive;
+    private Date created;
+    private Date updated;
+    private String memberId;
+    private Boolean isCheckedIn;
+    private Integer statusMember;
+    private String objectId;
+    private List<MemberSelectedTimestamp> selectedTimestamps;
+    private List<MemberProposedTimestamp> proposedTimestamps;
+//    private GeoPoint location;
 
-/**
- * Created by chuanxu on 4/13/16.
- */
-public class EventMemberDetail {
-
-    private int status;    // set default to 0
-    private boolean isCheckedIn;    // set default to false
-    private int estimateInMin;  // set default to -1
-    private List<Timestamp> proposedTimestamps;
-    private List<Timestamp> selectedTimestamps;
-
-    public EventMemberDetail() {
-        this.status = StatusMember.Pending.getStatus();
-        this.proposedTimestamps = new ArrayList<>();
-        this.selectedTimestamps = new ArrayList<>();
+    public String getOwnerId()
+    {
+        return ownerId;
     }
 
-    public int getStatus() {
-        return this.status;
+    public Integer getMinsToArrive()
+    {
+        return minsToArrive;
     }
 
-    public boolean isCheckedIn() {
-        return this.isCheckedIn;
+    public void setMinsToArrive( Integer minsToArrive )
+    {
+        this.minsToArrive = minsToArrive;
     }
 
-    public int getEstimateInMin() {
-        return this.estimateInMin;
+    public Date getCreated()
+    {
+        return created;
     }
 
-    public List<Timestamp> getProposedTimestamps() {
-        return this.proposedTimestamps;
+    public Date getUpdated()
+    {
+        return updated;
     }
 
-    public List<Timestamp> getSelectedTimestamps() {
-        return this.selectedTimestamps;
+    public String getMemberId()
+    {
+        return memberId;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setMemberId( String memberId )
+    {
+        this.memberId = memberId;
     }
 
-    public void setCheckedIn(boolean isCheckedIn) {
+    public Boolean getIsCheckedIn()
+    {
+        return isCheckedIn;
+    }
+
+    public void setIsCheckedIn( Boolean isCheckedIn )
+    {
         this.isCheckedIn = isCheckedIn;
     }
 
-    public void setEstimateInMin(int estimate) {
-        this.estimateInMin = estimate;
+    public Integer getStatusMember()
+    {
+        return statusMember;
     }
 
-    public boolean containsProposedTimestamp(Timestamp timestamp) {
-        return this.proposedTimestamps.contains(timestamp);
+    public void setStatusMember( Integer statusMember )
+    {
+        this.statusMember = statusMember;
     }
 
-    public boolean containsSelectedTimestamp(Timestamp timestamp) {
-        return this.selectedTimestamps.contains(timestamp);
+    public String getObjectId()
+    {
+        return objectId;
     }
 
-    public boolean addProposedTimestamp(Timestamp timestamp) {
-        if (!this.containsProposedTimestamp(timestamp)) {
-            boolean success = this.proposedTimestamps.add(timestamp);
-            if (!success) {
-                return false;
-            }
-            Collections.sort(this.proposedTimestamps, new TimestampComparator());
-        }
-        return true;
+    public List<MemberSelectedTimestamp> getSelectedTimestamps()
+    {
+        return selectedTimestamps;
     }
 
-    public boolean addSelectedTimestamp(Timestamp timestamp) {
-        if (!this.containsSelectedTimestamp(timestamp)) {
-            this.selectedTimestamps.add(timestamp);
-            Collections.sort(this.selectedTimestamps, new TimestampComparator());
-        }
-        return true;
+    public void setSelectedTimestamps( List<MemberSelectedTimestamp> selectedTimestamps )
+    {
+        this.selectedTimestamps = selectedTimestamps;
     }
 
-    public boolean removeProposedTimestamp(Timestamp timestamp) {
-        if (this.containsProposedTimestamp(timestamp)) {
-            return this.proposedTimestamps.remove(timestamp);
-        }
-        return true;
+    public List<MemberProposedTimestamp> getProposedTimestamps()
+    {
+        return proposedTimestamps;
     }
 
-    public boolean removeSelectedTimestamp(Timestamp timestamp) {
-        if (this.containsSelectedTimestamp(timestamp)) {
-            return this.selectedTimestamps.remove(timestamp);
-        }
-        return true;
+    public void setProposedTimestamps( List<MemberProposedTimestamp> proposedTimestamps )
+    {
+        this.proposedTimestamps = proposedTimestamps;
     }
+
+//    public GeoPoint getLocation()
+//    {
+//        return location;
+//    }
+//
+//    public void setLocation( GeoPoint location )
+//    {
+//        this.location = location;
+//    }
+//
+//
+//    public EventMemberDetail save()
+//    {
+//        return Backendless.Data.of( EventMemberDetail.class ).save( this );
+//    }
+//
+//    public Long remove()
+//    {
+//        return Backendless.Data.of( EventMemberDetail.class ).remove( this );
+//    }
+//
+//    public static EventMemberDetail findById( String id )
+//    {
+//        return Backendless.Data.of( EventMemberDetail.class ).findById( id );
+//    }
+//
+//    public static EventMemberDetail findFirst()
+//    {
+//        return Backendless.Data.of( EventMemberDetail.class ).findFirst();
+//    }
+//
+//    public static EventMemberDetail findLast()
+//    {
+//        return Backendless.Data.of( EventMemberDetail.class ).findLast();
+//    }
+//
+//    public static void findLastAsync( AsyncCallback<EventMemberDetail> callback )
+//    {
+//        Backendless.Data.of( EventMemberDetail.class ).findLast( callback );
+//    }
+//
+//    public static BackendlessCollection<EventMemberDetail> find( BackendlessDataQuery query )
+//    {
+//        return Backendless.Data.of( EventMemberDetail.class ).find( query );
+//    }
 
 }

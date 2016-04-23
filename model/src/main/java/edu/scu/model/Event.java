@@ -1,273 +1,162 @@
 package edu.scu.model;
 
-import org.w3c.dom.Text;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import edu.scu.util.TimestampComparator;
-
-/**
- * Created by chuanxu on 4/13/16.
- */
 public class Event {
 
+    private Integer reminderInMin;
+    private Integer statusEvent;
+    private String title;
+    private String ownerId;
     private String objectId;
-    private String name;
-    private Text note;
-    private Text location;
-    private int durationInMin;
-    private boolean hasReminder;
-    private int reminderInMin;
-    private Timestamp timestamp;
-    private int status;
+    private Date updated;
+    private String note;
+    private Date created;
+    private Boolean hasReminder;
+    private Integer durationInMin;
+    private Date timestamp;
+    private String location;
+    private List<EventMemberDetail> eventMemberDetail;
+    private List<LeaderProposedTimestamp> proposedTimestamps;
     private Person leader;
-    private List<Timestamp> proposedTimestamps;
-    private Map<Person, EventMemberDetail> eventMembersMap;
+//    private GeoPoint locationGeo;
 
-    public Event() {
-        this.setStatus(StatusEvent.Tentative.getStatus());
-        this.proposedTimestamps = new ArrayList<>();
-        this.eventMembersMap = new HashMap<>();
+    public Integer getReminderInMin() {
+        return reminderInMin;
     }
 
-    public String getObjectId() {
-        return this.objectId;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public Text getNote() {
-        return this.note;
-    }
-
-    public Text getLocation() {
-        return this.location;
-    }
-
-    public int getDurationInMin() {
-        return this.durationInMin;
-    }
-
-    public boolean hasReminder() {
-        return this.hasReminder;
-    }
-
-    public int getReminderInMin() {
-        return this.reminderInMin;
-    }
-
-    public Timestamp getTimestamp() {
-        return this.timestamp;
-    }
-
-    public int getStatus() {
-        return this.status;
-    }
-
-    public List<Timestamp> getProposedTimestamps() {
-        return this.proposedTimestamps;
-    }
-
-    public boolean containsProposedTimestamp(Timestamp timestamp) {
-        return this.proposedTimestamps.contains(timestamp);
-    }
-
-    public boolean removeProposedTime(Timestamp timestamp) {
-        if (this.containsProposedTimestamp(timestamp)) {
-            return this.proposedTimestamps.remove(timestamp);
-        }
-        return true;
-    }
-
-    public Person getLeader() {
-        return this.leader;
-    }
-
-    public Set<Person> getMembers() {
-        return this.eventMembersMap.keySet();
-    }
-
-    public Collection<EventMemberDetail> getEventMemberDetails() {
-        return this.eventMembersMap.values();
-    }
-
-    public boolean isLeader(Person person) {
-        return this.leader == person;
-    }
-
-    public boolean hasMember(Person person) {
-        return this.eventMembersMap.containsKey(person);
-    }
-
-    public EventMemberDetail getEventMemberDetail(Person person) {
-        if (!this.hasMember(person)) {
-            return null;
-        }
-        return this.eventMembersMap.get(person);
-    }
-
-    public int getMemberStatus(Person member) {
-        if (!this.hasMember(member)) {
-            return -1;
-        }
-        return this.eventMembersMap.get(member).getStatus();
-    }
-
-    public boolean isMemberCheckedIn(Person member) {
-        if (!this.hasMember(member)) {
-            return false;
-        }
-        return this.eventMembersMap.get(member).isCheckedIn();
-    }
-
-    public int getMemberEstimateInMin(Person member) {
-        if (!this.hasMember(member)) {
-            return -1;
-        }
-        return this.eventMembersMap.get(member).getEstimateInMin();
-    }
-
-    public List<Timestamp> getMemberProposedTimestamps(Person member) {
-        if (!this.hasMember(member)) {
-            return null;
-        }
-        return this.eventMembersMap.get(member).getProposedTimestamps();
-    }
-
-    public List<Timestamp> getMemberSelectedTimestamps(Person member) {
-        if (!this.hasMember(member)) {
-            return null;
-        }
-        return this.eventMembersMap.get(member).getSelectedTimestamps();
-    }
-
-    public List<Person> getMembersAsPending() {
-        List<Person> pendingMembers = new ArrayList<>();
-        for (Map.Entry<Person, EventMemberDetail> memberInfo : this.eventMembersMap.entrySet()) {
-            if (memberInfo.getValue().getStatus() == StatusMember.Pending.getStatus()) {
-                pendingMembers.add(memberInfo.getKey());
-            }
-        }
-        return pendingMembers;
-    }
-
-    public List<Person> getMembersAsAccepted() {
-        List<Person> readyMembers = new ArrayList<>();
-        for (Map.Entry<Person, EventMemberDetail> memberInfo : this.eventMembersMap.entrySet()) {
-            if (memberInfo.getValue().getStatus() == StatusMember.Accept.getStatus()) {
-                readyMembers.add(memberInfo.getKey());
-            }
-        }
-        return readyMembers;
-    }
-
-    public List<Person> getMembersAsDeclined() {
-        List<Person> declinedMembers = new ArrayList<>();
-        for (Map.Entry<Person, EventMemberDetail> memberInfo : this.eventMembersMap.entrySet()) {
-            if (memberInfo.getValue().getStatus() == StatusMember.Declined.getStatus()) {
-                declinedMembers.add(memberInfo.getKey());
-            }
-        }
-        return declinedMembers;
-    }
-
-    public void setObjectId(String objectId) {
-        this.objectId = objectId;
-    }
-
-    public void setLeader(Person person) {
-        this.leader = person;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setNote(Text note) {
-        this.note = note;
-    }
-
-    public void setLocation(Text location) {
-        this.location = location;
-    }
-
-    public void setDurationInMin(int durationInMin) {
-        this.durationInMin = durationInMin;
-    }
-
-    public boolean addProposedTime(Timestamp timestamp) {
-        if (!this.containsProposedTimestamp(timestamp)) {
-            boolean success = this.proposedTimestamps.add(timestamp);
-            if (!success) {
-                return false;
-            }
-            Collections.sort(this.proposedTimestamps, new TimestampComparator());
-        }
-        return true;
-    }
-
-    public void setHasReminder(boolean hasReminder) {
-        this.hasReminder = hasReminder;
-    }
-
-    public void setReminderInMin(int reminderInMin) {
+    public void setReminderInMin(Integer reminderInMin) {
         this.reminderInMin = reminderInMin;
     }
 
-    public void setEventTimestamp(Timestamp timestamp) {
+    public Integer getStatusEvent() {
+        return statusEvent;
+    }
+
+    public void setStatusEvent(Integer statusEvent) {
+        this.statusEvent = statusEvent;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public java.util.Date getUpdated() {
+        return updated;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public Boolean getHasReminder() {
+        return hasReminder;
+    }
+
+    public void setHasReminder(Boolean hasReminder) {
+        this.hasReminder = hasReminder;
+    }
+
+    public Integer getDurationInMin() {
+        return durationInMin;
+    }
+
+    public void setDurationInMin(Integer durationInMin) {
+        this.durationInMin = durationInMin;
+    }
+
+    public java.util.Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(java.util.Date timestamp) {
         this.timestamp = timestamp;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public String getLocation() {
+        return location;
     }
 
-    /**
-     * This method is used for switching the leader of an event.
-     * TODO: Later
-     * @param leader
-     * @return
-     */
-    public boolean switchLeader(Person leader) {
-        if (!this.getMembers().contains(leader) || !leader.getEventsAsMemeber().contains(this)) {
-            return false;
-        }
-
-        // update Person obj
-        boolean oldLeaderUpdate =  this.getLeader().getEventsAsLeader().remove(this) &&
-                this.getLeader().getEventsAsMemeber().add(this);
-        boolean newLeaderUpdate = leader.getEventsAsLeader().add(this) &&
-                leader.getEventsAsMemeber().remove(this);
-
-        // update "this" event obj
-
-
-        return oldLeaderUpdate && newLeaderUpdate;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public boolean addEventMember(Person member) {
-        if (!this.eventMembersMap.containsKey(member)) {
-            EventMemberDetail eventMemberDetail = new EventMemberDetail();
-            this.eventMembersMap.put(member, eventMemberDetail);
-        }
-        return true;
+    public List<EventMemberDetail> getEventMemberDetail() {
+        return eventMemberDetail;
     }
 
-    public boolean removeEventMember(Person person) {
-        if (this.hasMember(person)) {
-            this.eventMembersMap.remove(person);
-            return person.removeEventAsMember(this);
-        }
-        return true;
+    public void setEventMemberDetail(List<EventMemberDetail> eventMemberDetail) {
+        this.eventMemberDetail = eventMemberDetail;
     }
+
+    public List<LeaderProposedTimestamp> getProposedTimestamps() {
+        return proposedTimestamps;
+    }
+
+    public void setProposedTimestamps(List<LeaderProposedTimestamp> proposedTimestamps) {
+        this.proposedTimestamps = proposedTimestamps;
+    }
+
+    public Person getLeader() {
+        return leader;
+    }
+
+    public void setLeader(Person leader) {
+        this.leader = leader;
+    }
+
+//    public GeoPoint getLocationGeo() {
+//        return locationGeo;
+//    }
+//
+//    public /*void setLocationGeo(GeoPoint locationGeo) {
+//        this.locationGeo = locationGeo;
+//    }
+//
+//
+//    public Event save() {
+//        return Backendless.Data.of(Event.class).save(this);
+//    }
+//
+//    public Long remove() {
+//        return Backendless.Data.of(Event.class).remove(this);
+//    }
+//
+//    public static Event findById(String id) {
+//        return Backendless.Data.of(Event.class).findById(id);
+//    }
+//
+//    public static Event findFirst() {
+//        return Backendless.Data.of(Event.class).findFirst();
+//    }
+//
+//    public static Event findLast() {
+//        return Backendless.Data.of(Event.class).findLast();
+//    }
+//
+//    public static BackendlessCollection<Event> find(BackendlessDataQuery query) {
+//        return Backendless.Data.of(Event.class).find(query);
+//    }*/
 
 }
