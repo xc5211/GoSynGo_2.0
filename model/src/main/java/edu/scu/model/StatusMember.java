@@ -12,7 +12,7 @@ public enum StatusMember {
         this.status = status;
     }
 
-    int getStatus() {
+    public int getStatus() {
         return status;
     }
 }

@@ -12,9 +12,9 @@ public class Person
     private java.util.Date updated;
     private String ownerId;
     private Boolean isGoogleCalendarImported;
-    private java.util.List<Event> eventsAsLeader;
-    private java.util.List<Event> eventsAsMember;
-    private java.util.List<Person> contacts;
+    private List<Event> eventsAsLeader;
+    private List<Event> eventsAsMember;
+    private List<Person> contacts;
     private String userId;
 
     public String getEmail()
@@ -87,6 +87,10 @@ public class Person
         this.eventsAsMember = eventsAsMember;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
     public List<Person> getContacts()
     {
         return contacts;
@@ -95,6 +99,10 @@ public class Person
     public void setContacts( List<Person> contacts )
     {
         this.contacts = contacts;
+    }
+
+    public void setUserId( String userId ) {
+        this.userId = userId;
     }
 
 //    public BackendlessUser getUser()

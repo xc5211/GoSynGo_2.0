@@ -9,7 +9,7 @@ public class EventMemberDetail
     private Integer minsToArrive;
     private Date created;
     private Date updated;
-    private String memberId;
+    private Person member;
     private Boolean isCheckedIn;
     private Integer statusMember;
     private String objectId;
@@ -42,14 +42,14 @@ public class EventMemberDetail
         return updated;
     }
 
-    public String getMemberId()
+    public Person getMember()
     {
-        return memberId;
+        return member;
     }
 
-    public void setMemberId( String memberId )
+    public void setMember( Person memberId )
     {
-        this.memberId = memberId;
+        this.member = member;
     }
 
     public Boolean getIsCheckedIn()
