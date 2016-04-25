@@ -117,7 +117,6 @@ public class ApiImpl implements Api {
 
         // TODO[later]: Remove next line after testing
         String leaderObjectId = idChuan;
-        String temp = "Chuan 1 Event";
         StringBuilder whereClause = new StringBuilder();
         whereClause.append( "leader" );
         whereClause.append(".objectId = '").append(leaderObjectId).append("'");
