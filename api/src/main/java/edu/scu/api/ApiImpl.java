@@ -6,25 +6,20 @@ import com.backendless.BackendlessUser;
 import com.backendless.exceptions.BackendlessException;
 import com.backendless.persistence.BackendlessDataQuery;
 import com.backendless.persistence.QueryOptions;
-import com.backendless.persistence.local.UserIdStorageFactory;
-import com.backendless.persistence.local.UserTokenStorageFactory;
 
 import org.w3c.dom.Text;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import edu.scu.model.Event;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
-import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
 import edu.scu.model.StatusEvent;
 import edu.scu.model.StatusMember;
@@ -193,8 +188,27 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Void> getAllEventMembers(String leaderId, String eventId) {
-        return null;
+    public ApiResponse<List<Person>> getAllEventMembers(String eventId) {
+
+        // TODO[later]: Remove next line after testing
+        String  eventObjectId = "260378B7-0725-107A-FF4A-F1EEA4768400";
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append("eventsAsMember");
+        whereClause.append( ".objectId = '" ).append(eventObjectId).append("'");
+
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause( whereClause.toString() );
+
+        QueryOptions queryOptions = new QueryOptions();
+        BackendlessCollection<Person> result = null;
+        try {
+            result = Backendless.Data.of( Person.class ).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        List<Person> eventsAsMember = result.getData();
+        return new ApiResponse<List<Person>>(SUCCESS_EVENT, "", eventsAsMember);
     }
 
     @Override

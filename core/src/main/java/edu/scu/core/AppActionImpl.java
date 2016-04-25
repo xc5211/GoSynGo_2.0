@@ -14,6 +14,7 @@ import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
 import edu.scu.api.ApiResponse;
 import edu.scu.model.Event;
+import edu.scu.model.Person;
 
 /**
  * Created by chuanxu on 4/14/16.
@@ -154,7 +155,7 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void getMonthlyScheduledDates(ActionCallbackListener<List<Date>> actionCallbackListener) {
+    public void getMonthlyScheduledDates(final ActionCallbackListener<List<Date>> actionCallbackListener) {
 
     }
 
@@ -183,8 +184,33 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void addEventMember(String leaderId, String eventId, String memberEmail, ActionCallbackListener<String> listener) {
+    public void addEventMember(final String leaderId, final String eventId, final String memberEmail, final ActionCallbackListener<String> listener) {
 
+    }
+
+    @Override
+    public void getAllEventMembers(final String eventId, final ActionCallbackListener<List<Person>> listener) {
+        AsyncTask<Void, Void, ApiResponse<List<Person>>> asyncTask = new AsyncTask<Void, Void, ApiResponse<List<Person>>>() {
+
+            @Override
+            protected ApiResponse<List<Person>> doInBackground(Void... params) {
+                // TODO: Fix argument in the next line
+                return api.getAllEventMembers("");
+            }
+
+            @Override
+            protected void onPostExecute(ApiResponse<List<Person>> response) {
+                if (listener != null && response != null) {
+                    if (response.isSuccess()) {
+                        listener.onSuccess(response.getObj());
+                    } else {
+                        listener.onFailure(response.getMsg());
+                    }
+                }
+            }
+
+        };
+        asyncTask.execute();
     }
 
     public void getEventsAsLeader(final ActionCallbackListener<List<Event>> listener) {

@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import edu.scu.model.Event;
+import edu.scu.model.Person;
 
 /**
  * Created by chuanxu on 4/13/16.
@@ -52,7 +53,7 @@ public interface Api {
     //List<T>:evenMemberStatus, List<E>:estimateList
     public ApiResponse<Void> getAllEventMembersStatusAndEstimate(String leaderId, String eventId);
     //List<T>: eventMemberList
-    public ApiResponse<Void> getAllEventMembers(String leaderId, String eventId);
+    public ApiResponse<List<Person>> getAllEventMembers(String eventId);
 
     // As member
     //Boolean:True/False
