@@ -3,6 +3,8 @@ package edu.scu.core;
 import java.util.Date;
 import java.util.List;
 
+import edu.scu.model.Event;
+
 /**
  * Created by chuanxu on 4/14/16.
  */
@@ -14,6 +16,8 @@ public interface AppAction {
     public void login(String userEmail, String password, boolean stayLoggedIn, ActionCallbackListener<String> listener);
     public void logout(ActionCallbackListener<Void> listener);
     public void getMonthlyScheduledDates(ActionCallbackListener<List<Date>> listener);
+    public void getEventsAsLeader(ActionCallbackListener<List<Event>> listener);
+    public void getEventsAsMember(ActionCallbackListener<List<Event>> listener);
 
 
     // As leader

@@ -13,6 +13,7 @@ import java.util.List;
 import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
 import edu.scu.api.ApiResponse;
+import edu.scu.model.Event;
 
 /**
  * Created by chuanxu on 4/14/16.
@@ -30,19 +31,19 @@ public class AppActionImpl implements AppAction {
     @Override
     public void register(final String userEmail, final String password, final String name, final ActionCallbackListener<String> listener) {
 
-        // check userEmail
-        if (TextUtils.isEmpty(userEmail)) {
-            if (listener != null) {
-                listener.onFailure("Email is empty");
-            }
-        }
-
-        // check password
-        if (TextUtils.isEmpty(password)) {
-            if (listener != null) {
-                listener.onFailure("Password is empty");
-            }
-        }
+//        // check userEmail
+//        if (TextUtils.isEmpty(userEmail)) {
+//            if (listener != null) {
+//                listener.onFailure("Email is empty");
+//            }
+//        }
+//
+//        // check password
+//        if (TextUtils.isEmpty(password)) {
+//            if (listener != null) {
+//                listener.onFailure("Password is empty");
+//            }
+//        }
 
         // TODO: check name
 
@@ -182,8 +183,57 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void addEventMember(String leaderId, String eventId, String memberEmail,ActionCallbackListener<String> listener) {
+    public void addEventMember(String leaderId, String eventId, String memberEmail, ActionCallbackListener<String> listener) {
 
+    }
+
+    public void getEventsAsLeader(final ActionCallbackListener<List<Event>> listener) {
+        AsyncTask<Void, Void, ApiResponse<List<Event>>> asyncTask = new AsyncTask<Void, Void, ApiResponse<List<Event>>>() {
+
+            @Override
+            protected ApiResponse<List<Event>> doInBackground(Void... params) {
+                // TODO: Fix argument in the next line
+                return api.getEventsAsLeader("");
+            }
+
+            @Override
+            protected void onPostExecute(ApiResponse<List<Event>> response) {
+                if (listener != null && response != null) {
+                    if (response.isSuccess()) {
+                        listener.onSuccess(response.getObj());
+                    } else {
+                        listener.onFailure(response.getMsg());
+                    }
+                }
+            }
+
+        };
+        asyncTask.execute();
+    }
+
+    @Override
+    public void getEventsAsMember(final ActionCallbackListener<List<Event>> listener) {
+        AsyncTask<Void, Void, ApiResponse<List<Event>>> asyncTask = new AsyncTask<Void, Void, ApiResponse<List<Event>>>() {
+
+            @Override
+            protected ApiResponse<List<Event>> doInBackground(Void... params) {
+                // TODO: Fix argument in the next line
+                return api.getEventsAsMember("");
+            }
+
+            @Override
+            protected void onPostExecute(ApiResponse<List<Event>> response) {
+                if (listener != null && response != null) {
+                    if (response.isSuccess()) {
+                        listener.onSuccess(response.getObj());
+                    } else {
+                        listener.onFailure(response.getMsg());
+                    }
+                }
+            }
+
+        };
+        asyncTask.execute();
     }
 
 }
