@@ -24,13 +24,16 @@ public class AppActionImpl implements AppAction {
     private Context context;
     private Api api;
 
+    private static String hostUserId;
+    private static Person hostPerson;
+
     public AppActionImpl (Context context) {
         this.context = context;
         this.api = new ApiImpl();
     }
 
     @Override
-    public void register(final String userEmail, final String password, final String name, final ActionCallbackListener<String> listener) {
+    public void register(final String userEmail, final String password, final String name, final ActionCallbackListener<Person> listener) {
 
 //        // check userEmail
 //        if (TextUtils.isEmpty(userEmail)) {
@@ -51,15 +54,15 @@ public class AppActionImpl implements AppAction {
         // TODO: validate parameters...
 
 
-        AsyncTask<Void, Void, ApiResponse<String>> asyncTask = new AsyncTask<Void, Void, ApiResponse<String>>() {
+        AsyncTask<Void, Void, ApiResponse<Person>> asyncTask = new AsyncTask<Void, Void, ApiResponse<Person>>() {
 
             @Override
-            protected ApiResponse<String> doInBackground(Void... params) {
+            protected ApiResponse<Person> doInBackground(Void... params) {
                 return api.register(userEmail, password, name);
             }
 
             @Override
-            protected void onPostExecute(ApiResponse<String> response) {
+            protected void onPostExecute(ApiResponse<Person> response) {
                 if (listener != null && response != null) {
                     if (response.isSuccess()) {
                         listener.onSuccess(response.getObj());
@@ -79,7 +82,7 @@ public class AppActionImpl implements AppAction {
         // Check local userToken. If available, it means the user has already logged in.
         String userToken = UserTokenStorageFactory.instance().getStorage().get();
         if(userToken != null && !userToken.equals("")) {
-            String currentUserObjectId = UserIdStorageFactory.instance().getStorage().get();
+            hostUserId = UserIdStorageFactory.instance().getStorage().get();
             listener.onSuccess(null);
         } else {
             listener.onFailure(null);
@@ -160,16 +163,16 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void proposeEvent(final String leaderId, final ActionCallbackListener<String> listener) {
-        AsyncTask<Void, Void, ApiResponse<String>> asyncTask = new AsyncTask<Void, Void, ApiResponse<String>>() {
+    public void proposeEvent(final ActionCallbackListener<Event> listener) {
+        AsyncTask<Void, Void, ApiResponse<Event>> asyncTask = new AsyncTask<Void, Void, ApiResponse<Event>>() {
 
             @Override
-            protected ApiResponse<String> doInBackground(Void... params) {
-                return api.proposeEvent(leaderId);
+            protected ApiResponse<Event> doInBackground(Void... params) {
+                return api.proposeEvent(hostUserId);
             }
 
             @Override
-            protected void onPostExecute(ApiResponse<String> response) {
+            protected void onPostExecute(ApiResponse<Event> response) {
                 if (listener != null && response != null) {
                     if (response.isSuccess()) {
                         listener.onSuccess(response.getObj());
@@ -184,7 +187,7 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void addEventMember(final String leaderId, final String eventId, final String memberEmail, final ActionCallbackListener<String> listener) {
+    public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener) {
 
     }
 

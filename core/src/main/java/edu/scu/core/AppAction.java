@@ -11,8 +11,10 @@ import edu.scu.model.Person;
  */
 public interface AppAction {
 
-    // As user
-    public void register(final String userEmail, final String password, final String name, final ActionCallbackListener<String> listener);
+    /**
+     * As user
+     */
+    public void register(final String userEmail, final String password, final String name, final ActionCallbackListener<Person> listener);
     public void validateLogin(final ActionCallbackListener<Void> listener);
     public void login(final String userEmail, final String password, final boolean stayLoggedIn, final ActionCallbackListener<String> listener);
     public void logout(final ActionCallbackListener<Void> listener);
@@ -20,14 +22,20 @@ public interface AppAction {
     public void getEventsAsLeader(final ActionCallbackListener<List<Event>> listener);
     public void getEventsAsMember(final ActionCallbackListener<List<Event>> listener);
 
-
-    // As leader
-    public void proposeEvent(String leaderId, ActionCallbackListener<String> listener);
-    public void addEventMember(final String leaderId, final String eventId, final String memberEmail, final ActionCallbackListener<String> listener);
+    /**
+     * As leader
+     */
+    public void proposeEvent(ActionCallbackListener<Event> listener);
+    public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener);
     public void getAllEventMembers(final String eventId, final ActionCallbackListener<List<Person>> listener);
 
-    // As member
+    /**
+     * As member
+     */
 
-    // Event - Shared to both leader and member
+
+    /**
+     * Event - Shared to both leader and member
+     */
 
 }
