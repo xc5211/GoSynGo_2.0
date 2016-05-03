@@ -17,10 +17,9 @@ public class Event {
     private Integer durationInMin;
     private Date timestamp;
     private String location;
+    private EventLeaderDetail eventLeaderDetail;
     private List<EventMemberDetail> eventMemberDetail;
     private List<LeaderProposedTimestamp> proposedTimestamps;
-    private Person leader;
-    private String leaderObjectId;
 //    private GeoPoint locationGeo;
 
     public Integer getReminderInMin() {
@@ -119,20 +118,12 @@ public class Event {
         this.proposedTimestamps = proposedTimestamps;
     }
 
-    public Person getLeader() {
-        return leader;
+    public EventLeaderDetail getEventLeaderDetail() {
+        return eventLeaderDetail;
     }
 
-    public String getLeaderObjectId() {
-        return leaderObjectId;
-    }
-
-    public void setLeader(Person leader) {
-        this.leader = leader;
-    }
-
-    public void setLeaderObjectId(String leaderObjectId) {
-        this.leaderObjectId = leaderObjectId;
+    public void setEventLeaderDetail(EventLeaderDetail eventLeaderDetail) {
+        this.eventLeaderDetail = eventLeaderDetail;
     }
 
 //    public GeoPoint getLocationGeo() {

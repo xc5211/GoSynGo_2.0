@@ -49,7 +49,7 @@ public interface Api {
 
     public ApiResponse<Event> addEventMember(String leaderId, String eventId, String memberEmail);
 
-    public ApiResponse<Event> removeEventMember(String leaderId, String eventId, String memberEmail);
+    public ApiResponse<Event> removeEventMember(String leaderId, String eventId, String memberId);
 
     public ApiResponse<Event> sendEventInvitation(String leaderId, String title, int durationInMin, boolean hasReminder, int reminderInMin, Text location, List<Timestamp> proposedTimestamps);
 

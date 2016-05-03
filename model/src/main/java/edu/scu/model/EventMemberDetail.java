@@ -10,7 +10,6 @@ public class EventMemberDetail
     private Date created;
     private Date updated;
     private Person member;
-    private String memberObjectId;
     private Boolean isCheckedIn;
     private Integer statusMember;
     private String objectId;
@@ -81,14 +80,6 @@ public class EventMemberDetail
     public List<MemberSelectedTimestamp> getSelectedTimestamps()
     {
         return selectedTimestamps;
-    }
-
-    public String getMemberObjectId() {
-        return memberObjectId;
-    }
-
-    public void setMemberObjectId(String memberObjectId) {
-        this.memberObjectId = memberObjectId;
     }
 
     public void setSelectedTimestamps( List<MemberSelectedTimestamp> selectedTimestamps )

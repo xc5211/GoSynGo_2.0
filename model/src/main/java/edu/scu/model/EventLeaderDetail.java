@@ -10,9 +10,7 @@ public class EventLeaderDetail
     private Date created;
     private Date updated;
     private Person leader;
-    private String leaderObjectId;
     private Boolean isCheckedIn;
-    private Integer statusMember;
     private String objectId;
     private List<LeaderProposedTimestamp> proposedTimestamps;
 //    private GeoPoint location;
@@ -62,27 +60,9 @@ public class EventLeaderDetail
         this.isCheckedIn = isCheckedIn;
     }
 
-    public Integer getStatusLeader()
-    {
-        return statusMember;
-    }
-
-    public void setStatusLeader( Integer statusLeader )
-    {
-        this.statusMember = statusLeader;
-    }
-
     public String getObjectId()
     {
         return objectId;
-    }
-
-    public String getLeaderObjectId() {
-        return leaderObjectId;
-    }
-
-    public void setLeaderObjectId(String leaderObjectId) {
-        this.leaderObjectId = leaderObjectId;
     }
 
     public List<LeaderProposedTimestamp> getProposedTimestamps()

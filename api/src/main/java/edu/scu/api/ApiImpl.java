@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.scu.model.Event;
+import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
@@ -166,7 +167,8 @@ public class ApiImpl implements Api {
         // TODO[later]: Remove next line after testing
         personId = idPersonChuan;
         StringBuilder whereClause = new StringBuilder();
-        whereClause.append("leader");
+        whereClause.append("eventLeaderDetail");
+        whereClause.append(".leader");
         whereClause.append(".objectId = '").append(personId).append("'");
 
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
@@ -218,10 +220,13 @@ public class ApiImpl implements Api {
         }
 
         // Propose new event
+        EventLeaderDetail eventLeaderDetail = new EventLeaderDetail();
+        eventLeaderDetail.setLeader(leader);
+        eventLeaderDetail.setIsCheckedIn(false);
         Event event = new Event();
+
         event.setStatusEvent(StatusEvent.Tentative.getStatus());
-        event.setLeader(leader);
-        //event.setLeaderObjectId(leader.getObjectId());
+        event.setEventLeaderDetail(eventLeaderDetail);
         try {
             event = Backendless.Data.of(Event.class).save(event);
         } catch (BackendlessException exception) {
@@ -261,11 +266,13 @@ public class ApiImpl implements Api {
 
         // Add member into event
         Person member = result.getData().get(0);
-        List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
         EventMemberDetail eventMemberDetail = new EventMemberDetail();
         eventMemberDetail.setMember(member);
         //eventMemberDetail.setMemberObjectId(member.getObjectId());
         eventMemberDetail.setStatusMember(StatusMember.Pending.getStatus());
+
+        List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
+        eventMemberDetails.add(eventMemberDetail);
         event.setEventMemberDetail(eventMemberDetails);
         try {
             event = Backendless.Data.of(Event.class).save(event);
@@ -278,7 +285,7 @@ public class ApiImpl implements Api {
 
     // TODO[Hairong]
     @Override
-    public ApiResponse<Event> removeEventMember(String leaderId, String eventId, String memberEmail) {
+    public ApiResponse<Event> removeEventMember(String leaderId, String eventId, String memberId) {
         return null;
     }
 
