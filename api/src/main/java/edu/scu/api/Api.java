@@ -81,7 +81,7 @@ public interface Api {
     /**
      * Event - Shared to both leader and member
      */
-    public ApiResponse<StatusEvent> getEventStatus(String eventId);
+    public ApiResponse<Integer> getEventStatus(String eventId);
 
     public ApiResponse<Person> getEventLeader(String eventId);
 

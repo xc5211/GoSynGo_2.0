@@ -313,7 +313,7 @@ public class ApiImpl implements Api {
     public ApiResponse<List<Person>> getAllEventMembers(String eventId) {
 
         // TODO[later]: Remove next line after testing
-        eventId = "260378B7-0725-107A-FF4A-F1EEA4768400";
+        eventId = "0ED31A48-13E1-2EDC-FFF8-F2EF8764AC00";
         StringBuilder whereClause = new StringBuilder();
         whereClause.append("eventsAsMember");
         whereClause.append(".objectId = '").append(eventId).append("'");
@@ -450,8 +450,15 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<StatusEvent> getEventStatus(String eventId) {
-        return null;
+    public ApiResponse<Integer> getEventStatus(String eventId) {
+        //get event
+        Event event = null;
+        try {
+            event = Backendless.Data.of( Event.class ).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<Integer> (SUCCESS_EVENT, "Status OK", event.getStatusEvent());
     }
 
     @Override
@@ -461,12 +468,26 @@ public class ApiImpl implements Api {
 
     @Override
     public ApiResponse<String> getEventLocation(String eventId) {
-        return null;
+        //get event
+        Event event = null;
+        try {
+            event = Backendless.Data.of( Event.class ).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<String> (SUCCESS_EVENT, "Get event leader success", event.getLocation());
     }
 
     @Override
     public ApiResponse<Integer> getEventDurationInMin(String eventId) {
-        return null;
+        //get event
+        Event event = null;
+        try {
+            event = Backendless.Data.of( Event.class ).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<> (SUCCESS_EVENT,"Get event duration min success", event.getDurationInMin());
     }
 
 }
