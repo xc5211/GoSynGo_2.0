@@ -1,14 +1,13 @@
 package edu.scu.api;
 
-import org.w3c.dom.Text;
-
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
 import edu.scu.model.Event;
+import edu.scu.model.LeaderProposedTimestamp;
+import edu.scu.model.MemberProposedTimestamp;
+import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
-import edu.scu.model.StatusEvent;
 
 /**
  * Created by chuanxu on 4/13/16.
@@ -47,28 +46,28 @@ public interface Api {
     // Returns a newly created empty Event object
     public ApiResponse<Event> proposeEvent(String leaderId);
 
-    public ApiResponse<Event> addEventMember(String leaderId, String eventId, String memberEmail);
+    public ApiResponse<Event> addEventMember(String eventId, String memberEmail);
 
-    public ApiResponse<Event> removeEventMember(String leaderId, String eventId, String memberId);
+    public ApiResponse<Event> removeEventMember(String eventId, String memberId);
 
-    public ApiResponse<Event> sendEventInvitation(String leaderId, String title, int durationInMin, boolean hasReminder, int reminderInMin, Text location, List<Timestamp> proposedTimestamps);
+    public ApiResponse<Event> sendEventInvitation(String eventId, String title, String location, int durationInMin, boolean hasReminder, int reminderInMin, List<LeaderProposedTimestamp> proposedTimestamps);
 
-    public ApiResponse<Event> initiateEvent(String leaderId, String eventId);
+    public ApiResponse<Event> initiateEvent(String eventId);
 
-    public ApiResponse<Void> cancelEvent(String leaderId, String eventId);
+    public ApiResponse<Event> cancelEvent(String eventId);
 
-    public ApiResponse<Integer> getAllEventMembersStatusAndEstimate(String leaderId, String eventId);
+    public ApiResponse<Integer> getAllEventMembersStatusAndEstimate(String eventId);
 
     public ApiResponse<List<Person>> getAllEventMembers(String eventId);
 
-    public ApiResponse<Event> proposeEventTimestampsAsLeader(String eventId, List<Timestamp> proposedEventTimestamps);
+    public ApiResponse<Event> proposeEventTimestampsAsLeader(String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps);
 
     /**
      * As member
      */
-    public ApiResponse<Event> proposeEventTimestampsAsMember(String memberId, String eventId, List<Timestamp> proposedEventTimestamps);
+    public ApiResponse<Event> proposeEventTimestampsAsMember(String memberId, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps);
 
-    public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<Timestamp> selectedEventTimestamps);
+    public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps);
 
     public ApiResponse<Event> acceptEvent(String memberId, String eventId);
 

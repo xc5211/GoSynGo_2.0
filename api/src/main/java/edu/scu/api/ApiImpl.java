@@ -7,9 +7,6 @@ import com.backendless.exceptions.BackendlessException;
 import com.backendless.persistence.BackendlessDataQuery;
 import com.backendless.persistence.QueryOptions;
 
-import org.w3c.dom.Text;
-
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +18,7 @@ import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
+import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
 import edu.scu.model.StatusEvent;
 import edu.scu.model.StatusMember;
@@ -275,7 +273,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Event> addEventMember(String leaderId, String eventId, String memberEmail) {
+    public ApiResponse<Event> addEventMember(String eventId, String memberEmail) {
 
         // Get event
         Event event = null;
@@ -323,31 +321,94 @@ public class ApiImpl implements Api {
 
     // TODO[Hairong]
     @Override
-    public ApiResponse<Event> removeEventMember(String leaderId, String eventId, String memberId) {
+    public ApiResponse<Event> removeEventMember(String eventId, String memberId) {
         return null;
+    }
+
+    @Override
+    public ApiResponse<Event> sendEventInvitation(String eventId, String title, String location, int durationInMin, boolean hasReminder, int reminderInMin, List<LeaderProposedTimestamp> proposedTimestamps) {
+
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append("objectId = '").append(eventId).append("'");
+
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause(whereClause.toString());
+        BackendlessCollection<Event> result = null;
+        try {
+            result = Backendless.Data.of(Event.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        if (result.getData().size() != 1) {
+            return new ApiResponse<>(FAIL_EVENT, "Event doesn't exist");
+        }
+
+        Event event = result.getData().get(0);
+        event.setTitle(title);
+        event.setLocation(location);
+        event.setDurationInMin(durationInMin);
+        event.setHasReminder(hasReminder);
+        event.setReminderInMin(reminderInMin);
+        event.setProposedTimestamps(proposedTimestamps);
+        event.setStatusEvent(StatusEvent.Pending.getStatus());
+        try {
+            event = Backendless.Data.of(Event.class).save(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Send invitation success", event);
+    }
+
+    @Override
+    public ApiResponse<Event> initiateEvent(String eventId) {
+
+        // Get target Event object
+        Event event = null;
+        try {
+            event = Backendless.Data.of(Event.class).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        // Update event status
+        event.setStatusEvent(StatusEvent.Ready.getStatus());
+
+        // Save target Event object
+        try {
+            event = Backendless.Data.of(Event.class).save(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Event Initiate", event);
+    }
+
+    @Override
+    public ApiResponse<Event> cancelEvent(String eventId) {
+
+        // Get target Event object
+        Event event = null;
+        try {
+            event = Backendless.Data.of(Event.class).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        // Update event status
+        event.setStatusEvent(StatusEvent.Cancelled.getStatus());
+
+        // Save target Event object
+        try {
+            event = Backendless.Data.of(Event.class).save(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Event Initiate", event);
     }
 
     // TODO
     @Override
-    public ApiResponse<Event> sendEventInvitation(String leaderId, String title, int durationInMin, boolean hasReminder, int reminderInMin, Text location, List<Timestamp> proposedTimestamps) {
-        return null;
-    }
-
-    // TODO
-    @Override
-    public ApiResponse<Event> initiateEvent(String leaderId, String eventId) {
-        return null;
-    }
-
-    // TODO
-    @Override
-    public ApiResponse<Void> cancelEvent(String leaderId, String eventId) {
-        return null;
-    }
-
-    // TODO
-    @Override
-    public ApiResponse<Integer> getAllEventMembersStatusAndEstimate(String leaderId, String eventId) {
+    public ApiResponse<Integer> getAllEventMembersStatusAndEstimate(String eventId) {
         return null;
     }
 
@@ -376,10 +437,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Event> proposeEventTimestampsAsLeader(String eventId, List<Timestamp> proposedEventTimestamps) {
-
-        // TODO: convert parameter to fit local call
-        List<LeaderProposedTimestamp> leaderProposedTimestamps = proposeEventTimestampsAsLeader(null);
+    public ApiResponse<Event> proposeEventTimestampsAsLeader(String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps) {
 
         StringBuilder whereClause = new StringBuilder();
         whereClause.append("objectId = '").append(eventId).append("'");
@@ -394,7 +452,7 @@ public class ApiImpl implements Api {
         }
 
         Event event = result.getData().get(0);
-        event.setProposedTimestamps(leaderProposedTimestamps);
+        event.setProposedTimestamps(proposedEventTimestamps);
 
         try {
             event = Backendless.Data.of(Event.class).save(event);
@@ -406,10 +464,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Event> proposeEventTimestampsAsMember(String memberId, String eventId, List<Timestamp> proposedEventTimestamps) {
-
-        // TODO: convert parameter to fit local call
-        List<MemberProposedTimestamp> memberProposedTimestamps = proposeEventTimestampsAsMember(null);
+    public ApiResponse<Event> proposeEventTimestampsAsMember(String memberId, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps) {
 
         StringBuilder whereClause = new StringBuilder();
         whereClause.append("objectId = '").append(eventId).append("'");
@@ -426,7 +481,7 @@ public class ApiImpl implements Api {
         Event event = result.getData().get(0);
         for (EventMemberDetail memberDetail : event.getEventMemberDetail()) {
             if (memberDetail.getMember().getObjectId().equals(memberId)) {
-                memberDetail.setProposedTimestamps(memberProposedTimestamps);
+                memberDetail.setProposedTimestamps(proposedEventTimestamps);
                 break;
             }
         }
@@ -442,7 +497,7 @@ public class ApiImpl implements Api {
 
     // TODO[Hairong]
     @Override
-    public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<Timestamp> selectedEventTimestamps) {
+    public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps) {
         return null;
     }
 
