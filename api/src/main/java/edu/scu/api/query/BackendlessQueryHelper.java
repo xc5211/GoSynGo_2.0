@@ -1,4 +1,4 @@
-package edu.scu.model.query;
+package edu.scu.api.query;
 
 /**
  * Created by chuanxu on 5/3/16.

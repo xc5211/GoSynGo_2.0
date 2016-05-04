@@ -24,7 +24,7 @@ import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
 import edu.scu.model.StatusEvent;
 import edu.scu.model.StatusMember;
-import edu.scu.model.query.BackendlessQueryHelper;
+import edu.scu.api.query.BackendlessQueryHelper;
 
 /**
  * Created by chuanxu on 4/13/16.
