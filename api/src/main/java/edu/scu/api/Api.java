@@ -2,6 +2,7 @@ package edu.scu.api;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import edu.scu.model.Event;
 import edu.scu.model.LeaderProposedTimestamp;
@@ -56,7 +57,7 @@ public interface Api {
 
     public ApiResponse<Event> cancelEvent(String eventId);
 
-    public ApiResponse<Integer> getAllEventMembersStatusAndEstimate(String eventId);
+    public ApiResponse<Map<Person, Integer>> getAllEventMembersStatusAndEstimate(String eventId);
 
     public ApiResponse<List<Person>> getAllEventMembers(String eventId);
 

@@ -11,7 +11,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
@@ -22,6 +24,7 @@ import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
 import edu.scu.model.StatusEvent;
 import edu.scu.model.StatusMember;
+import edu.scu.model.query.BackendlessQueryHelper;
 
 /**
  * Created by chuanxu on 4/13/16.
@@ -149,13 +152,13 @@ public class ApiImpl implements Api {
         try{
             Backendless.Data.of(Person.class).findById(personId);
         }
-        catch (BackendlessException exception){
-            return new ApiResponse<>(FAIL_EVENT,"Error code:" + exception.getCode());
+        catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code:" + exception.getCode());
         }
-
-        return new ApiResponse<>(SUCCESS_EVENT, "GoogleCalendarImpoted", person.getIsGoogleCalendarImported());
+        return new ApiResponse<>(SUCCESS_EVENT, "", person.getIsGoogleCalendarImported());
     }
 
+    // TODO[later]
     @Override
     public ApiResponse<Void> importGoogleCalendar(String personId) {
         return null;
@@ -165,13 +168,8 @@ public class ApiImpl implements Api {
     public ApiResponse<List<Date>> getScheduledDates(String personId) {
 
         // Get events as member
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("eventMemberDetail");
-        whereClause.append(".member");
-        whereClause.append(".objectId = '").append(personId).append("'");
-
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(whereClause.toString());
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventsAsMember(personId));
         BackendlessCollection<Event> result = null;
         try {
             result = Backendless.Data.of(Event.class).find(dataQuery);
@@ -181,13 +179,8 @@ public class ApiImpl implements Api {
         List<Event> scheduledEventsAsMember = result.getData();
 
         // Get events as leader
-        whereClause = new StringBuilder();
-        whereClause.append("eventLeaderDetail");
-        whereClause.append(".leader");
-        whereClause.append(".objectId = '").append(personId).append("'");
-
         dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(whereClause.toString());
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventsAsLeader(personId));
         try {
             result = Backendless.Data.of(Event.class).find(dataQuery);
         } catch (BackendlessException exception) {
@@ -208,16 +201,10 @@ public class ApiImpl implements Api {
     @Override
     public ApiResponse<List<Event>> getEventsAsLeader(String personId) {
 
-        // TODO: Change whereClause to match argument userId instead of personObjectId used for testing
         // TODO[later]: Remove next line after testing
         personId = idPersonChuan;
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("eventLeaderDetail");
-        whereClause.append(".leader");
-        whereClause.append(".objectId = '").append(personId).append("'");
-
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(whereClause.toString());
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventsAsLeader(personId));
         BackendlessCollection<Event> result = null;
         try {
             result = Backendless.Data.of(Event.class).find(dataQuery);
@@ -232,16 +219,10 @@ public class ApiImpl implements Api {
     @Override
     public ApiResponse<List<Event>> getEventsAsMember(String personId) {
 
-        // TODO: Change whereClause to match argument userId instead of personObjectId used for testing
         // TODO[later]: Remove next line after testing
         personId = idPersonSichao;
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("eventMemberDetail");
-        whereClause.append(".member");
-        whereClause.append(".objectId = '").append(personId).append("'");
-
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(whereClause.toString());
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventsAsMember(personId));
         BackendlessCollection<Event> result = null;
         try {
             result = Backendless.Data.of(Event.class).find(dataQuery);
@@ -268,10 +249,11 @@ public class ApiImpl implements Api {
         EventLeaderDetail eventLeaderDetail = new EventLeaderDetail();
         eventLeaderDetail.setLeader(leader);
         eventLeaderDetail.setIsCheckedIn(false);
-        Event event = new Event();
 
+        Event event = new Event();
         event.setStatusEvent(StatusEvent.Tentative.getStatus());
         event.setEventLeaderDetail(eventLeaderDetail);
+
         try {
             event = Backendless.Data.of(Event.class).save(event);
         } catch (BackendlessException exception) {
@@ -292,12 +274,8 @@ public class ApiImpl implements Api {
         }
 
         // Get member
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("email = '").append(memberEmail).append("'");
-
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause( whereClause.toString() );
-
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryPerson(memberEmail));
         BackendlessCollection<Person> result;
         try {
             result = Backendless.Data.of(Person.class).find(dataQuery);
@@ -323,7 +301,6 @@ public class ApiImpl implements Api {
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-
         return new ApiResponse<>(SUCCESS_EVENT, "Add event member success", event);
     }
 
@@ -338,17 +315,8 @@ public class ApiImpl implements Api {
         }
 
         // Get EventMemberDetail object
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("member");
-        whereClause.append(".objectId = '").append(memberId).append("'");
-        whereClause.append(" and ");
-        whereClause.append("member");
-        whereClause.append(".eventsAsMember");
-        whereClause.append(".objectId = '").append(eventId).append("'");
-
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause( whereClause.toString() );
-
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMemberDetail(eventId, memberId));
         BackendlessCollection<EventMemberDetail> result;
         try {
             result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
@@ -442,10 +410,24 @@ public class ApiImpl implements Api {
         return new ApiResponse<>(SUCCESS_EVENT, "Event Initiate", event);
     }
 
-    // TODO
     @Override
-    public ApiResponse<Integer> getAllEventMembersStatusAndEstimate(String eventId) {
-        return null;
+    public ApiResponse<Map<Person, Integer>> getAllEventMembersStatusAndEstimate(String eventId) {
+
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMemberDetails(eventId));
+        BackendlessCollection<EventMemberDetail> result = null;
+        try {
+            result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        List<EventMemberDetail> eventMemberDetails = result.getData();
+        Map<Person, Integer> statusMap = new HashMap<>();
+        for (EventMemberDetail memberDetail : eventMemberDetails) {
+            statusMap.put(memberDetail.getMember(), memberDetail.getMinsToArrive());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "", statusMap);
     }
 
     @Override
@@ -453,14 +435,8 @@ public class ApiImpl implements Api {
 
         // TODO[later]: Remove next line after testing
         eventId = "0ED31A48-13E1-2EDC-FFF8-F2EF8764AC00";
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("eventsAsMember");
-        whereClause.append(".objectId = '").append(eventId).append("'");
-
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause( whereClause.toString() );
-
-        QueryOptions queryOptions = new QueryOptions();
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMembers(eventId));
         BackendlessCollection<Person> result = null;
         try {
             result = Backendless.Data.of(Person.class).find(dataQuery);
@@ -475,19 +451,13 @@ public class ApiImpl implements Api {
     @Override
     public ApiResponse<Event> proposeEventTimestampsAsLeader(String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps) {
 
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("objectId = '").append(eventId).append("'");
-
-        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(whereClause.toString());
-        BackendlessCollection<Event> result = null;
+        Event event;
         try {
-            result = Backendless.Data.of(Event.class).find(dataQuery);
+            event = Backendless.Data.of(Event.class).findById(eventId);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
-        Event event = result.getData().get(0);
         event.setProposedTimestamps(proposedEventTimestamps);
 
         try {
@@ -502,32 +472,40 @@ public class ApiImpl implements Api {
     @Override
     public ApiResponse<Event> proposeEventTimestampsAsMember(String memberId, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps) {
 
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("objectId = '").append(eventId).append("'");
-
-        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(whereClause.toString());
-        BackendlessCollection<Event> result = null;
+        // Get target Event object
+        Event event;
         try {
-            result = Backendless.Data.of(Event.class).find(dataQuery);
+            event = Backendless.Data.of(Event.class).findById(eventId);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
-        Event event = result.getData().get(0);
-        for (EventMemberDetail memberDetail : event.getEventMemberDetail()) {
-            if (memberDetail.getMember().getObjectId().equals(memberId)) {
-                memberDetail.setProposedTimestamps(proposedEventTimestamps);
-                break;
-            }
+        // Get target EventMemberDetail object
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMemberDetail(eventId, memberId));
+        BackendlessCollection<EventMemberDetail> result;
+        try {
+            result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
+
+        if (result.getData().size() != 1) {
+            return new ApiResponse<>(FAIL_EVENT, "Member doesn't exist");
+        }
+
+        // Set member proposed time
+        EventMemberDetail eventMemberDetail = result.getData().get(0);
+        eventMemberDetail.setProposedTimestamps(proposedEventTimestamps);
+        List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
+        eventMemberDetails.add(eventMemberDetail);
+        event.setEventMemberDetail(eventMemberDetails);
 
         try {
             event = Backendless.Data.of(Event.class).save(event);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-
         return new ApiResponse<>(SUCCESS_EVENT, "Propose event time success", event);
     }
 
@@ -541,18 +519,9 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
-        // Find the eventMemberDetail
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("member");
-        whereClause.append(".objectId = '").append(memberId).append("'");
-        whereClause.append(" and ");
-        whereClause.append("member");
-        whereClause.append(".eventsAsMember");
-        whereClause.append(".objectId = '").append(eventId).append("'");
-
+        // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause( whereClause.toString() );
-
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMemberDetail(eventId, memberId));
         BackendlessCollection<EventMemberDetail> result;
         try {
             result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
@@ -565,7 +534,8 @@ public class ApiImpl implements Api {
         }
 
         List<EventMemberDetail> eventMemberDetails = result.getData();
-        eventMemberDetails.get(0).setSelectedTimestamps(selectedEventTimestamps);
+        EventMemberDetail eventMemberDetail = eventMemberDetails.get(0);
+        eventMemberDetail.setSelectedTimestamps(selectedEventTimestamps);
         event.setEventMemberDetail(eventMemberDetails);
 
         // Send back the event
@@ -588,19 +558,9 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
-        // Update member status
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("member");
-        whereClause.append(".objectId = '").append(memberId).append("'");
-        whereClause.append(" and ");
-        whereClause.append("member");
-        whereClause.append(".eventsAsMember");
-        whereClause.append(".objectId = '").append(eventId).append("'");
-
+        // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause( whereClause.toString() );
-
-        QueryOptions queryOptions = new QueryOptions();
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMemberDetail(eventId, memberId));
         BackendlessCollection<EventMemberDetail> result = null;
         try {
             result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
@@ -612,9 +572,11 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Member detail doesn't exist");
         }
 
-        List<EventMemberDetail> eventMemberDetail = result.getData();
-        eventMemberDetail.get(0).setStatusMember(StatusMember.Accept.getStatus());
-        event.setEventMemberDetail(eventMemberDetail);
+        // Update member status
+        List<EventMemberDetail> eventMemberDetails = result.getData();
+        EventMemberDetail eventMemberDetail = eventMemberDetails.get(0);
+        eventMemberDetail.setStatusMember(StatusMember.Accept.getStatus());
+        event.setEventMemberDetail(eventMemberDetails);
 
         // Save target Event object
         try {
@@ -636,19 +598,9 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
-        // Update member status
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("member");
-        whereClause.append(".objectId = '").append(memberId).append("'");
-        whereClause.append(" and ");
-        whereClause.append("member");
-        whereClause.append(".eventsAsMember");
-        whereClause.append(".objectId = '").append(eventId).append("'");
-
+        // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause( whereClause.toString() );
-
-        QueryOptions queryOptions = new QueryOptions();
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMemberDetail(eventId, memberId));
         BackendlessCollection<EventMemberDetail> result = null;
         try {
             result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
@@ -660,9 +612,11 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Member detail doesn't exist");
         }
 
-        List<EventMemberDetail> eventMemberDetail = result.getData();
-        eventMemberDetail.get(0).setStatusMember(StatusMember.Declined.getStatus());
-        event.setEventMemberDetail(eventMemberDetail);
+        // Update member status
+        List<EventMemberDetail> eventMemberDetails = result.getData();
+        EventMemberDetail eventMemberDetail = eventMemberDetails.get(0);
+        eventMemberDetail.setStatusMember(StatusMember.Declined.getStatus());
+        event.setEventMemberDetail(eventMemberDetails);
 
         // Save target Event object
         try {
@@ -684,18 +638,9 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
-        // Update member status
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("member");
-        whereClause.append(".objectId = '").append(memberId).append("'");
-        whereClause.append(" and ");
-        whereClause.append("member");
-        whereClause.append(".eventsAsMember");
-        whereClause.append(".objectId = '").append(eventId).append("'");
-
+        // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause( whereClause.toString() );
-
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMemberDetail(eventId, memberId));
         QueryOptions queryOptions = new QueryOptions();
         BackendlessCollection<EventMemberDetail> result = null;
         try {
@@ -708,9 +653,11 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Member detail doesn't exsit");
         }
 
-        List<EventMemberDetail> eventMemberDetail = result.getData();
-        eventMemberDetail.get(0).setIsCheckedIn(true);
-        event.setEventMemberDetail(eventMemberDetail);
+        // Update member status
+        List<EventMemberDetail> eventMemberDetails = result.getData();
+        EventMemberDetail eventMemberDetail = eventMemberDetails.get(0);
+        eventMemberDetail.setIsCheckedIn(true);
+        event.setEventMemberDetail(eventMemberDetails);
 
         // Save target Event object
         try {
@@ -732,18 +679,9 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
-        // Find the eventMemberDetail
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("member");
-        whereClause.append(".objectId = '").append(memberId).append("'");
-        whereClause.append(" and ");
-        whereClause.append("member");
-        whereClause.append(".eventsAsMember");
-        whereClause.append(".objectId = '").append(eventId).append("'");
-
+        // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause( whereClause.toString() );
-
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMemberDetail(eventId, memberId));
         BackendlessCollection<EventMemberDetail> result;
         try {
             result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
@@ -752,7 +690,8 @@ public class ApiImpl implements Api {
         }
 
         List<EventMemberDetail> eventMemberDetails = result.getData();
-        eventMemberDetails.get(0).setMinsToArrive(estimateInMin);
+        EventMemberDetail eventMemberDetail = eventMemberDetails.get(0);
+        eventMemberDetail.setMinsToArrive(estimateInMin);
         event.setEventMemberDetail(eventMemberDetails);
 
         // Send back the event
@@ -761,7 +700,7 @@ public class ApiImpl implements Api {
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Set mins success", event);
+        return new ApiResponse<>(SUCCESS_EVENT, "Set estimate success", event);
     }
 
     @Override
