@@ -69,6 +69,7 @@ public class AppActionImpl implements AppAction {
             protected void onPostExecute(ApiResponse<Person> response) {
                 if (listener != null && response != null) {
                     if (response.isSuccess()) {
+                        hostPerson = response.getObj();
                         listener.onSuccess(response.getObj());
                     } else {
                         listener.onFailure(response.getMsg());
