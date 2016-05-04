@@ -142,10 +142,18 @@ public class ApiImpl implements Api {
         return new ApiResponse<>(SUCCESS_EVENT, "You have successfully logged out");
     }
 
-    // TODO[Hairong]
     @Override
     public ApiResponse<Boolean> isGoogleCalendarImported(String personId) {
-        return null;
+        // Get person
+        Person person = null;
+        try{
+            Backendless.Data.of(Person.class).findById(personId);
+        }
+        catch (BackendlessException exception){
+            return new ApiResponse<>(FAIL_EVENT,"Error code:" + exception.getCode());
+        }
+
+        return new ApiResponse<>(SUCCESS_EVENT, "GoogleCalendarImpoted", person.getIsGoogleCalendarImported());
     }
 
     @Override
@@ -319,32 +327,60 @@ public class ApiImpl implements Api {
         return new ApiResponse<>(SUCCESS_EVENT, "Add event member success", event);
     }
 
-    // TODO[Hairong]
     @Override
     public ApiResponse<Event> removeEventMember(String eventId, String memberId) {
-        return null;
-    }
+        // Get event
+        Event event = null;
+        try {
+            event = Backendless.Data.of(Event.class).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
 
-    @Override
-    public ApiResponse<Event> sendEventInvitation(String eventId, String title, String location, int durationInMin, boolean hasReminder, int reminderInMin, List<LeaderProposedTimestamp> proposedTimestamps) {
-
+        // Get EventMemberDetail object
         StringBuilder whereClause = new StringBuilder();
-        whereClause.append("objectId = '").append(eventId).append("'");
+        whereClause.append("member");
+        whereClause.append(".objectId = '").append(memberId).append("'");
+        whereClause.append(" and ");
+        whereClause.append("member");
+        whereClause.append(".eventsAsMember");
+        whereClause.append(".objectId = '").append(eventId).append("'");
 
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(whereClause.toString());
-        BackendlessCollection<Event> result = null;
+        dataQuery.setWhereClause( whereClause.toString() );
+
+        BackendlessCollection<EventMemberDetail> result;
         try {
-            result = Backendless.Data.of(Event.class).find(dataQuery);
+            result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
         if (result.getData().size() != 1) {
-            return new ApiResponse<>(FAIL_EVENT, "Event doesn't exist");
+            return new ApiResponse<>(FAIL_EVENT, "Member doesn't exist");
         }
 
-        Event event = result.getData().get(0);
+        //Delete member from the event
+        EventMemberDetail eventMemberDetail = result.getData().get(0);
+        event.getEventMemberDetail().remove(eventMemberDetail);
+        try {
+            event = Backendless.Data.of(Event.class).save(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Remove event member success", event);
+    }
+
+    @Override
+    public ApiResponse<Event> sendEventInvitation(String eventId, String title, String location, int durationInMin, boolean hasReminder, int reminderInMin, List<LeaderProposedTimestamp> proposedTimestamps) {
+
+        Event event;
+        try {
+            event = Backendless.Data.of(Event.class).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
         event.setTitle(title);
         event.setLocation(location);
         event.setDurationInMin(durationInMin);
@@ -495,10 +531,50 @@ public class ApiImpl implements Api {
         return new ApiResponse<>(SUCCESS_EVENT, "Propose event time success", event);
     }
 
-    // TODO[Hairong]
     @Override
     public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps) {
-        return null;
+        // Get Event
+        Event event = null;
+        try {
+            event = Backendless.Data.of(Event.class).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        // Find the eventMemberDetail
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append("member");
+        whereClause.append(".objectId = '").append(memberId).append("'");
+        whereClause.append(" and ");
+        whereClause.append("member");
+        whereClause.append(".eventsAsMember");
+        whereClause.append(".objectId = '").append(eventId).append("'");
+
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause( whereClause.toString() );
+
+        BackendlessCollection<EventMemberDetail> result;
+        try {
+            result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        if (result.getData().size() != 1) {
+            return new ApiResponse<>(FAIL_EVENT, "Member doesn't exist");
+        }
+
+        List<EventMemberDetail> eventMemberDetails = result.getData();
+        eventMemberDetails.get(0).setSelectedTimestamps(selectedEventTimestamps);
+        event.setEventMemberDetail(eventMemberDetails);
+
+        // Send back the event
+        try {
+            event = Backendless.Data.of(Event.class).save(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Select event time success", event);
     }
 
     @Override
@@ -645,10 +721,47 @@ public class ApiImpl implements Api {
         return new ApiResponse<>(SUCCESS_EVENT, "Checked in event", event);
     }
 
-    // TODO[Hairong]
     @Override
     public ApiResponse<Event> setMinsToArriveAsMember(String memberId, String eventId, int estimateInMin) {
-        return null;
+
+        // Get Event
+        Event event = null;
+        try {
+            event = Backendless.Data.of(Event.class).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        // Find the eventMemberDetail
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append("member");
+        whereClause.append(".objectId = '").append(memberId).append("'");
+        whereClause.append(" and ");
+        whereClause.append("member");
+        whereClause.append(".eventsAsMember");
+        whereClause.append(".objectId = '").append(eventId).append("'");
+
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause( whereClause.toString() );
+
+        BackendlessCollection<EventMemberDetail> result;
+        try {
+            result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        List<EventMemberDetail> eventMemberDetails = result.getData();
+        eventMemberDetails.get(0).setMinsToArrive(estimateInMin);
+        event.setEventMemberDetail(eventMemberDetails);
+
+        // Send back the event
+        try {
+            event = Backendless.Data.of(Event.class).save(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Set mins success", event);
     }
 
     @Override
