@@ -167,6 +167,7 @@ public class AppActionImpl implements AppAction {
 
     }
 
+    // TODO[Hairong]
     @Override
     public void isGoogleCalendarImported(ActionCallbackListener<Boolean> listener) {
 
@@ -236,6 +237,7 @@ public class AppActionImpl implements AppAction {
         asyncTask.execute();
     }
 
+    // TODO[Hairong]
     @Override
     public void removeEventMember(String eventId, String memberId, ActionCallbackListener<Event> listener) {
 
@@ -271,6 +273,7 @@ public class AppActionImpl implements AppAction {
 
     }
 
+    // TODO[Hairong]
     @Override
     public void selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps, ActionCallbackListener<Event> listener) {
 
@@ -281,6 +284,7 @@ public class AppActionImpl implements AppAction {
 
     }
 
+    // TODO[Hairong]
     @Override
     public void declineEvent(String memberId, String eventId, ActionCallbackListener<Event> listener) {
 
@@ -291,6 +295,7 @@ public class AppActionImpl implements AppAction {
 
     }
 
+    // TODO[Hairong]
     @Override
     public void setMinsToArriveAsMember(String memberId, String eventId, int estimateInMin, ActionCallbackListener<Event> listener) {
 
