@@ -327,21 +327,25 @@ public class ApiImpl implements Api {
         return null;
     }
 
+    // TODO
     @Override
     public ApiResponse<Event> sendEventInvitation(String leaderId, String title, int durationInMin, boolean hasReminder, int reminderInMin, Text location, List<Timestamp> proposedTimestamps) {
         return null;
     }
 
+    // TODO
     @Override
     public ApiResponse<Event> initiateEvent(String leaderId, String eventId) {
         return null;
     }
 
+    // TODO
     @Override
     public ApiResponse<Void> cancelEvent(String leaderId, String eventId) {
         return null;
     }
 
+    // TODO
     @Override
     public ApiResponse<Integer> getAllEventMembersStatusAndEstimate(String leaderId, String eventId) {
         return null;
