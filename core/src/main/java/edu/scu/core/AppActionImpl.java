@@ -9,11 +9,15 @@ import com.backendless.persistence.local.UserTokenStorageFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
 import edu.scu.api.ApiResponse;
 import edu.scu.model.Event;
+import edu.scu.model.LeaderProposedTimestamp;
+import edu.scu.model.MemberProposedTimestamp;
+import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
 
 /**
@@ -163,6 +167,21 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
+    public void isGoogleCalendarImported(ActionCallbackListener<Boolean> listener) {
+
+    }
+
+    @Override
+    public void importGoogleCalendar(ActionCallbackListener<Void> listener) {
+
+    }
+
+    @Override
+    public void getScheduledDates(String personId) {
+
+    }
+
+    @Override
     public void proposeEvent(final ActionCallbackListener<Event> listener) {
         AsyncTask<Void, Void, ApiResponse<Event>> asyncTask = new AsyncTask<Void, Void, ApiResponse<Event>>() {
 
@@ -214,6 +233,86 @@ public class AppActionImpl implements AppAction {
 
         };
         asyncTask.execute();
+    }
+
+    @Override
+    public void removeEventMember(String eventId, String memberId, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void sendEventInvitation(String eventId, String title, String location, int durationInMin, boolean hasReminder, int reminderInMin, List<LeaderProposedTimestamp> proposedTimestamps, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void initiateEvent(String eventId, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void cancelEvent(String eventId, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void getAllEventMembersStatusAndEstimate(String eventId, ActionCallbackListener<Map<Person, Integer>> lisener) {
+
+    }
+
+    @Override
+    public void proposeEventTimestampsAsLeader(String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void proposeEventTimestampsAsMember(String memberId, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void acceptEvent(String memberId, String eventId, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void declineEvent(String memberId, String eventId, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void checkInEvent(String memberId, String eventId, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void setMinsToArriveAsMember(String memberId, String eventId, int estimateInMin, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void getEventStatus(String eventId, ActionCallbackListener<Integer> listner) {
+
+    }
+
+    @Override
+    public void getEventLeader(String eventId, ActionCallbackListener<Person> listner) {
+
+    }
+
+    @Override
+    public void getEventLocation(String eventId, ActionCallbackListener<String> listner) {
+
+    }
+
+    @Override
+    public void getEventDurationInMin(String eventId, ActionCallbackListener<Integer> listner) {
+
     }
 
     public void getEventsAsLeader(final ActionCallbackListener<List<Event>> listener) {
