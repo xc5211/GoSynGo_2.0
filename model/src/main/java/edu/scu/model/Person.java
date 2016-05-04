@@ -145,4 +145,48 @@ public class Person
 //        return Backendless.Data.of( Person.class ).find( query );
 //    }
 
+    public void addContact(Person contact) {
+        this.contacts.add(contact);
+    }
+
+    public boolean removeContact(Person person) {
+        if (!this.contacts.contains(person)) {
+            this.contacts.remove(this.contacts.indexOf(person));
+        }
+        return true;
+    }
+
+    public boolean addEventAsLeader(Event event) {
+        if (!this.getEventsAsLeader().contains(event)) {
+            boolean personChange = this.getEventsAsLeader().add(event);
+            boolean eventCheck = event.isLeader(this);
+            return personChange && eventCheck;
+        }
+        return true;
+    }
+
+    public boolean addEventAsMember(Event event) {
+        if (!this.getEventsAsMember().contains(event)) {
+            boolean personChange = this.getEventsAsMember().add(event);
+            boolean eventChange = event.addEventMember(this);
+            return personChange && eventChange;
+        }
+        return true;
+    }
+
+    public boolean removeEventAsLeader(Event event) {
+        if (this.getEventsAsLeader().contains(event)) {
+            return this.getEventsAsLeader().remove(event);
+        }
+        return true;
+    }
+
+    public boolean removeEventAsMember(Event event) {
+        if (this.getEventsAsMember().contains(event)) {
+            boolean personChange = this.getEventsAsMember().remove(event);
+            boolean eventChange = event.removeEventMember(this);
+            return personChange && eventChange;
+        }
+        return true;
+    }
 }
