@@ -35,7 +35,7 @@ public interface Api {
     //
     public ApiResponse<Void> importGoogleCalendar(String personId);
 
-    public ApiResponse<List<Date>> getMonthlyScheduledDates(String personId);
+    public ApiResponse<List<Date>> getScheduledDates(String personId);
 
     public ApiResponse<List<Event>> getEventsAsLeader(String personId);
 
@@ -68,7 +68,7 @@ public interface Api {
      */
     public ApiResponse<Event> proposeEventTimestampsAsMember(String memberId, String eventId, List<Timestamp> proposedEventTimestamps);
 
-    public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<Timestamp> proposedEventTimestamps);
+    public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<Timestamp> selectedEventTimestamps);
 
     public ApiResponse<Event> acceptEvent(String memberId, String eventId);
 

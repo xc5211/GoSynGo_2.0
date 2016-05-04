@@ -156,8 +156,47 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<List<Date>> getMonthlyScheduledDates(String personId) {
-        return null;
+    public ApiResponse<List<Date>> getScheduledDates(String personId) {
+
+        // Get events as member
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append("eventMemberDetail");
+        whereClause.append(".member");
+        whereClause.append(".objectId = '").append(personId).append("'");
+
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause(whereClause.toString());
+        BackendlessCollection<Event> result = null;
+        try {
+            result = Backendless.Data.of(Event.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        List<Event> scheduledEventsAsMember = result.getData();
+
+        // Get events as leader
+        whereClause = new StringBuilder();
+        whereClause.append("eventLeaderDetail");
+        whereClause.append(".leader");
+        whereClause.append(".objectId = '").append(personId).append("'");
+
+        dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause(whereClause.toString());
+        try {
+            result = Backendless.Data.of(Event.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        List<Event> scheduledEventsAsLeader = result.getData();
+
+        List<Date> scheduledDates = new ArrayList<>();
+        for (Event eventAsMember : scheduledEventsAsMember) {
+            scheduledDates.add(eventAsMember.getTimestamp());
+        }
+        for (Event eventsAsLeader : scheduledEventsAsLeader) {
+            scheduledDates.add(eventsAsLeader.getTimestamp());
+        }
+        return new ApiResponse<List<Date>>(SUCCESS_EVENT, "Get scheduled dates success", scheduledDates);
     }
 
     @Override
@@ -268,7 +307,6 @@ public class ApiImpl implements Api {
         Person member = result.getData().get(0);
         EventMemberDetail eventMemberDetail = new EventMemberDetail();
         eventMemberDetail.setMember(member);
-        //eventMemberDetail.setMemberObjectId(member.getObjectId());
         eventMemberDetail.setStatusMember(StatusMember.Pending.getStatus());
 
         List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
@@ -400,7 +438,7 @@ public class ApiImpl implements Api {
 
     // TODO[Hairong]
     @Override
-    public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<Timestamp> proposedEventTimestamps) {
+    public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<Timestamp> selectedEventTimestamps) {
         return null;
     }
 
@@ -416,12 +454,32 @@ public class ApiImpl implements Api {
         }
 
         // Update member status
-        for (EventMemberDetail memberDetail : event.getEventMemberDetail()) {
-            if (memberDetail.getMember().getObjectId().equals(memberId)) {
-                memberDetail.setStatusMember(StatusMember.Accept.getStatus());
-                break;
-            }
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append("member");
+        whereClause.append(".objectId = '").append(memberId).append("'");
+        whereClause.append(" and ");
+        whereClause.append("member");
+        whereClause.append(".eventsAsMember");
+        whereClause.append(".objectId = '").append(eventId).append("'");
+
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause( whereClause.toString() );
+
+        QueryOptions queryOptions = new QueryOptions();
+        BackendlessCollection<EventMemberDetail> result = null;
+        try {
+            result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
+
+        if (result.getData().size() != 1) {
+            return new ApiResponse<>(FAIL_EVENT, "Member detail doesn't exist");
+        }
+
+        List<EventMemberDetail> eventMemberDetail = result.getData();
+        eventMemberDetail.get(0).setStatusMember(StatusMember.Accept.getStatus());
+        event.setEventMemberDetail(eventMemberDetail);
 
         // Save target Event object
         try {
@@ -432,15 +490,100 @@ public class ApiImpl implements Api {
         return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", event);
     }
 
-    // TODO[Hairong]
     @Override
     public ApiResponse<Event> declineEvent(String memberId, String eventId) {
-        return null;
+
+        // Get target Event object
+        Event event = null;
+        try {
+            event = Backendless.Data.of(Event.class).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        // Update member status
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append("member");
+        whereClause.append(".objectId = '").append(memberId).append("'");
+        whereClause.append(" and ");
+        whereClause.append("member");
+        whereClause.append(".eventsAsMember");
+        whereClause.append(".objectId = '").append(eventId).append("'");
+
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause( whereClause.toString() );
+
+        QueryOptions queryOptions = new QueryOptions();
+        BackendlessCollection<EventMemberDetail> result = null;
+        try {
+            result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        if (result.getData().size() != 1) {
+            return new ApiResponse<>(FAIL_EVENT, "Member detail doesn't exist");
+        }
+
+        List<EventMemberDetail> eventMemberDetail = result.getData();
+        eventMemberDetail.get(0).setStatusMember(StatusMember.Declined.getStatus());
+        event.setEventMemberDetail(eventMemberDetail);
+
+        // Save target Event object
+        try {
+            event = Backendless.Data.of(Event.class).save(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", event);
     }
 
     @Override
     public ApiResponse<Event> checkInEvent(String memberId, String eventId) {
-        return null;
+
+        // Get target Event object
+        Event event = null;
+        try {
+            event = Backendless.Data.of(Event.class).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        // Update member status
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append("member");
+        whereClause.append(".objectId = '").append(memberId).append("'");
+        whereClause.append(" and ");
+        whereClause.append("member");
+        whereClause.append(".eventsAsMember");
+        whereClause.append(".objectId = '").append(eventId).append("'");
+
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause( whereClause.toString() );
+
+        QueryOptions queryOptions = new QueryOptions();
+        BackendlessCollection<EventMemberDetail> result = null;
+        try {
+            result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        if(result.getData().size() != 1) {
+            return new ApiResponse<>(FAIL_EVENT, "Member detail doesn't exsit");
+        }
+
+        List<EventMemberDetail> eventMemberDetail = result.getData();
+        eventMemberDetail.get(0).setIsCheckedIn(true);
+        event.setEventMemberDetail(eventMemberDetail);
+
+        // Save target Event object
+        try {
+            event = Backendless.Data.of(Event.class).save(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Checked in event", event);
     }
 
     // TODO[Hairong]
@@ -458,12 +601,19 @@ public class ApiImpl implements Api {
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<Integer> (SUCCESS_EVENT, "Status OK", event.getStatusEvent());
+        return new ApiResponse<> (SUCCESS_EVENT, "Status OK", event.getStatusEvent());
     }
 
     @Override
     public ApiResponse<Person> getEventLeader(String eventId) {
-        return null;
+        //get event
+        Event event = null;
+        try {
+            event = Backendless.Data.of( Event.class ).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<Person> (SUCCESS_EVENT, "Get event leader success", event.getEventLeaderDetail().getLeader());
     }
 
     @Override
@@ -475,7 +625,7 @@ public class ApiImpl implements Api {
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<String> (SUCCESS_EVENT, "Get event leader success", event.getLocation());
+        return new ApiResponse<> (SUCCESS_EVENT, "Get event leader success", event.getLocation());
     }
 
     @Override
