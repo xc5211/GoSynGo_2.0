@@ -84,174 +84,30 @@ public class ApiImpl implements Api {
     @Override
     public ApiResponse<Person> register(String userEmail, String password, String name) {
 
-        Person chuan = Backendless.Data.of( Person.class ).findById(idPersonChuan);
-        Person sichao = Backendless.Data.of( Person.class ).findById(idPersonSichao);
-        Person hairong = Backendless.Data.of( Person.class ).findById(idPersonHairong);
-
-//        List<Person> contactsChuan = new ArrayList<>();
-//        contactsChuan.add(sichao);
-//        contactsChuan.add(hairong);
-//        chuan.setContacts(contactsChuan);
-//        List<Person> contactsSichao = new ArrayList<>();
-//        contactsSichao.add(hairong);
-//        sichao.setContacts(contactsSichao);
-//        List<Person> contactsHairong = new ArrayList<>();
-//        contactsHairong.add(sichao);
-//        hairong.setContacts(contactsHairong);
-
-        EventLeaderDetail eventLeaderDetail1 = new EventLeaderDetail();
-        eventLeaderDetail1.setLeader(chuan);
-        eventLeaderDetail1.setIsCheckedIn(false);
-
-        Event eventChuan1 = new Event();
-        eventChuan1.setEventLeaderDetail(eventLeaderDetail1);
-        eventChuan1.setTitle("Chuan 1 Event");
-        eventChuan1.setStatusEvent(StatusEvent.Tentative.getStatus());
-        eventChuan1.setDurationInMin(30);
-
-        List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
-        EventMemberDetail event1MemberDetail1 = new EventMemberDetail();
-        event1MemberDetail1.setMember(sichao);
-        event1MemberDetail1.setStatusMember(StatusMember.Pending.getStatus());
-        List<MemberProposedTimestamp> member1ProposedTimestamp = new ArrayList<>();
+        // Register
+        BackendlessUser user = new BackendlessUser();
+        user.setEmail(userEmail);
+        user.setPassword(password);
+        user.setProperty("name", name);
+        user.setProperty("isGoogleCalendarImported", false);
         try {
-            String dateInString = "2016/10/15 16:00:00";
-            Date member1ProposedDate1 = sdf.parse(dateInString);
-            MemberProposedTimestamp member1ProposedTimestamp1 = new MemberProposedTimestamp();
-            member1ProposedTimestamp1.setTimestamp(member1ProposedDate1);
-            member1ProposedTimestamp.add(member1ProposedTimestamp1);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        try {
-            String dateInString = "2016/10/14 16:30:00";
-            Date member1ProposedDate2 = sdf.parse(dateInString);
-            MemberProposedTimestamp member1ProposedTimestamp2 = new MemberProposedTimestamp();
-            member1ProposedTimestamp2.setTimestamp(member1ProposedDate2);
-            member1ProposedTimestamp.add(member1ProposedTimestamp2);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        event1MemberDetail1.setProposedTimestamps(member1ProposedTimestamp);
-        List<Event> sichaoEventsAsMember = new ArrayList<>();
-        sichaoEventsAsMember.add(eventChuan1);
-        sichao.setEventsAsMember(sichaoEventsAsMember);
-
-        eventMemberDetails.add(event1MemberDetail1);
-
-//        List<MemberSelectedTimestamp> member1SelectedTimestamp = new ArrayList<>();
-//        MemberSelectedTimestamp member1SelectedTimestamp1 = new MemberSelectedTimestamp();
-//        // TODO
-//        member1SelectedTimestamp.add(member1SelectedTimestamp1);
-//        event1MemberDetail1.setSelectedTimestamps(member1SelectedTimestamp);
-//        eventChuan1.setEventMemberDetail(eventMemberDetails);
-
-        List<LeaderProposedTimestamp> leaderProposedTimestamps = new ArrayList<>();
-        try {
-            String dateInString1 = "2016/10/15 16:00:00";
-            Date leaderProposedDate1 = sdf.parse(dateInString1);
-            LeaderProposedTimestamp leaderProposedTimestamp1 = new LeaderProposedTimestamp();
-            leaderProposedTimestamp1.setTimestamp(leaderProposedDate1);
-            leaderProposedTimestamps.add(leaderProposedTimestamp1);
-
-            String dateInString2 = "2016/10/14 16:00:00";
-            Date leaderProposedDate2 = sdf.parse(dateInString2);
-            LeaderProposedTimestamp leaderProposedTimestamp2 = new LeaderProposedTimestamp();
-            leaderProposedTimestamp2.setTimestamp(leaderProposedDate2);
-            leaderProposedTimestamps.add(leaderProposedTimestamp2);
-
-            String dateInString3 = "2016/10/15 10:00:00";
-            Date leaderProposedDate3 = sdf.parse(dateInString3);
-            LeaderProposedTimestamp leaderProposedTimestamp3 = new LeaderProposedTimestamp();
-            leaderProposedTimestamp3.setTimestamp(leaderProposedDate3);
-            leaderProposedTimestamps.add(leaderProposedTimestamp3);
-
-            eventChuan1.setProposedTimestamps(leaderProposedTimestamps);
-        } catch (ParseException e) {
-            e.printStackTrace();
+            user = Backendless.UserService.register(user);
+        } catch(BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
+        // Create Person object
+        Person person = new Person();
+        person.setUserId(user.getObjectId());
+        person.setEmail(user.getEmail());
+        person.setName((String) user.getProperty("name"));
+        person.setIsGoogleCalendarImported((boolean) user.getProperty("isGoogleCalendarImported"));
         try {
-            String dateInString = "2016/10/15 16:00:00";
-            Date eventTimestamp = sdf.parse(dateInString);
-            eventChuan1.setTimestamp(eventTimestamp);
-        } catch (ParseException e) {
-            e.printStackTrace();
+            person = Backendless.Data.of(Person.class).save(person);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-
-//        Event eventChuan2 = new Event();
-//        eventChuan2.setEventLeaderDetail(eventLeaderDetail1);
-//        eventChuan2.setTitle("Chuan's 2 Event");
-//        eventChuan2.setStatusEvent(StatusEvent.Tentative.getStatus());
-
-        List<Event> eventsLeaderChuan = new ArrayList<>();
-        eventChuan1.setEventMemberDetail(eventMemberDetails);
-        eventsLeaderChuan.add(eventChuan1);
-//        eventsLeaderChuan.add(eventChuan2);
-        chuan.setEventsAsLeader(eventsLeaderChuan);
-
-        try {
-            chuan = Backendless.Data.of(Person.class).save(chuan);
-            sichao = Backendless.Data.of(Person.class).save(sichao);
-            hairong = Backendless.Data.of(Person.class).save(hairong);
-        } catch(BackendlessException e) {
-            System.out.println("Exception code: " + e.getCode());
-        }
-
-
-//        Person person1 = new Person();
-//        person1.setName("Chuan");
-//        person1.setEmail("xc5211@gmail.com");
-//
-//        Person person2 = new Person();
-//        person2.setName("Sichao");
-//        person2.setEmail("huangsichao2015@gmail.com");
-//
-//        Person person3 = new Person();
-//        person3.setName("Hairong");
-//        person3.setEmail("whairong2011@gmail.com");
-//
-//        try {
-//            person1 = Backendless.Data.of(Person.class).save(person1);
-//            person2 = Backendless.Data.of(Person.class).save(person2);
-//            person3 = Backendless.Data.of(Person.class).save(person3);
-//        } catch(BackendlessException e) {
-//            System.out.println("Exception code: " + e.getCode());
-//        }
-//
-//        String p1Id = person1.getObjectId();
-//        String p2Id = person2.getObjectId();
-//        String p3Id = person3.getObjectId();
-//        System.out.println(p1Id);
-//        System.out.println(p2Id);
-//        System.out.println(p3Id);
-
-        return new ApiResponse<>(SUCCESS_EVENT, "HAHHAHA");
-
-//        // Register
-//        BackendlessUser user = new BackendlessUser();
-//        user.setEmail(userEmail);
-//        user.setPassword(password);
-//        user.setProperty("name", name);
-//        user.setProperty("isGoogleCalendarImported", false);
-//        try {
-//            user = Backendless.UserService.register(user);
-//        } catch(BackendlessException exception) {
-//            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-//        }
-//
-//        // Create Person object
-//        Person person = new Person();
-//        person.setUserId(user.getObjectId());
-//        person.setEmail(user.getEmail());
-//        person.setName((String) user.getProperty("name"));
-//        person.setIsGoogleCalendarImported((boolean) user.getProperty("isGoogleCalendarImported"));
-//        try {
-//            person = Backendless.Data.of(Person.class).save(person);
-//        } catch (BackendlessException exception) {
-//            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-//        }
-//        return new ApiResponse<>(SUCCESS_EVENT, "You have successfully registered", person);
+        return new ApiResponse<>(SUCCESS_EVENT, "You have successfully registered", person);
     }
 
     @Override
