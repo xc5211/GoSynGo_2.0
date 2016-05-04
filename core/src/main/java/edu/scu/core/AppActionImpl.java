@@ -312,12 +312,32 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void getEventLocation(String eventId, ActionCallbackListener<String> listner) {
+    public void getEventLocation(final String eventId, final ActionCallbackListener<String> listener) {
+        AsyncTask<Void, Void, ApiResponse<String>> asyncTask = new AsyncTask<Void, Void, ApiResponse<String>>() {
 
+            @Override
+            protected ApiResponse<String> doInBackground(Void... params) {
+                return api.getEventLocation(eventId);
+            }
+
+            @Override
+            protected void onPostExecute(ApiResponse<String> response) {
+                if (listener != null && response != null) {
+                    if (response.isSuccess()) {
+                        //TODO:UPDATE
+                        listener.onSuccess(response.getObj());
+                    } else {
+                        listener.onFailure(response.getMsg());
+                    }
+                }
+            }
+
+        };
+        asyncTask.execute();
     }
 
     @Override
-    public void getEventDurationInMin(String eventId, ActionCallbackListener<Integer> listner) {
+    public void getEventDurationInMin(String eventId, ActionCallbackListener<Integer> listener) {
 
     }
 
