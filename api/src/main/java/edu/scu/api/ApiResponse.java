@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by chuanxu on 4/13/16.
  */
-public class ApiResponse<T> {
+public class ApiResponse<T> implements Responsable {
 
     private String event;
     private String msg;

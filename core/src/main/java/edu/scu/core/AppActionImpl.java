@@ -15,7 +15,6 @@ import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.task.AcceptEventAsyncTask;
-import edu.scu.core.task.Executable;
 import edu.scu.model.Event;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
@@ -180,6 +179,7 @@ public class AppActionImpl implements AppAction {
 
     }
 
+    // TODO[later]
     @Override
     public void importGoogleCalendar(final ActionCallbackListener<Void> listener) {
 
@@ -190,6 +190,7 @@ public class AppActionImpl implements AppAction {
 
     }
 
+    // TODO
     @Override
     public void proposeEvent(final ActionCallbackListener<Event> listener) {
         AsyncTask<Void, Void, ApiResponse<Event>> asyncTask = new AsyncTask<Void, Void, ApiResponse<Event>>() {
@@ -214,6 +215,7 @@ public class AppActionImpl implements AppAction {
         asyncTask.execute();
     }
 
+    // TODO
     @Override
     public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener) {
 
@@ -230,16 +232,19 @@ public class AppActionImpl implements AppAction {
 
     }
 
+    // TODO
     @Override
     public void sendEventInvitation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final List<LeaderProposedTimestamp> proposedTimestamps, ActionCallbackListener<Event> listener) {
 
     }
 
+    // TODO
     @Override
     public void initiateEvent(final String eventId, final ActionCallbackListener<Event> listener) {
 
     }
 
+    // TODO
     @Override
     public void cancelEvent(final String eventId, final ActionCallbackListener<Event> listener) {
 
@@ -250,11 +255,13 @@ public class AppActionImpl implements AppAction {
 
     }
 
+    // TODO
     @Override
     public void proposeEventTimestampsAsLeader(final String eventId, final List<LeaderProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<Event> listener) {
 
     }
 
+    // TODO
     @Override
     public void proposeEventTimestampsAsMember(final String eventId, final List<MemberProposedTimestamp> proposedEventTimestamps, ActionCallbackListener<Event> listener) {
 
@@ -268,11 +275,10 @@ public class AppActionImpl implements AppAction {
 
     @Override
     public void acceptEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
-        Executable acceptTask = new AcceptEventAsyncTask(api, listener, eventId, hostPerson);
-        acceptTask.execute();
+        // TODO: check event
 
-        // TODO: Test hostPerson change after async task
-        // Use "watch"?
+        AcceptEventAsyncTask acceptTask = new AcceptEventAsyncTask(api, listener, hostPerson, eventId);
+        acceptTask.execute();
     }
 
     // TODO[Hairong]
@@ -281,6 +287,7 @@ public class AppActionImpl implements AppAction {
 
     }
 
+    // TODO
     @Override
     public void checkInEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
 

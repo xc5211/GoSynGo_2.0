@@ -1,7 +1,5 @@
 package edu.scu.core.task;
 
-import android.os.AsyncTask;
-
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
@@ -15,35 +13,36 @@ import edu.scu.model.Person;
  */
 public class AcceptEventAsyncTask extends BaseAsyncTask {
 
-    public AcceptEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, final String eventId, final Person hostPerson) {
-        super(api, listener);
+    private String eventId;
 
-        super.asyncTask = new AsyncTask<Void, Void, ApiResponse<EventMemberDetail>>() {
+    public AcceptEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, Person hostPerson, String eventId) {
+        super(api, listener, hostPerson);
 
-            @Override
-            protected ApiResponse<EventMemberDetail> doInBackground(Void... params) {
-                return api.acceptEvent(hostPerson.getObjectId(), eventId);
-            }
+        this.eventId = eventId;
+    }
 
-            @Override
-            protected void onPostExecute(ApiResponse<EventMemberDetail> response) {
-                if (listener != null && response != null) {
-                    if (response.isSuccess()) {
-                        EventMemberDetail updatedEventMemberDetail = response.getObj();
-                        for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-                            if (eventAsMember.getObjectId().equals(eventId)) {
-                                eventAsMember.updateEventMemberDetail(updatedEventMemberDetail);
-                                listener.onSuccess(true);
-                                return;
-                            }
-                        }
-                        listener.onFailure(String.valueOf(R.string.member_accept_event_fail_message));
-                    } else {
-                        listener.onFailure(response.getMsg());
+    @Override
+    protected ApiResponse<EventMemberDetail> doInBackground(Object... params) {
+        return api.acceptEvent(hostPerson.getObjectId(), eventId);
+    }
+
+    @Override
+    protected void onPostExecute(ApiResponse response) {
+        if (listener != null && response != null) {
+            if (response.isSuccess()) {
+                EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) response.getObj();
+                for (Event eventAsMember : hostPerson.getEventsAsMember()) {
+                    if (eventAsMember.getObjectId().equals(eventId)) {
+                        eventAsMember.updateEventMemberDetail(updatedEventMemberDetail);
+                        listener.onSuccess(true);
+                        return;
                     }
                 }
+                listener.onFailure(String.valueOf(R.string.member_accept_event_fail_message));
+            } else {
+                listener.onFailure(response.getMsg());
             }
-        };
+        }
     }
 
 }
