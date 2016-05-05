@@ -14,6 +14,8 @@ import java.util.Map;
 import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
 import edu.scu.api.ApiResponse;
+import edu.scu.core.task.AcceptEventAsyncTask;
+import edu.scu.core.task.Executable;
 import edu.scu.model.Event;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
@@ -34,6 +36,11 @@ public class AppActionImpl implements AppAction {
     public AppActionImpl (Context context) {
         this.context = context;
         this.api = new ApiImpl();
+    }
+
+    @Override
+    public Person getHostPerson() {
+        return hostPerson;
     }
 
     @Override
@@ -169,17 +176,17 @@ public class AppActionImpl implements AppAction {
 
     // TODO[Hairong]
     @Override
-    public void isGoogleCalendarImported(ActionCallbackListener<Boolean> listener) {
+    public void isGoogleCalendarImported(final ActionCallbackListener<Boolean> listener) {
 
     }
 
     @Override
-    public void importGoogleCalendar(ActionCallbackListener<Void> listener) {
+    public void importGoogleCalendar(final ActionCallbackListener<Void> listener) {
 
     }
 
     @Override
-    public void getScheduledDates(String personId) {
+    public void getScheduledDates(final ActionCallbackListener<List<Date>> listener) {
 
     }
 
@@ -214,100 +221,84 @@ public class AppActionImpl implements AppAction {
 
     @Override
     public void getAllEventMembers(final String eventId, final ActionCallbackListener<List<Person>> listener) {
-        AsyncTask<Void, Void, ApiResponse<List<Person>>> asyncTask = new AsyncTask<Void, Void, ApiResponse<List<Person>>>() {
-
-            @Override
-            protected ApiResponse<List<Person>> doInBackground(Void... params) {
-                // TODO: Fix argument in the next line
-                return api.getAllEventMembers("");
-            }
-
-            @Override
-            protected void onPostExecute(ApiResponse<List<Person>> response) {
-                if (listener != null && response != null) {
-                    if (response.isSuccess()) {
-                        listener.onSuccess(response.getObj());
-                    } else {
-                        listener.onFailure(response.getMsg());
-                    }
-                }
-            }
-
-        };
-        asyncTask.execute();
-    }
-
-    // TODO[Hairong]
-    @Override
-    public void removeEventMember(String eventId, String memberId, ActionCallbackListener<Event> listener) {
-
-    }
-
-    @Override
-    public void sendEventInvitation(String eventId, String title, String location, int durationInMin, boolean hasReminder, int reminderInMin, List<LeaderProposedTimestamp> proposedTimestamps, ActionCallbackListener<Event> listener) {
-
-    }
-
-    @Override
-    public void initiateEvent(String eventId, ActionCallbackListener<Event> listener) {
-
-    }
-
-    @Override
-    public void cancelEvent(String eventId, ActionCallbackListener<Event> listener) {
-
-    }
-
-    @Override
-    public void getAllEventMembersStatusAndEstimate(String eventId, ActionCallbackListener<Map<Person, Integer>> lisener) {
-
-    }
-
-    @Override
-    public void proposeEventTimestampsAsLeader(String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps, ActionCallbackListener<Event> listener) {
-
-    }
-
-    @Override
-    public void proposeEventTimestampsAsMember(String memberId, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps, ActionCallbackListener<Event> listener) {
 
     }
 
     // TODO[Hairong]
     @Override
-    public void selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps, ActionCallbackListener<Event> listener) {
+    public void removeEventMember(final String eventId, final String memberId, final ActionCallbackListener<Event> listener) {
 
     }
 
     @Override
-    public void acceptEvent(String memberId, String eventId, ActionCallbackListener<Event> listener) {
+    public void sendEventInvitation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final List<LeaderProposedTimestamp> proposedTimestamps, ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void initiateEvent(final String eventId, final ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void cancelEvent(final String eventId, final ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void getAllEventMembersStatusAndEstimate(final String eventId, final ActionCallbackListener<Map<Person, Integer>> lisener) {
+
+    }
+
+    @Override
+    public void proposeEventTimestampsAsLeader(final String eventId, final List<LeaderProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<Event> listener) {
+
+    }
+
+    @Override
+    public void proposeEventTimestampsAsMember(final String eventId, final List<MemberProposedTimestamp> proposedEventTimestamps, ActionCallbackListener<Event> listener) {
 
     }
 
     // TODO[Hairong]
     @Override
-    public void declineEvent(String memberId, String eventId, ActionCallbackListener<Event> listener) {
+    public void selectEventTimestamps(final String eventId, final List<MemberSelectedTimestamp> selectedEventTimestamps, final ActionCallbackListener<Event> listener) {
 
     }
 
     @Override
-    public void checkInEvent(String memberId, String eventId, ActionCallbackListener<Event> listener) {
+    public void acceptEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
+        Executable acceptTask = new AcceptEventAsyncTask(api, listener, eventId, hostPerson);
+        acceptTask.execute();
+
+        // TODO: Test hostPerson change after async task
+        // Use "watch"?
+    }
+
+    // TODO[Hairong]
+    @Override
+    public void declineEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
+
+    }
+
+    @Override
+    public void checkInEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
 
     }
 
     // TODO[Hairong]
     @Override
-    public void setMinsToArriveAsMember(String memberId, String eventId, int estimateInMin, ActionCallbackListener<Event> listener) {
+    public void setMinsToArriveAsMember(final String eventId, final int estimateInMin, final ActionCallbackListener<Boolean> listener) {
 
     }
 
     @Override
-    public void getEventStatus(String eventId, ActionCallbackListener<Integer> listner) {
+    public void getEventStatus(final String eventId, final ActionCallbackListener<Integer> listener) {
 
     }
 
     @Override
-    public void getEventLeader(String eventId, ActionCallbackListener<Person> listner) {
+    public void getEventLeader(final String eventId, final ActionCallbackListener<Person> listener) {
 
     }
 
@@ -337,7 +328,7 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void getEventDurationInMin(String eventId, ActionCallbackListener<Integer> listener) {
+    public void getEventDurationInMin(final String eventId, final ActionCallbackListener<Integer> listener) {
 
     }
 
