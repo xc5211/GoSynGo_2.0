@@ -25,7 +25,7 @@ public interface Api {
      * As user
       */
     // String: userId
-    public ApiResponse<Person> register(String userEmail, String password, String name);
+    public ApiResponse<Person> register(String userEmail, String password, String firstName, String lastName);
     // Boolean: True/False
     public ApiResponse<String> login(String userEmail, String password, boolean stayLoggedIn);
     //Boolean:True/False

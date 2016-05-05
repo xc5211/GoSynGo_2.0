@@ -42,7 +42,7 @@ public class ApiImpl implements Api {
     private final static String idPersonHairong = "28E7440B-B6F3-8715-FF64-0F08AF049400";
     private final static String idUserChuan = "FA3F28DA-362E-3492-FF03-18E2DE3E2400";
     private final static String idUserSichao = "C91D6698-A1D0-0A85-FF20-9A8475F93600";
-    private final static String IdPersonHairong = "F6651BEB-EDF4-65BD-FFA3-8CD20C756C00";
+    private final static String idUserHairong = "F6651BEB-EDF4-65BD-FFA3-8CD20C756C00";
 
 
     private static List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader(List<String> datesInString) {
@@ -82,14 +82,14 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Person> register(String userEmail, String password, String name) {
+    public ApiResponse<Person> register(String userEmail, String password, String firstName, String lastName) {
 
         // Register
         BackendlessUser user = new BackendlessUser();
         user.setEmail(userEmail);
         user.setPassword(password);
-        user.setProperty("name", name);
-        user.setProperty("isGoogleCalendarImported", false);
+        user.setProperty("firstName", firstName);
+        user.setProperty("lastName", lastName);
         try {
             user = Backendless.UserService.register(user);
         } catch(BackendlessException exception) {
@@ -100,8 +100,9 @@ public class ApiImpl implements Api {
         Person person = new Person();
         person.setUserId(user.getObjectId());
         person.setEmail(user.getEmail());
-        person.setName((String) user.getProperty("name"));
-        person.setIsGoogleCalendarImported((boolean) user.getProperty("isGoogleCalendarImported"));
+        person.setFirstName((String) user.getProperty("firstName"));
+        person.setLastName((String) user.getProperty("lastName"));
+        person.setIsGoogleCalendarImported(false);
         try {
             person = Backendless.Data.of(Person.class).save(person);
         } catch (BackendlessException exception) {
