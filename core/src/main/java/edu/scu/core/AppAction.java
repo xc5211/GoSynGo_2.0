@@ -18,7 +18,7 @@ public interface AppAction {
     /**
      * As user
      */
-    public void register(final String userEmail, final String password, final String name, final ActionCallbackListener<Person> listener);
+    public void register(final String userEmail, final String password, final String firstName, final String lastName, final ActionCallbackListener<Person> listener);
     public void validateLogin(final ActionCallbackListener<Void> listener);
     public void login(final String userEmail, final String password, final boolean stayLoggedIn, final ActionCallbackListener<String> listener);
     public void logout(final ActionCallbackListener<Void> listener);

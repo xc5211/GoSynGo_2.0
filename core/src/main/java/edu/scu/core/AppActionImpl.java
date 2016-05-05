@@ -37,7 +37,7 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void register(final String userEmail, final String password, final String name, final ActionCallbackListener<Person> listener) {
+    public void register(final String userEmail, final String password, final String firstName, final String lastName, final ActionCallbackListener<Person> listener) {
 
 //        // check userEmail
 //        if (TextUtils.isEmpty(userEmail)) {
@@ -62,7 +62,7 @@ public class AppActionImpl implements AppAction {
 
             @Override
             protected ApiResponse<Person> doInBackground(Void... params) {
-                return api.register(userEmail, password, name);
+                return api.register(userEmail, password, firstName, lastName);
             }
 
             @Override
