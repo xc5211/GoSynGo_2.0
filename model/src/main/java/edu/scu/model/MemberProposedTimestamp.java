@@ -2,8 +2,8 @@ package edu.scu.model;
 
 import java.util.Date;
 
-public class MemberProposedTimestamp
-{
+public class MemberProposedTimestamp {
+
     private Date timestamp;
     private Date created;
     private Date updated;

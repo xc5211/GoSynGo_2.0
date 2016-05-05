@@ -2,10 +2,10 @@ package edu.scu.model;
 
 import java.util.Date;
 
-public class MemberSelectedTimestamp
-{
-    private Date updated;
+public class MemberSelectedTimestamp {
+
     private Date timestamp;
+    private Date updated;
     private Date created;
     private String objectId;
     private String ownerId;

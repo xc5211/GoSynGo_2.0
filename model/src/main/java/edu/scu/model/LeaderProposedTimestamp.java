@@ -2,11 +2,11 @@ package edu.scu.model;
 
 import java.util.Date;
 
-public class LeaderProposedTimestamp
-{
+public class LeaderProposedTimestamp {
+
+    private Date timestamp;
     private Date created;
     private Date updated;
-    private Date timestamp;
     private String ownerId;
     private String objectId;
 

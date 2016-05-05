@@ -4,6 +4,7 @@ package edu.scu.model;
  * Created by chuanxu on 4/13/16.
  */
 public enum StatusMember {
+
     Pending(0), Accept(1), Declined(2);
 
     private int status;
@@ -15,4 +16,5 @@ public enum StatusMember {
     public int getStatus() {
         return status;
     }
+
 }

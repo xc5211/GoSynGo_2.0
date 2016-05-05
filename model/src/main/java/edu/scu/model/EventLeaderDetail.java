@@ -3,17 +3,17 @@ package edu.scu.model;
 import java.util.Date;
 import java.util.List;
 
-public class EventLeaderDetail
-{
-    private String ownerId;
-    private Integer minsToArrive;
-    private Date created;
-    private Date updated;
+public class EventLeaderDetail {
+
     private Person leader;
     private Boolean isCheckedIn;
-    private String objectId;
+    private Integer minsToArrive;
     private List<LeaderProposedTimestamp> proposedTimestamps;
-//    private GeoPoint location;
+    //    private GeoPoint location;
+    private String ownerId;
+    private Date created;
+    private Date updated;
+    private String objectId;
 
     public String getOwnerId()
     {
@@ -120,5 +120,44 @@ public class EventLeaderDetail
 //    {
 //        return Backendless.Data.of( EventLeaderDetail.class ).find( query );
 //    }
+
+    private boolean hasProposedTimestamp(LeaderProposedTimestamp timestamp) {
+        for (LeaderProposedTimestamp proposedTimestamp : this.proposedTimestamps) {
+            if (proposedTimestamp.getObjectId().equals(timestamp.getObjectId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean addProposedTimestamp(LeaderProposedTimestamp timestamp) {
+        if (!hasProposedTimestamp(timestamp)) {
+            return this.proposedTimestamps.add(timestamp);
+        }
+        return false;
+    }
+
+    public boolean removeProposedTimestamp(LeaderProposedTimestamp timestamp) {
+        if (hasProposedTimestamp(timestamp)) {
+            return this.proposedTimestamps.remove(timestamp);
+        }
+        return false;
+    }
+
+    public boolean updateProposedTimestamp(LeaderProposedTimestamp timestamp) {
+        if (!hasProposedTimestamp(timestamp)) {
+            return false;
+        }
+
+        for (int i = 0; i < this.proposedTimestamps.size(); i++) {
+            LeaderProposedTimestamp currentProposedTimestamp = this.proposedTimestamps.get(i);
+            if (currentProposedTimestamp.getObjectId().equals(timestamp.getObjectId())) {
+                this.proposedTimestamps.set(i, currentProposedTimestamp);
+                return true;
+            }
+        }
+        assert false;
+        return false;
+    }
 
 }

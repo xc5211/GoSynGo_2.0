@@ -5,22 +5,22 @@ import java.util.List;
 
 public class Event {
 
-    private Integer reminderInMin;
-    private Integer statusEvent;
     private String title;
-    private String ownerId;
-    private String objectId;
-    private Date updated;
     private String note;
-    private Date created;
-    private Boolean hasReminder;
-    private Integer durationInMin;
-    private Date timestamp;
     private String location;
+    //    private GeoPoint locationGeo;
+    private Integer durationInMin;
+    private Integer statusEvent;
+    private Boolean hasReminder;
+    private Integer reminderInMin;
+    private Date timestamp;
     private EventLeaderDetail eventLeaderDetail;
     private List<EventMemberDetail> eventMemberDetail;
     private List<LeaderProposedTimestamp> proposedTimestamps;
-//    private GeoPoint locationGeo;
+    private String ownerId;
+    private String objectId;
+    private Date updated;
+    private Date created;
 
     public Integer getReminderInMin() {
         return reminderInMin;
@@ -158,5 +158,83 @@ public class Event {
 //    public static BackendlessCollection<Event> find(BackendlessDataQuery query) {
 //        return Backendless.Data.of(Event.class).find(query);
 //    }*/
+
+    private boolean hasEventMemberDetail(EventMemberDetail eventMemberDetail) {
+        for (EventMemberDetail memberDetail : this.eventMemberDetail) {
+            if (memberDetail.getObjectId().equals(eventMemberDetail.getObjectId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean addEventMemberDetail(EventMemberDetail eventMemberDetail) {
+        if (!hasEventMemberDetail(eventMemberDetail)) {
+            return this.eventMemberDetail.add(eventMemberDetail);
+        }
+        return false;
+    }
+
+    public boolean removeEventMemberDetail(EventMemberDetail eventMemberDetail) {
+        if (hasEventMemberDetail(eventMemberDetail)) {
+            return this.eventMemberDetail.remove(eventMemberDetail);
+        }
+        return true;
+    }
+
+    public boolean updateEventMemberDetail(EventMemberDetail eventMemberDetail) {
+        if (!hasEventMemberDetail(eventMemberDetail)) {
+            return false;
+        }
+
+        for (int i = 0; i < this.eventMemberDetail.size(); i++) {
+            EventMemberDetail currentMemberDetail = this.eventMemberDetail.get(i);
+            if (currentMemberDetail.getObjectId().equals(eventMemberDetail.getObjectId())) {
+                this.eventMemberDetail.set(i, currentMemberDetail);
+                return true;
+            }
+        }
+        assert false;
+        return false;
+    }
+
+    public boolean hasProposedTimestamp(LeaderProposedTimestamp timestamp) {
+        for (LeaderProposedTimestamp proposedTimestamp : this.proposedTimestamps) {
+            if (proposedTimestamp.getObjectId().equals(timestamp.getObjectId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean addProposedTimestamp(LeaderProposedTimestamp timestamp) {
+        if (!hasProposedTimestamp(timestamp)) {
+            return this.proposedTimestamps.add(timestamp);
+        }
+        return false;
+    }
+
+    public boolean removeProposedTimestamp(LeaderProposedTimestamp timestamp) {
+        if (hasProposedTimestamp(timestamp)) {
+            return this.proposedTimestamps.remove(timestamp);
+        }
+        return false;
+    }
+
+    public boolean updateProposedTimestamp(LeaderProposedTimestamp timestamp) {
+        if (!hasProposedTimestamp(timestamp)) {
+            return false;
+        }
+
+        for (int i = 0; i < this.proposedTimestamps.size(); i++) {
+            LeaderProposedTimestamp currentProposedTimestamp = this.proposedTimestamps.get(i);
+            if (currentProposedTimestamp.getObjectId().equals(timestamp.getObjectId())) {
+                this.proposedTimestamps.set(i, currentProposedTimestamp);
+                return true;
+            }
+        }
+        assert false;
+        return false;
+    }
 
 }

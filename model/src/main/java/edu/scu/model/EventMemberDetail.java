@@ -3,19 +3,19 @@ package edu.scu.model;
 import java.util.Date;
 import java.util.List;
 
-public class EventMemberDetail
-{
-    private String ownerId;
-    private Integer minsToArrive;
-    private Date created;
-    private Date updated;
+public class EventMemberDetail {
+
     private Person member;
-    private Boolean isCheckedIn;
     private Integer statusMember;
-    private String objectId;
+    private Boolean isCheckedIn;
+    private Integer minsToArrive;
     private List<MemberSelectedTimestamp> selectedTimestamps;
     private List<MemberProposedTimestamp> proposedTimestamps;
-//    private GeoPoint location;
+    //    private GeoPoint location;
+    private String ownerId;
+    private Date created;
+    private Date updated;
+    private String objectId;
 
     public String getOwnerId()
     {
@@ -142,5 +142,83 @@ public class EventMemberDetail
 //    {
 //        return Backendless.Data.of( EventMemberDetail.class ).find( query );
 //    }
+
+    private boolean hasProposedTimestamp(MemberProposedTimestamp timestamp) {
+        for (MemberProposedTimestamp proposedTimestamp : this.proposedTimestamps) {
+            if (proposedTimestamp.getObjectId().equals(timestamp.getObjectId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean addProposedTimestamp(MemberProposedTimestamp timestamp) {
+        if (!hasProposedTimestamp(timestamp)) {
+            return this.proposedTimestamps.add(timestamp);
+        }
+        return false;
+    }
+
+    public boolean removeProposedTimestamp(MemberProposedTimestamp timestamp) {
+        if (hasProposedTimestamp(timestamp)) {
+            return this.proposedTimestamps.remove(timestamp);
+        }
+        return false;
+    }
+
+    public boolean updateProposedTimestamp(MemberProposedTimestamp timestamp) {
+        if (!hasProposedTimestamp(timestamp)) {
+            return false;
+        }
+
+        for (int i = 0; i < this.proposedTimestamps.size(); i++) {
+            MemberProposedTimestamp currentProposedTimestamp = this.proposedTimestamps.get(i);
+            if (currentProposedTimestamp.getObjectId().equals(timestamp.getObjectId())) {
+                this.proposedTimestamps.set(i, currentProposedTimestamp);
+                return true;
+            }
+        }
+        assert false;
+        return false;
+    }
+
+    private boolean hasSelectedTimestamp(MemberSelectedTimestamp timestamp) {
+        for (MemberSelectedTimestamp selectedTimestamp : this.selectedTimestamps) {
+            if (selectedTimestamp.getObjectId().equals(timestamp.getObjectId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean addSelectedTimestamp(MemberSelectedTimestamp timestamp) {
+        if (!hasSelectedTimestamp(timestamp)) {
+            return this.selectedTimestamps.add(timestamp);
+        }
+        return false;
+    }
+
+    public boolean removeSelectedTimestamp(MemberSelectedTimestamp timestamp) {
+        if (hasSelectedTimestamp(timestamp)) {
+            return this.selectedTimestamps.remove(timestamp);
+        }
+        return false;
+    }
+
+    public boolean updateSelectedTimestamp(MemberSelectedTimestamp timestamp) {
+        if (!hasSelectedTimestamp(timestamp)) {
+            return false;
+        }
+
+        for (int i = 0; i < this.selectedTimestamps.size(); i++) {
+            MemberSelectedTimestamp currentSelectedTimestamp = this.selectedTimestamps.get(i);
+            if (currentSelectedTimestamp.getObjectId().equals(timestamp.getObjectId())) {
+                this.selectedTimestamps.set(i, currentSelectedTimestamp);
+                return true;
+            }
+        }
+        assert false;
+        return false;
+    }
 
 }
