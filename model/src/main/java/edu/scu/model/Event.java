@@ -16,6 +16,7 @@ public class Event {
     private Date timestamp;
     private EventLeaderDetail eventLeaderDetail;
     private List<EventMemberDetail> eventMemberDetail;
+    @Deprecated
     private List<LeaderProposedTimestamp> proposedTimestamps;
     private String ownerId;
     private String objectId;
@@ -110,10 +111,12 @@ public class Event {
         this.eventMemberDetail = eventMemberDetail;
     }
 
+    @Deprecated
     public List<LeaderProposedTimestamp> getProposedTimestamps() {
         return proposedTimestamps;
     }
 
+    @Deprecated
     public void setProposedTimestamps(List<LeaderProposedTimestamp> proposedTimestamps) {
         this.proposedTimestamps = proposedTimestamps;
     }

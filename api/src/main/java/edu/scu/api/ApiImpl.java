@@ -293,10 +293,7 @@ public class ApiImpl implements Api {
         EventMemberDetail eventMemberDetail = new EventMemberDetail();
         eventMemberDetail.setMember(member);
         eventMemberDetail.setStatusMember(StatusMember.Pending.getStatus());
-
-        List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
-        eventMemberDetails.add(eventMemberDetail);
-        event.setEventMemberDetail(eventMemberDetails);
+        event.getEventMemberDetail().add(eventMemberDetail);
         try {
             event = Backendless.Data.of(Event.class).save(event);
         } catch (BackendlessException exception) {
@@ -355,7 +352,8 @@ public class ApiImpl implements Api {
         event.setDurationInMin(durationInMin);
         event.setHasReminder(hasReminder);
         event.setReminderInMin(reminderInMin);
-        event.setProposedTimestamps(proposedTimestamps);
+        // event.setProposedTimestamps(proposedTimestamps);
+        event.getEventLeaderDetail().setProposedTimestamps(proposedTimestamps);
         event.setStatusEvent(StatusEvent.Pending.getStatus());
         try {
             event = Backendless.Data.of(Event.class).save(event);
@@ -366,7 +364,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Event> initiateEvent(String eventId) {
+    public ApiResponse<Event> initiateEvent(String eventId, Date eventTimestamp) {
 
         // Get target Event object
         Event event = null;
@@ -377,6 +375,7 @@ public class ApiImpl implements Api {
         }
 
         // Update event status
+        event.setTimestamp(eventTimestamp);
         event.setStatusEvent(StatusEvent.Ready.getStatus());
 
         // Save target Event object
@@ -450,36 +449,37 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Event> proposeEventTimestampsAsLeader(String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps) {
+    public ApiResponse<EventLeaderDetail> proposeEventTimestampsAsLeader(String leaderId, String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps) {
 
-        Event event;
+        // Get target EventLeaderDetail object
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventleaderDetail(eventId, leaderId));
+        BackendlessCollection<EventLeaderDetail> result;
         try {
-            event = Backendless.Data.of(Event.class).findById(eventId);
+            result = Backendless.Data.of(EventLeaderDetail.class).find(dataQuery);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
-        event.setProposedTimestamps(proposedEventTimestamps);
+        if (result.getData().size() != 1) {
+            return new ApiResponse<>(FAIL_EVENT, "Member doesn't exist");
+        }
 
+        // Set leader proposed time
+        EventLeaderDetail eventLeaderDetail = result.getData().get(0);
+        eventLeaderDetail.setProposedTimestamps(proposedEventTimestamps);
+
+        // Save
         try {
-            event = Backendless.Data.of(Event.class).save(event);
+            eventLeaderDetail = Backendless.Data.of(EventLeaderDetail.class).save(eventLeaderDetail);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-
-        return new ApiResponse<>(SUCCESS_EVENT, "Propose event time success", event);
+        return new ApiResponse<>(SUCCESS_EVENT, "Propose event time success", eventLeaderDetail);
     }
 
     @Override
-    public ApiResponse<Event> proposeEventTimestampsAsMember(String memberId, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps) {
-
-        // Get target Event object
-        Event event;
-        try {
-            event = Backendless.Data.of(Event.class).findById(eventId);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
+    public ApiResponse<EventMemberDetail> proposeEventTimestampsAsMember(String memberId, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps) {
 
         // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
@@ -498,27 +498,18 @@ public class ApiImpl implements Api {
         // Set member proposed time
         EventMemberDetail eventMemberDetail = result.getData().get(0);
         eventMemberDetail.setProposedTimestamps(proposedEventTimestamps);
-        List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
-        eventMemberDetails.add(eventMemberDetail);
-        event.setEventMemberDetail(eventMemberDetails);
 
+        // Save
         try {
-            event = Backendless.Data.of(Event.class).save(event);
+            eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Propose event time success", event);
+        return new ApiResponse<>(SUCCESS_EVENT, "Propose event time success", eventMemberDetail);
     }
 
     @Override
-    public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps) {
-        // Get Event
-        Event event = null;
-        try {
-            event = Backendless.Data.of(Event.class).findById(eventId);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
+    public ApiResponse<EventMemberDetail> selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps) {
 
         // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
@@ -534,30 +525,22 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Member doesn't exist");
         }
 
+        // Set member selected time
         List<EventMemberDetail> eventMemberDetails = result.getData();
         EventMemberDetail eventMemberDetail = eventMemberDetails.get(0);
         eventMemberDetail.setSelectedTimestamps(selectedEventTimestamps);
-        event.setEventMemberDetail(eventMemberDetails);
 
         // Send back the event
         try {
-            event = Backendless.Data.of(Event.class).save(event);
+            eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Select event time success", event);
+        return new ApiResponse<>(SUCCESS_EVENT, "Select event time success", eventMemberDetail);
     }
 
     @Override
-    public ApiResponse<Event> acceptEvent(String memberId, String eventId) {
-
-        // Get target Event object
-        Event event;
-        try {
-            event = Backendless.Data.of(Event.class).findById(eventId);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
+    public ApiResponse<EventMemberDetail> acceptEvent(String memberId, String eventId) {
 
         // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
@@ -574,30 +557,20 @@ public class ApiImpl implements Api {
         }
 
         // Update member status
-        List<EventMemberDetail> eventMemberDetails = result.getData();
-        EventMemberDetail eventMemberDetail = eventMemberDetails.get(0);
+        EventMemberDetail eventMemberDetail = result.getData().get(0);
         eventMemberDetail.setStatusMember(StatusMember.Accept.getStatus());
-        event.setEventMemberDetail(eventMemberDetails);
 
-        // Save target Event object
+        // Save
         try {
-            event = Backendless.Data.of(Event.class).save(event);
+            eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", event);
+        return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", eventMemberDetail);
     }
 
     @Override
-    public ApiResponse<Event> declineEvent(String memberId, String eventId) {
-
-        // Get target Event object
-        Event event = null;
-        try {
-            event = Backendless.Data.of(Event.class).findById(eventId);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
+    public ApiResponse<EventMemberDetail> declineEvent(String memberId, String eventId) {
 
         // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
@@ -614,35 +587,24 @@ public class ApiImpl implements Api {
         }
 
         // Update member status
-        List<EventMemberDetail> eventMemberDetails = result.getData();
-        EventMemberDetail eventMemberDetail = eventMemberDetails.get(0);
+        EventMemberDetail eventMemberDetail = result.getData().get(0);
         eventMemberDetail.setStatusMember(StatusMember.Declined.getStatus());
-        event.setEventMemberDetail(eventMemberDetails);
 
-        // Save target Event object
+        // Save
         try {
-            event = Backendless.Data.of(Event.class).save(event);
+            eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", event);
+        return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", eventMemberDetail);
     }
 
     @Override
-    public ApiResponse<Event> checkInEvent(String memberId, String eventId) {
-
-        // Get target Event object
-        Event event = null;
-        try {
-            event = Backendless.Data.of(Event.class).findById(eventId);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
+    public ApiResponse<EventMemberDetail> checkInEvent(String memberId, String eventId) {
 
         // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
         dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMemberDetail(eventId, memberId));
-        QueryOptions queryOptions = new QueryOptions();
         BackendlessCollection<EventMemberDetail> result = null;
         try {
             result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
@@ -655,30 +617,20 @@ public class ApiImpl implements Api {
         }
 
         // Update member status
-        List<EventMemberDetail> eventMemberDetails = result.getData();
-        EventMemberDetail eventMemberDetail = eventMemberDetails.get(0);
+        EventMemberDetail eventMemberDetail = result.getData().get(0);
         eventMemberDetail.setIsCheckedIn(true);
-        event.setEventMemberDetail(eventMemberDetails);
 
-        // Save target Event object
+        // Save
         try {
-            event = Backendless.Data.of(Event.class).save(event);
+            eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Checked in event", event);
+        return new ApiResponse<>(SUCCESS_EVENT, "Checked in event", eventMemberDetail);
     }
 
     @Override
-    public ApiResponse<Event> setMinsToArriveAsMember(String memberId, String eventId, int estimateInMin) {
-
-        // Get Event
-        Event event = null;
-        try {
-            event = Backendless.Data.of(Event.class).findById(eventId);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
+    public ApiResponse<EventMemberDetail> setMinsToArriveAsMember(String memberId, String eventId, int estimateInMin) {
 
         // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
@@ -690,18 +642,17 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
 
-        List<EventMemberDetail> eventMemberDetails = result.getData();
-        EventMemberDetail eventMemberDetail = eventMemberDetails.get(0);
+        // Update
+        EventMemberDetail eventMemberDetail = result.getData().get(0);
         eventMemberDetail.setMinsToArrive(estimateInMin);
-        event.setEventMemberDetail(eventMemberDetails);
 
         // Send back the event
         try {
-            event = Backendless.Data.of(Event.class).save(event);
+            eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Set estimate success", event);
+        return new ApiResponse<>(SUCCESS_EVENT, "Set estimate success", eventMemberDetail);
     }
 
     @Override

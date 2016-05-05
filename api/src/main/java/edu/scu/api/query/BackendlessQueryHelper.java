@@ -5,6 +5,17 @@ package edu.scu.api.query;
  */
 public class BackendlessQueryHelper {
 
+    public static String queryEventleaderDetail(String eventId, String leaderId) {
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append("leader");
+        whereClause.append(".objectId = '").append(leaderId).append("'");
+        whereClause.append(" and ");
+        whereClause.append("leader");
+        whereClause.append(".eventsAsLeader");
+        whereClause.append(".objectId = '").append(eventId).append("'");
+        return whereClause.toString();
+    }
+
     public static String queryEventMemberDetail(String eventId, String memberId) {
         StringBuilder whereClause = new StringBuilder();
         whereClause.append("member");

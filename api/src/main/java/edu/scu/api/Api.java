@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import edu.scu.model.Event;
+import edu.scu.model.EventLeaderDetail;
+import edu.scu.model.EventMemberDetail;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
@@ -53,7 +55,7 @@ public interface Api {
 
     public ApiResponse<Event> sendEventInvitation(String eventId, String title, String location, int durationInMin, boolean hasReminder, int reminderInMin, List<LeaderProposedTimestamp> proposedTimestamps);
 
-    public ApiResponse<Event> initiateEvent(String eventId);
+    public ApiResponse<Event> initiateEvent(String eventId, Date eventTimestamp);
 
     public ApiResponse<Event> cancelEvent(String eventId);
 
@@ -61,22 +63,22 @@ public interface Api {
 
     public ApiResponse<List<Person>> getAllEventMembers(String eventId);
 
-    public ApiResponse<Event> proposeEventTimestampsAsLeader(String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps);
+    public ApiResponse<EventLeaderDetail> proposeEventTimestampsAsLeader(String leaderId, String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps);
 
     /**
      * As member
      */
-    public ApiResponse<Event> proposeEventTimestampsAsMember(String memberId, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps);
+    public ApiResponse<EventMemberDetail> proposeEventTimestampsAsMember(String memberId, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps);
 
-    public ApiResponse<Event> selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps);
+    public ApiResponse<EventMemberDetail> selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps);
 
-    public ApiResponse<Event> acceptEvent(String memberId, String eventId);
+    public ApiResponse<EventMemberDetail> acceptEvent(String memberId, String eventId);
 
-    public ApiResponse<Event> declineEvent(String memberId, String eventId);
+    public ApiResponse<EventMemberDetail> declineEvent(String memberId, String eventId);
 
-    public ApiResponse<Event> checkInEvent(String memberId, String eventId);
+    public ApiResponse<EventMemberDetail> checkInEvent(String memberId, String eventId);
 
-    public ApiResponse<Event> setMinsToArriveAsMember(String memberId, String eventId, int estimateInMin);
+    public ApiResponse<EventMemberDetail> setMinsToArriveAsMember(String memberId, String eventId, int estimateInMin);
 
     /**
      * Event - Shared to both leader and member
