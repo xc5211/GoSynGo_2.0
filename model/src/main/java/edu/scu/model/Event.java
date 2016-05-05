@@ -16,8 +16,6 @@ public class Event {
     private Date timestamp;
     private EventLeaderDetail eventLeaderDetail;
     private List<EventMemberDetail> eventMemberDetail;
-    @Deprecated
-    private List<LeaderProposedTimestamp> proposedTimestamps;
     private String ownerId;
     private String objectId;
     private Date updated;
@@ -111,16 +109,6 @@ public class Event {
         this.eventMemberDetail = eventMemberDetail;
     }
 
-    @Deprecated
-    public List<LeaderProposedTimestamp> getProposedTimestamps() {
-        return proposedTimestamps;
-    }
-
-    @Deprecated
-    public void setProposedTimestamps(List<LeaderProposedTimestamp> proposedTimestamps) {
-        this.proposedTimestamps = proposedTimestamps;
-    }
-
     public EventLeaderDetail getEventLeaderDetail() {
         return eventLeaderDetail;
     }
@@ -194,45 +182,6 @@ public class Event {
             EventMemberDetail currentMemberDetail = this.eventMemberDetail.get(i);
             if (currentMemberDetail.getObjectId().equals(eventMemberDetail.getObjectId())) {
                 this.eventMemberDetail.set(i, currentMemberDetail);
-                return true;
-            }
-        }
-        assert false;
-        return false;
-    }
-
-    public boolean hasProposedTimestamp(LeaderProposedTimestamp timestamp) {
-        for (LeaderProposedTimestamp proposedTimestamp : this.proposedTimestamps) {
-            if (proposedTimestamp.getObjectId().equals(timestamp.getObjectId())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean addProposedTimestamp(LeaderProposedTimestamp timestamp) {
-        if (!hasProposedTimestamp(timestamp)) {
-            return this.proposedTimestamps.add(timestamp);
-        }
-        return false;
-    }
-
-    public boolean removeProposedTimestamp(LeaderProposedTimestamp timestamp) {
-        if (hasProposedTimestamp(timestamp)) {
-            return this.proposedTimestamps.remove(timestamp);
-        }
-        return false;
-    }
-
-    public boolean updateProposedTimestamp(LeaderProposedTimestamp timestamp) {
-        if (!hasProposedTimestamp(timestamp)) {
-            return false;
-        }
-
-        for (int i = 0; i < this.proposedTimestamps.size(); i++) {
-            LeaderProposedTimestamp currentProposedTimestamp = this.proposedTimestamps.get(i);
-            if (currentProposedTimestamp.getObjectId().equals(timestamp.getObjectId())) {
-                this.proposedTimestamps.set(i, currentProposedTimestamp);
                 return true;
             }
         }
