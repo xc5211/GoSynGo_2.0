@@ -22,7 +22,6 @@ public interface Api {
     // ApiResponseRegister
     // ApiResponseLogin
 
-
     /**
      * As user
       */
@@ -49,7 +48,7 @@ public interface Api {
     // Returns a newly created empty Event object
     public ApiResponse<Event> proposeEvent(String leaderId);
 
-    public ApiResponse<Event> addEventMember(String eventId, String memberEmail);
+    public ApiResponse<Person> addEventMember(String eventId, String memberEmail);
 
     public ApiResponse<Event> removeEventMember(String eventId, String memberId);
 
@@ -90,5 +89,12 @@ public interface Api {
     public ApiResponse<String> getEventLocation(String eventId);
 
     public ApiResponse<Integer> getEventDurationInMin(String eventId);
+
+    /**
+     * Device
+     */
+    public ApiResponse<Void> registerDevice();
+
+    public ApiResponse<Void> unregisterDevice();
 
 }

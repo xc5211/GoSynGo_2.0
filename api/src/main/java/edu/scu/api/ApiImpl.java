@@ -5,7 +5,6 @@ import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
 import com.backendless.exceptions.BackendlessException;
 import com.backendless.persistence.BackendlessDataQuery;
-import com.backendless.persistence.QueryOptions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.scu.api.query.BackendlessQueryHelper;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
@@ -24,7 +24,7 @@ import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
 import edu.scu.model.StatusEvent;
 import edu.scu.model.StatusMember;
-import edu.scu.api.query.BackendlessQueryHelper;
+import edu.scu.util.lib.GoogleProjectSettings;
 
 /**
  * Created by chuanxu on 4/13/16.
@@ -81,9 +81,27 @@ public class ApiImpl implements Api {
         return memberProposedTimestamps;
     }
 
+    private static List<MemberSelectedTimestamp> selectEventTimestampsAsMember(List<String> datesInString) {
+//        String dateInString = "2016/10/15 16:00:00";
+
+        List<MemberSelectedTimestamp> memberSelectedTimestamps = new ArrayList<>();
+        try {
+            Date date;
+            for (String dateInString : datesInString) {
+                date = sdf.parse(dateInString);
+                MemberSelectedTimestamp memberSelectedTimestamp = new MemberSelectedTimestamp();
+                memberSelectedTimestamp.setTimestamp(date);
+                memberSelectedTimestamps.add(memberSelectedTimestamp);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return memberSelectedTimestamps;
+    }
+
     @Override
     public ApiResponse<Person> register(String userEmail, String password, String firstName, String lastName) {
-
+        
         // Register
         BackendlessUser user = new BackendlessUser();
         user.setEmail(userEmail);
@@ -264,7 +282,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Event> addEventMember(String eventId, String memberEmail) {
+    public ApiResponse<Person> addEventMember(String eventId, String memberEmail) {
 
         // Get event
         Event event = null;
@@ -294,12 +312,14 @@ public class ApiImpl implements Api {
         eventMemberDetail.setMember(member);
         eventMemberDetail.setStatusMember(StatusMember.Pending.getStatus());
         event.getEventMemberDetail().add(eventMemberDetail);
+
+        member.getEventsAsMember().add(event);
         try {
-            event = Backendless.Data.of(Event.class).save(event);
+            member = Backendless.Data.of(Person.class).save(member);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Add event member success", event);
+        return new ApiResponse<>(SUCCESS_EVENT, "Add event member success", member);
     }
 
     @Override
@@ -352,7 +372,6 @@ public class ApiImpl implements Api {
         event.setDurationInMin(durationInMin);
         event.setHasReminder(hasReminder);
         event.setReminderInMin(reminderInMin);
-        // event.setProposedTimestamps(proposedTimestamps);
         event.getEventLeaderDetail().setProposedTimestamps(proposedTimestamps);
         event.setStatusEvent(StatusEvent.Pending.getStatus());
         try {
@@ -541,6 +560,8 @@ public class ApiImpl implements Api {
 
     @Override
     public ApiResponse<EventMemberDetail> acceptEvent(String memberId, String eventId) {
+        memberId = idPersonHairong;
+        eventId = "0ED31A48-13E1-2EDC-FFF8-F2EF8764AC00";
 
         // Get target EventMemberDetail object
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
@@ -701,6 +722,18 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
         return new ApiResponse<> (SUCCESS_EVENT,"Get event duration min success", event.getDurationInMin());
+    }
+
+    @Override
+    public ApiResponse<Void> registerDevice() {
+        Backendless.Messaging.registerDevice(GoogleProjectSettings.GOOGLE_PROJECT_NUMBER, GoogleProjectSettings.DEFAULT_CHANNEL);
+        return new ApiResponse<>(SUCCESS_EVENT, "Register device success");
+    }
+
+    @Override
+    public ApiResponse<Void> unregisterDevice() {
+        Backendless.Messaging.unregisterDevice();
+        return new ApiResponse<>(SUCCESS_EVENT, "Unregister device success");
     }
 
 }

@@ -15,6 +15,11 @@ import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.task.AcceptEventAsyncTask;
+import edu.scu.core.task.InitiateEventAsyncTask;
+import edu.scu.core.task.LoginAsyncTask;
+import edu.scu.core.task.LogoutAsyncTask;
+import edu.scu.core.task.RegisterAsyncTask;
+import edu.scu.core.task.RegisterDeviceAsyncTask;
 import edu.scu.model.Event;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
@@ -38,8 +43,23 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
+    public String getHostUserId() {
+        return hostUserId;
+    }
+
+    @Override
     public Person getHostPerson() {
         return hostPerson;
+    }
+
+    @Override
+    public void setHostUserId(String hostUserId) {
+        AppActionImpl.hostUserId = hostUserId;
+    }
+
+    @Override
+    public void setHostPerson(Person hostPerson) {
+        AppActionImpl.hostPerson = hostPerson;
     }
 
     @Override
@@ -64,28 +84,11 @@ public class AppActionImpl implements AppAction {
         // TODO: validate parameters...
 
 
-        AsyncTask<Void, Void, ApiResponse<Person>> asyncTask = new AsyncTask<Void, Void, ApiResponse<Person>>() {
+        RegisterAsyncTask registerTask = new RegisterAsyncTask(api, listener, hostPerson, userEmail, password, firstName, lastName);
+        registerTask.execute();
 
-            @Override
-            protected ApiResponse<Person> doInBackground(Void... params) {
-                return api.register(userEmail, password, firstName, lastName);
-            }
-
-            @Override
-            protected void onPostExecute(ApiResponse<Person> response) {
-                if (listener != null && response != null) {
-                    if (response.isSuccess()) {
-                        hostPerson = response.getObj();
-                        listener.onSuccess(response.getObj());
-                    } else {
-                        listener.onFailure(response.getMsg());
-                    }
-                }
-            }
-
-        };
-        asyncTask.execute();
-
+        RegisterDeviceAsyncTask registerDeviceTask = new RegisterDeviceAsyncTask(api, null, null);
+        registerDeviceTask.execute();
     }
 
     @Override
@@ -120,52 +123,15 @@ public class AppActionImpl implements AppAction {
         // TODO: validate password
 
 
-        AsyncTask<Void, Void, ApiResponse<String>> asyncTask = new AsyncTask<Void, Void, ApiResponse<String>>() {
-
-            @Override
-            protected ApiResponse<String> doInBackground(Void... params) {
-                return api.login(userEmail, password, stayLoggedIn);
-            }
-
-            @Override
-            protected void onPostExecute(ApiResponse<String> response) {
-                if (listener != null && response != null) {
-                    if (response.isSuccess()) {
-                        listener.onSuccess(response.getObj());
-                    } else {
-                        listener.onFailure(response.getMsg());
-                    }
-                }
-            }
-
-        };
-        asyncTask.execute();
-
+        LoginAsyncTask loginAsyncTask = new LoginAsyncTask(api, listener, hostPerson, this, userEmail, password, stayLoggedIn);
+        loginAsyncTask.execute();
     }
 
     @Override
     public void logout(final ActionCallbackListener<Void> listener) {
 
-        AsyncTask<Void, Void, ApiResponse<Void>> asyncTask = new AsyncTask<Void, Void, ApiResponse<Void>>() {
-
-            @Override
-            protected ApiResponse<Void> doInBackground(Void... params) {
-                return api.logout();
-            }
-
-            @Override
-            protected void onPostExecute(ApiResponse<Void> response) {
-                if (listener != null && response != null) {
-                    if (response.isSuccess()) {
-                        listener.onSuccess(null);
-                    } else {
-                        listener.onFailure(response.getMsg());
-                    }
-                }
-            }
-
-        };
-        asyncTask.execute();
+        LogoutAsyncTask logoutAsyncTask = new LogoutAsyncTask(api, listener, hostPerson, this);
+        logoutAsyncTask.execute();
     }
 
     @Override
@@ -240,8 +206,11 @@ public class AppActionImpl implements AppAction {
 
     // TODO
     @Override
-    public void initiateEvent(final String eventId, final ActionCallbackListener<Event> listener) {
+    public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp) {
+        // TODO: check event
 
+        InitiateEventAsyncTask initiateEvent = new InitiateEventAsyncTask(api, listener, hostPerson, eventId, eventFinalTimestamp);
+        initiateEvent.execute();
     }
 
     // TODO

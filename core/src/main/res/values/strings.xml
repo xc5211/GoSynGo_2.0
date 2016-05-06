@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Core</string>
     <string name="member_accept_event_fail_message">Sync with server error</string>
+    <string name="initiate_event_response_data_not_sync">Sync problem with server</string>
 </resources>

@@ -16,7 +16,10 @@ import edu.scu.model.Person;
  */
 public interface AppAction {
 
+    public String getHostUserId();
     public Person getHostPerson();
+    public void setHostUserId(String hostUserId);
+    public void setHostPerson(Person person);
 
     /**
      * As user
@@ -40,7 +43,7 @@ public interface AppAction {
     public void getAllEventMembers(final String eventId, final ActionCallbackListener<List<Person>> listener);
     public void removeEventMember(final String eventId, final String memberId, final ActionCallbackListener<Event> listener);
     public void sendEventInvitation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final List<LeaderProposedTimestamp> proposedTimestamps, final ActionCallbackListener<Event> listener);
-    public void initiateEvent(final String eventId, final ActionCallbackListener<Event> listener);
+    public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp);
     public void cancelEvent(final String eventId, final ActionCallbackListener<Event> listener);
     public void getAllEventMembersStatusAndEstimate(final String eventId, final ActionCallbackListener<Map<Person, Integer>> lisener);
     public void proposeEventTimestampsAsLeader(final String eventId, final List<LeaderProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<Event> listener);
