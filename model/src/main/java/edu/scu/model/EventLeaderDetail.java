@@ -1,9 +1,10 @@
 package edu.scu.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class EventLeaderDetail {
+public class EventLeaderDetail implements Serializable {
 
     private Person leader;
     private Boolean isCheckedIn;

@@ -10,7 +10,8 @@
     <string name="button_register">Register</string>
     <string name="toast_login_success">You have successfully logged in</string>
     <string name="toast_logout_success">You have successfully logged out</string>
-
+    <!-- sichao test -->
+    <string name="sichao_test">sichao test</string>
     <!-- Register page -->
     <string name="title_register_display_message">Registration</string>
 

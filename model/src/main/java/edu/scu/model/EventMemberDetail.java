@@ -1,9 +1,10 @@
 package edu.scu.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class EventMemberDetail {
+public class EventMemberDetail implements Serializable {
 
     private Person member;
     private Integer statusMember;
