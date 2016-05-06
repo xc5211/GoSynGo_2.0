@@ -11,11 +11,11 @@ import edu.scu.model.Person;
 /**
  * Created by chuanxu on 5/5/16.
  */
-public class AcceptEventAsyncTask extends BaseAsyncTask {
+public class DeclineEventAsyncTask extends BaseAsyncTask {
 
     private String eventId;
 
-    public AcceptEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, Person hostPerson, String eventId) {
+    public DeclineEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, Person hostPerson, String eventId) {
         super(api, listener, hostPerson);
 
         this.eventId = eventId;
@@ -23,7 +23,7 @@ public class AcceptEventAsyncTask extends BaseAsyncTask {
 
     @Override
     protected ApiResponse<EventMemberDetail> doInBackground(Object... params) {
-        return api.acceptEvent(hostPerson.getObjectId(), eventId);
+        return api.declineEvent(hostPerson.getObjectId(), eventId);
     }
 
     @Override
