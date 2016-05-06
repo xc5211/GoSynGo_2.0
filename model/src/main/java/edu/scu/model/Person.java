@@ -1,9 +1,10 @@
 package edu.scu.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Person {
+public class Person implements Serializable {
 
     private String userId;
     private String email;

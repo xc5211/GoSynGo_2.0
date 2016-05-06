@@ -1,8 +1,9 @@
 package edu.scu.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class MemberProposedTimestamp {
+public class MemberProposedTimestamp implements Serializable{
 
     private Date timestamp;
     private Date created;
