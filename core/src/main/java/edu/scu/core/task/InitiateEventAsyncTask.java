@@ -35,7 +35,7 @@ public class InitiateEventAsyncTask extends BaseAsyncTask {
             if (response.isSuccess()) {
                 Event updatedEvent = (Event) response.getObj();
                 if (updatedEvent.getStatusEvent() != StatusEvent.Ready.getStatus()) {
-                    listener.onFailure(String.valueOf(R.string.sync_with_server_error));
+                    listener.onFailure(String.valueOf(R.string.initiate_event_response_data_not_sync));
                     return;
                 }
                 for (Event eventAsleader : hostPerson.getEventsAsLeader()) {
@@ -45,7 +45,7 @@ public class InitiateEventAsyncTask extends BaseAsyncTask {
                         return;
                     }
                 }
-                listener.onFailure(String.valueOf(R.string.sync_with_server_error));
+                listener.onFailure(String.valueOf(R.string.member_accept_event_fail_message));
             }else {
                 listener.onFailure(response.getMsg());
             }

@@ -38,7 +38,7 @@ public class AcceptEventAsyncTask extends BaseAsyncTask {
                         return;
                     }
                 }
-                listener.onFailure(String.valueOf(R.string.sync_with_server_error));
+                listener.onFailure(String.valueOf(R.string.member_accept_event_fail_message));
             } else {
                 listener.onFailure(response.getMsg());
             }
