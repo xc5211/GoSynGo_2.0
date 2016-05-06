@@ -15,11 +15,13 @@ import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.task.AcceptEventAsyncTask;
+import edu.scu.core.task.DeclineEventAsyncTask;
 import edu.scu.core.task.InitiateEventAsyncTask;
 import edu.scu.core.task.LoginAsyncTask;
 import edu.scu.core.task.LogoutAsyncTask;
 import edu.scu.core.task.RegisterAsyncTask;
 import edu.scu.core.task.RegisterDeviceAsyncTask;
+import edu.scu.core.task.SetMinsToArriveAsMemberAsyncTask;
 import edu.scu.model.Event;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
@@ -253,7 +255,8 @@ public class AppActionImpl implements AppAction {
     // TODO[Hairong]
     @Override
     public void declineEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
-
+        DeclineEventAsyncTask declineEvent = new DeclineEventAsyncTask(api, listener, hostPerson, eventId);
+        declineEvent.execute();
     }
 
     // TODO
@@ -265,7 +268,8 @@ public class AppActionImpl implements AppAction {
     // TODO[Hairong]
     @Override
     public void setMinsToArriveAsMember(final String eventId, final int estimateInMin, final ActionCallbackListener<Boolean> listener) {
-
+        SetMinsToArriveAsMemberAsyncTask setMinsToArriveAsMember = new SetMinsToArriveAsMemberAsyncTask(api, listener, hostPerson, eventId, estimateInMin);
+        setMinsToArriveAsMember.execute();
     }
 
     @Override

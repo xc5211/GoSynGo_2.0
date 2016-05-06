@@ -9,21 +9,22 @@ import edu.scu.model.EventMemberDetail;
 import edu.scu.model.Person;
 
 /**
- * Created by chuanxu on 5/5/16.
+ * Created by Hairong on 5/6/16.
  */
-public class AcceptEventAsyncTask extends BaseAsyncTask {
+public class SetMinsToArriveAsMemberAsyncTask extends BaseAsyncTask{
 
     private String eventId;
+    private int estimateInMin;
 
-    public AcceptEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, Person hostPerson, String eventId) {
+    public SetMinsToArriveAsMemberAsyncTask(Api api, ActionCallbackListener<Boolean> listener, Person hostPerson, String eventId, int estimateInMin) {
         super(api, listener, hostPerson);
-
         this.eventId = eventId;
+        this.estimateInMin = estimateInMin;
     }
 
     @Override
     protected ApiResponse<EventMemberDetail> doInBackground(Object... params) {
-        return api.acceptEvent(hostPerson.getObjectId(), eventId);
+        return api.setMinsToArriveAsMember(hostPerson.getObjectId(), eventId, estimateInMin);
     }
 
     @Override
@@ -44,5 +45,4 @@ public class AcceptEventAsyncTask extends BaseAsyncTask {
             }
         }
     }
-
 }
