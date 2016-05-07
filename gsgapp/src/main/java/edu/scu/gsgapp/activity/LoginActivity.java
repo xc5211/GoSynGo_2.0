@@ -16,9 +16,6 @@ public class LoginActivity extends GsgBaseActivity {
     private EditText passwordEdit;
     private Button loginButton;
     private Button registerButton;
-    //sichao
-    private Button testSichao;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +25,6 @@ public class LoginActivity extends GsgBaseActivity {
         initViews();
         initListeners();
         validateLogin();
-
-        //sichao Test
-        sichaoTest();
 
         /*
         Toolbar toolBar = (Toolbar) findViewById(R.id.button_register);
@@ -139,18 +133,6 @@ public class LoginActivity extends GsgBaseActivity {
                 loginButton.setEnabled(true);
             }
 
-        });
-    }
-
-    // sichaoTest
-    public void sichaoTest() {
-        testSichao = (Button) findViewById(R.id.button_sichao_test);
-        testSichao.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, TestActivity.class);
-                startActivity(intent);
-            }
         });
     }
 

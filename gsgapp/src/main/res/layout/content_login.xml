@@ -47,12 +47,4 @@
         android:layout_marginBottom="@dimen/button_vertical_margin"
         android:text="@string/button_register" />
 
-    <Button
-        android:id="@+id/button_sichao_test"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/button_vertical_margin"
-        android:layout_marginBottom="@dimen/button_vertical_margin"
-        android:text="@string/sichao_test" />
-
 </LinearLayout>
