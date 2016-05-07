@@ -1,36 +1,43 @@
 package edu.scu.core.task;
 
-import java.util.Date;
-
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.core.R;
 import edu.scu.model.Event;
+import edu.scu.model.EventMemberDetail;
 import edu.scu.model.Person;
-import edu.scu.model.StatusEvent;
 
 /**
- * Created by Hairong on 5/5/16.
+ * Created by chuanxu on 5/6/16.
  */
-public class InitiateEventAsyncTask extends BaseAsyncTask {
+public class RemoveEventMemberAsyncTask extends BaseAsyncTask {
 
     private String eventId;
-    private Date eventFinalTimestamp;
+    private String memberId;
 
-    public InitiateEventAsyncTask(final Api api, final ActionCallbackListener<Integer> listener, final Person hostPerson, final String eventId, final Date eventFinalTimestamp) {
+    public RemoveEventMemberAsyncTask(Api api, ActionCallbackListener<Event> listener, Person hostPerson, String eventId, String memberId) {
         super(api, listener, hostPerson);
         this.eventId = eventId;
-        this.eventFinalTimestamp = eventFinalTimestamp;
+        this.memberId = memberId;
     }
 
     @Override
     protected ApiResponse<Event> doInBackground(Object... params) {
+        Event targetEvent = null;
         for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
             if (eventAsLeader.getObjectId().equals(eventId)) {
-                eventAsLeader.setTimestamp(eventFinalTimestamp);
-                eventAsLeader.setStatusEvent(StatusEvent.Ready.getStatus());
-                return api.initiateEvent(eventAsLeader);
+                targetEvent = eventAsLeader;
+                break;
+            }
+        }
+        assert targetEvent != null;
+
+        for (EventMemberDetail memberDetail : targetEvent.getEventMemberDetail()) {
+            if (memberDetail.getObjectId().equals(memberId)) {
+                // TODO: Check if event needs to be removed from member eventsAsMember list
+                targetEvent.getEventMemberDetail().remove(memberDetail);
+                return api.removeEventMember(targetEvent);
             }
         }
         assert false;
@@ -42,19 +49,16 @@ public class InitiateEventAsyncTask extends BaseAsyncTask {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 Event updatedEvent = (Event) response.getObj();
-                if (updatedEvent.getStatusEvent() != StatusEvent.Ready.getStatus()) {
-                    listener.onFailure(String.valueOf(R.string.sync_with_server_error));
-                    return;
-                }
                 for (Event eventAsleader : hostPerson.getEventsAsLeader()) {
                     if(eventAsleader.getObjectId().equals(eventId)) {
-                        eventAsleader.setStatusEvent(updatedEvent.getStatusEvent());
+                        // TODO: Check next line
+                        eventAsleader.getEventMemberDetail().remove(updatedEvent.getEventMemberDetail().get(0));
                         listener.onSuccess(true);
                         return;
                     }
                 }
                 listener.onFailure(String.valueOf(R.string.sync_with_server_error));
-            }else {
+            } else {
                 listener.onFailure(response.getMsg());
             }
         }

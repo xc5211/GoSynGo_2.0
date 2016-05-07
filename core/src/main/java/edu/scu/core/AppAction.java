@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.scu.model.Event;
+import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
@@ -42,17 +43,18 @@ public interface AppAction {
     public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener);
     public void getAllEventMembers(final String eventId, final ActionCallbackListener<List<Person>> listener);
     public void removeEventMember(final String eventId, final String memberId, final ActionCallbackListener<Event> listener);
-    public void sendEventInvitation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final List<LeaderProposedTimestamp> proposedTimestamps, final ActionCallbackListener<Event> listener);
+    public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final ActionCallbackListener<Event> listener);
+    public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener);
     public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp);
-    public void cancelEvent(final String eventId, final ActionCallbackListener<Event> listener);
+    public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void getAllEventMembersStatusAndEstimate(final String eventId, final ActionCallbackListener<Map<Person, Integer>> lisener);
-    public void proposeEventTimestampsAsLeader(final String eventId, final List<LeaderProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<Event> listener);
+    public void proposeEventTimestampsAsLeader(final String eventId, final List<LeaderProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<EventLeaderDetail> listener);
 
     /**
      * As member
      */
-    public void proposeEventTimestampsAsMember(final String eventId, final List<MemberProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<Event> listener);
-    public void selectEventTimestamps(final String eventId, final List<MemberSelectedTimestamp> selectedEventTimestamps, final ActionCallbackListener<Event> listener);
+    public void proposeEventTimestampsAsMember(final String eventId, final List<MemberProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener);
+    public void selectEventTimestampsAsMember(final String eventId, final List<MemberSelectedTimestamp> selectedEventTimestamps, final ActionCallbackListener<Event> listener);
     public void acceptEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void declineEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void checkInEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
