@@ -8,6 +8,5 @@
         android:layout_height="wrap_content"
         android:text="Log out"
         android:id="@+id/button_logout"
-        android:onClick="logout"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>

@@ -10,6 +10,7 @@ import com.backendless.persistence.local.UserTokenStorageFactory;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
@@ -30,6 +31,7 @@ import edu.scu.core.task.AddEventInformationAsyncTask;
 import edu.scu.core.task.RemoveEventMemberAsyncTask;
 import edu.scu.core.task.SendEventInvitationAsyncTask;
 import edu.scu.core.task.SetMinsToArriveAsMemberAsyncTask;
+import edu.scu.core.task.UnregisterDeviceAsyncTask;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
@@ -98,9 +100,6 @@ public class AppActionImpl implements AppAction {
 
         RegisterAsyncTask registerTask = new RegisterAsyncTask(api, listener, hostPerson, userEmail, password, firstName, lastName);
         registerTask.execute();
-
-        RegisterDeviceAsyncTask registerDeviceTask = new RegisterDeviceAsyncTask(api, null, null);
-        registerDeviceTask.execute();
     }
 
     @Override
@@ -137,6 +136,9 @@ public class AppActionImpl implements AppAction {
 
         LoginAsyncTask loginAsyncTask = new LoginAsyncTask(api, listener, hostPerson, this, userEmail, password, stayLoggedIn);
         loginAsyncTask.execute();
+
+        RegisterDeviceAsyncTask registerDeviceAsyncTask = new RegisterDeviceAsyncTask(api, null, null);
+        registerDeviceAsyncTask.execute();
     }
 
     @Override

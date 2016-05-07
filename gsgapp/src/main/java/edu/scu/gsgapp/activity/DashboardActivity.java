@@ -27,6 +27,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         setContentView(R.layout.activity_dashboard);
 
         initViews();
+        initListener();
         getData();
         // TODO: Explain when to use initListener() vs "onclick" behavior defined in xml
     }
@@ -51,7 +52,17 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         this.logoutButton = (Button) findViewById(R.id.button_logout);
     }
 
-    public void logout(View view) {
+    private void initListener() {
+        this.logoutButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                logout();
+            }
+        });
+    }
+
+    public void logout() {
         super.appAction.logout(new ActionCallbackListener<Void>() {
             @Override
             public void onSuccess(Void v) {
@@ -65,6 +76,24 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
             public void onFailure(String message) {
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+
+    private void validateLogin() {
+        super.appAction.validateLogin(new ActionCallbackListener<Void>() {
+
+            @Override
+            public void onSuccess(Void data) {
+                Toast.makeText(context, R.string.toast_login_success, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFailure(String message) {
+                // Do nothing
+            }
+
         });
     }
 
