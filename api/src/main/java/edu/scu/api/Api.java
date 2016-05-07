@@ -47,7 +47,7 @@ public interface Api {
      */
     public ApiResponse<Event> proposeEvent(Event newEvent);
 
-    public ApiResponse<Person> addEventMember(Event event, String memberEmail);
+    public ApiResponse<EventMemberDetail> addEventMember(Event event, String memberEmail);
 
     public ApiResponse<Event> removeEventMember(Event event);
 

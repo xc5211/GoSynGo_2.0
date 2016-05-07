@@ -264,7 +264,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Person> addEventMember(Event event, String memberEmail) {
+    public ApiResponse<EventMemberDetail> addEventMember(Event event, String memberEmail) {
 
         // Query member
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
@@ -289,11 +289,12 @@ public class ApiImpl implements Api {
         event.getEventMemberDetail().add(eventMemberDetail);
         member.getEventsAsMember().add(event);
         try {
+            // NOTE: Saved object is not returned one
             member = Backendless.Data.of(Person.class).save(member);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Add event member success", member);
+        return new ApiResponse<>(SUCCESS_EVENT, "Add event member success", eventMemberDetail);
     }
 
     @Override

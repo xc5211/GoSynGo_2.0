@@ -10,12 +10,13 @@ import com.backendless.persistence.local.UserTokenStorageFactory;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.task.AcceptEventAsyncTask;
+import edu.scu.core.task.AddEventInformationAsyncTask;
+import edu.scu.core.task.AddEventMemberAsyncTask;
 import edu.scu.core.task.CancelEventAsyncTask;
 import edu.scu.core.task.CheckInEventAsyncTask;
 import edu.scu.core.task.DeclineEventAsyncTask;
@@ -27,11 +28,9 @@ import edu.scu.core.task.ProposeEventTimestampsAsLeaderAsyncTask;
 import edu.scu.core.task.ProposeEventTimestampsAsMemberAsyncTask;
 import edu.scu.core.task.RegisterAsyncTask;
 import edu.scu.core.task.RegisterDeviceAsyncTask;
-import edu.scu.core.task.AddEventInformationAsyncTask;
 import edu.scu.core.task.RemoveEventMemberAsyncTask;
 import edu.scu.core.task.SendEventInvitationAsyncTask;
 import edu.scu.core.task.SetMinsToArriveAsMemberAsyncTask;
-import edu.scu.core.task.UnregisterDeviceAsyncTask;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
@@ -174,10 +173,10 @@ public class AppActionImpl implements AppAction {
         proposeEventAsyncTask.execute();
     }
 
-    // TODO
     @Override
-    public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener) {
-
+    public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<EventMemberDetail> listener) {
+        AddEventMemberAsyncTask addEventMemberAsyncTask = new AddEventMemberAsyncTask(api, listener, hostPerson, eventId, memberEmail);
+        addEventMemberAsyncTask.execute();
     }
 
     @Override

@@ -40,7 +40,7 @@ public interface AppAction {
      * As leader
      */
     public void proposeEvent(final ActionCallbackListener<Event> listener);
-    public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener);
+    public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<EventMemberDetail> listener);
     public void getAllEventMembers(final String eventId, final ActionCallbackListener<List<Person>> listener);
     public void removeEventMember(final String eventId, final String memberId, final ActionCallbackListener<Event> listener);
     public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final ActionCallbackListener<Event> listener);
