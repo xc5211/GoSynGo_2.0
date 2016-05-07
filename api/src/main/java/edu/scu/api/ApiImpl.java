@@ -254,6 +254,7 @@ public class ApiImpl implements Api {
 
     @Override
     public ApiResponse<Event> proposeEvent(Event newEvent) {
+
         try {
             newEvent = Backendless.Data.of(Event.class).save(newEvent);
         } catch (BackendlessException exception) {
@@ -265,7 +266,7 @@ public class ApiImpl implements Api {
     @Override
     public ApiResponse<Person> addEventMember(Event event, String memberEmail) {
 
-        // Get member
+        // Query member
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
         dataQuery.setWhereClause(BackendlessQueryHelper.queryPerson(memberEmail));
         BackendlessCollection<Person> result;
@@ -295,12 +296,9 @@ public class ApiImpl implements Api {
         return new ApiResponse<>(SUCCESS_EVENT, "Add event member success", member);
     }
 
-    // TODO: Check if event needs to be removed from member eventsAsMember list
     @Override
-    public ApiResponse<Event> removeEventMember(Event event, EventMemberDetail eventMemberDetail) {
+    public ApiResponse<Event> removeEventMember(Event event) {
 
-        //Delete member from the event
-        event.getEventMemberDetail().remove(eventMemberDetail);
         try {
             event = Backendless.Data.of(Event.class).save(event);
         } catch (BackendlessException exception) {
@@ -323,7 +321,6 @@ public class ApiImpl implements Api {
     @Override
     public ApiResponse<Event> initiateEvent(Event event) {
 
-        // Save target Event object
         try {
             event = Backendless.Data.of(Event.class).save(event);
         } catch (BackendlessException exception) {
@@ -335,7 +332,6 @@ public class ApiImpl implements Api {
     @Override
     public ApiResponse<Event> cancelEvent(Event event) {
 
-        // Save target Event object
         try {
             event = Backendless.Data.of(Event.class).save(event);
         } catch (BackendlessException exception) {
@@ -383,12 +379,8 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<EventLeaderDetail> proposeEventTimestampsAsLeader(EventLeaderDetail eventLeaderDetail, List<LeaderProposedTimestamp> proposedEventTimestamps) {
+    public ApiResponse<EventLeaderDetail> proposeEventTimestampsAsLeader(EventLeaderDetail eventLeaderDetail) {
 
-        // Set leader proposed time
-        eventLeaderDetail.setProposedTimestamps(proposedEventTimestamps);
-
-        // Save
         try {
             eventLeaderDetail = Backendless.Data.of(EventLeaderDetail.class).save(eventLeaderDetail);
         } catch (BackendlessException exception) {
@@ -398,12 +390,8 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<EventMemberDetail> proposeEventTimestampsAsMember(EventMemberDetail eventMemberDetail, List<MemberProposedTimestamp> proposedEventTimestamps) {
+    public ApiResponse<EventMemberDetail> proposeEventTimestampsAsMember(EventMemberDetail eventMemberDetail) {
 
-        // Set member proposed time
-        eventMemberDetail.setProposedTimestamps(proposedEventTimestamps);
-
-        // Save
         try {
             eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
         } catch (BackendlessException exception) {
@@ -413,7 +401,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<EventMemberDetail> selectEventTimestamps(EventMemberDetail eventMemberDetail, List<MemberSelectedTimestamp> selectedEventTimestamps) {
+    public ApiResponse<EventMemberDetail> selectEventTimestampsAsMember(EventMemberDetail eventMemberDetail, List<MemberSelectedTimestamp> selectedEventTimestamps) {
 
         // Set member selected time
         eventMemberDetail.setSelectedTimestamps(selectedEventTimestamps);

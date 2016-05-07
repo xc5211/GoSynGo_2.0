@@ -15,7 +15,7 @@ public class CancelEventAsyncTask extends BaseAsyncTask {
 
     private String eventId;
 
-    public CancelEventAsyncTask(final Api api, final ActionCallbackListener<Integer> listener, final Person hostPerson, final String eventId) {
+    public CancelEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, final Person hostPerson, final String eventId) {
         super(api, listener, hostPerson);
         this.eventId = eventId;
     }

@@ -15,16 +15,24 @@ import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.task.AcceptEventAsyncTask;
+import edu.scu.core.task.CancelEventAsyncTask;
 import edu.scu.core.task.CheckInEventAsyncTask;
 import edu.scu.core.task.DeclineEventAsyncTask;
 import edu.scu.core.task.InitiateEventAsyncTask;
 import edu.scu.core.task.LoginAsyncTask;
 import edu.scu.core.task.LogoutAsyncTask;
 import edu.scu.core.task.ProposeEventAsyncTask;
+import edu.scu.core.task.ProposeEventTimestampsAsLeaderAsyncTask;
+import edu.scu.core.task.ProposeEventTimestampsAsMemberAsyncTask;
 import edu.scu.core.task.RegisterAsyncTask;
 import edu.scu.core.task.RegisterDeviceAsyncTask;
+import edu.scu.core.task.AddEventInformationAsyncTask;
+import edu.scu.core.task.RemoveEventMemberAsyncTask;
+import edu.scu.core.task.SendEventInvitationAsyncTask;
 import edu.scu.core.task.SetMinsToArriveAsMemberAsyncTask;
 import edu.scu.model.Event;
+import edu.scu.model.EventLeaderDetail;
+import edu.scu.model.EventMemberDetail;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
@@ -133,7 +141,6 @@ public class AppActionImpl implements AppAction {
 
     @Override
     public void logout(final ActionCallbackListener<Void> listener) {
-
         LogoutAsyncTask logoutAsyncTask = new LogoutAsyncTask(api, listener, hostPerson, this);
         logoutAsyncTask.execute();
     }
@@ -143,7 +150,6 @@ public class AppActionImpl implements AppAction {
 
     }
 
-    // TODO[Hairong]
     @Override
     public void isGoogleCalendarImported(final ActionCallbackListener<Boolean> listener) {
 
@@ -177,37 +183,34 @@ public class AppActionImpl implements AppAction {
 
     }
 
-    // TODO[Hairong]
     @Override
     public void removeEventMember(final String eventId, final String memberId, final ActionCallbackListener<Event> listener) {
-
+        RemoveEventMemberAsyncTask removeEventMemberAsyncTask = new RemoveEventMemberAsyncTask(api, listener, hostPerson, eventId, memberId);
+        removeEventMemberAsyncTask.execute();
     }
 
-    // TODO
     @Override
-    public void sendEventInvitation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final List<LeaderProposedTimestamp> proposedTimestamps, ActionCallbackListener<Event> listener) {
-//        event.setTitle(title);
-//        event.setLocation(location);
-//        event.setDurationInMin(durationInMin);
-//        event.setHasReminder(hasReminder);
-//        event.setReminderInMin(reminderInMin);
-//        event.getEventLeaderDetail().setProposedTimestamps(proposedTimestamps);
-//        event.setStatusEvent(StatusEvent.Pending.getStatus());
+    public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, ActionCallbackListener<Event> listener) {
+        AddEventInformationAsyncTask addEventInformationAsyncTask = new AddEventInformationAsyncTask(api, listener, hostPerson, eventId, title, location, durationInMin, hasReminder, reminderInMin);
+        addEventInformationAsyncTask.execute();
     }
 
-    // TODO
+    @Override
+    public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener) {
+        SendEventInvitationAsyncTask sendEventInvitationAsyncTask = new SendEventInvitationAsyncTask(api, listener, hostPerson, eventId);
+        sendEventInvitationAsyncTask.execute();
+    }
+
     @Override
     public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp) {
-        // TODO: check event
-
         InitiateEventAsyncTask initiateEvent = new InitiateEventAsyncTask(api, listener, hostPerson, eventId, eventFinalTimestamp);
         initiateEvent.execute();
     }
 
-    // TODO
     @Override
-    public void cancelEvent(final String eventId, final ActionCallbackListener<Event> listener) {
-
+    public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
+        CancelEventAsyncTask cancelEventAsyncTask = new CancelEventAsyncTask(api, listener, hostPerson, eventId);
+        cancelEventAsyncTask.execute();
     }
 
     @Override
@@ -215,28 +218,26 @@ public class AppActionImpl implements AppAction {
 
     }
 
-    // TODO
     @Override
-    public void proposeEventTimestampsAsLeader(final String eventId, final List<LeaderProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<Event> listener) {
-
+    public void proposeEventTimestampsAsLeader(final String eventId, final List<LeaderProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<EventLeaderDetail> listener) {
+        ProposeEventTimestampsAsLeaderAsyncTask proposeEventTimestampsAsLeaderAsyncTask = new ProposeEventTimestampsAsLeaderAsyncTask(api, listener, hostPerson, eventId, proposedEventTimestamps);
+        proposeEventTimestampsAsLeaderAsyncTask.execute();
     }
 
-    // TODO
     @Override
-    public void proposeEventTimestampsAsMember(final String eventId, final List<MemberProposedTimestamp> proposedEventTimestamps, ActionCallbackListener<Event> listener) {
-
+    public void proposeEventTimestampsAsMember(final String eventId, final List<MemberProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener) {
+        ProposeEventTimestampsAsMemberAsyncTask proposeEventTimestampsAsMemberAsyncTask = new ProposeEventTimestampsAsMemberAsyncTask(api, listener, hostPerson, eventId, proposedEventTimestamps);
+        proposeEventTimestampsAsMemberAsyncTask.execute();
     }
 
     // TODO[Hairong]
     @Override
-    public void selectEventTimestamps(final String eventId, final List<MemberSelectedTimestamp> selectedEventTimestamps, final ActionCallbackListener<Event> listener) {
+    public void selectEventTimestampsAsMember(final String eventId, final List<MemberSelectedTimestamp> selectedEventTimestamps, final ActionCallbackListener<Event> listener) {
 
     }
 
     @Override
     public void acceptEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
-        // TODO: check event
-
         AcceptEventAsyncTask acceptTask = new AcceptEventAsyncTask(api, listener, hostPerson, eventId);
         acceptTask.execute();
     }

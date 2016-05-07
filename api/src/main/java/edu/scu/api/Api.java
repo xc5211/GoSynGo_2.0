@@ -49,7 +49,7 @@ public interface Api {
 
     public ApiResponse<Person> addEventMember(Event event, String memberEmail);
 
-    public ApiResponse<Event> removeEventMember(Event event, EventMemberDetail eventMemberDetail);
+    public ApiResponse<Event> removeEventMember(Event event);
 
     public ApiResponse<Event> sendEventInvitation(Event event);
 
@@ -61,14 +61,14 @@ public interface Api {
 
     public ApiResponse<List<Person>> getAllEventMembers(String eventId);
 
-    public ApiResponse<EventLeaderDetail> proposeEventTimestampsAsLeader(EventLeaderDetail eventLeaderDetail, List<LeaderProposedTimestamp> proposedEventTimestamps);
+    public ApiResponse<EventLeaderDetail> proposeEventTimestampsAsLeader(EventLeaderDetail eventLeaderDetail);
 
     /**
      * As member
      */
-    public ApiResponse<EventMemberDetail> proposeEventTimestampsAsMember(EventMemberDetail eventMemberDetail, List<MemberProposedTimestamp> proposedEventTimestamps);
+    public ApiResponse<EventMemberDetail> proposeEventTimestampsAsMember(EventMemberDetail eventMemberDetail);
 
-    public ApiResponse<EventMemberDetail> selectEventTimestamps(EventMemberDetail eventMemberDetail, List<MemberSelectedTimestamp> selectedEventTimestamps);
+    public ApiResponse<EventMemberDetail> selectEventTimestampsAsMember(EventMemberDetail eventMemberDetail, List<MemberSelectedTimestamp> selectedEventTimestamps);
 
     public ApiResponse<EventMemberDetail> acceptEvent(EventMemberDetail eventMemberDetail);
 
