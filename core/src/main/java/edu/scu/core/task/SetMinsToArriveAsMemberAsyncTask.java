@@ -16,7 +16,7 @@ public class SetMinsToArriveAsMemberAsyncTask extends BaseAsyncTask{
     private String eventId;
     private int estimateInMin;
 
-    public SetMinsToArriveAsMemberAsyncTask(Api api, ActionCallbackListener<Boolean> listener, Person hostPerson, String eventId, int estimateInMin) {
+    public SetMinsToArriveAsMemberAsyncTask(Api api, ActionCallbackListener<Integer> listener, Person hostPerson, String eventId, int estimateInMin) {
         super(api, listener, hostPerson);
         this.eventId = eventId;
         this.estimateInMin = estimateInMin;
@@ -24,7 +24,15 @@ public class SetMinsToArriveAsMemberAsyncTask extends BaseAsyncTask{
 
     @Override
     protected ApiResponse<EventMemberDetail> doInBackground(Object... params) {
-        return api.setMinsToArriveAsMember(hostPerson.getObjectId(), eventId, estimateInMin);
+        for (Event eventAsMember : hostPerson.getEventsAsMember()) {
+            if (eventAsMember.getObjectId().equals(eventId)) {
+                EventMemberDetail eventMemberDetail = eventAsMember.getEventMemberDetail().get(0);
+                eventMemberDetail.setMinsToArrive(estimateInMin);
+                return api.setMinsToArriveAsMember(eventMemberDetail);
+            }
+        }
+        assert false;
+        return null;
     }
 
     @Override
@@ -45,4 +53,5 @@ public class SetMinsToArriveAsMemberAsyncTask extends BaseAsyncTask{
             }
         }
     }
+
 }

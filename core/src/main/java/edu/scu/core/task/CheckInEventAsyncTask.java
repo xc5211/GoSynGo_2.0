@@ -7,16 +7,15 @@ import edu.scu.core.R;
 import edu.scu.model.Event;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.Person;
-import edu.scu.model.StatusMember;
 
 /**
- * Created by chuanxu on 5/5/16.
+ * Created by chuanxu on 5/6/16.
  */
-public class AcceptEventAsyncTask extends BaseAsyncTask {
+public class CheckInEventAsyncTask extends BaseAsyncTask {
 
     private String eventId;
 
-    public AcceptEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, Person hostPerson, String eventId) {
+    public CheckInEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, final Person hostPerson, final String eventId) {
         super(api, listener, hostPerson);
         this.eventId = eventId;
     }
@@ -26,8 +25,8 @@ public class AcceptEventAsyncTask extends BaseAsyncTask {
         for (Event eventAsMember : hostPerson.getEventsAsMember()) {
             if (eventAsMember.getObjectId().equals(eventId)) {
                 EventMemberDetail eventMemberDetail = eventAsMember.getEventMemberDetail().get(0);
-                eventMemberDetail.setStatusMember(StatusMember.Accept.getStatus());
-                return api.acceptEvent(eventMemberDetail);
+                eventMemberDetail.setIsCheckedIn(true);
+                return api.checkInEvent(eventMemberDetail);
             }
         }
         assert false;
@@ -39,18 +38,22 @@ public class AcceptEventAsyncTask extends BaseAsyncTask {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) response.getObj();
+                if (updatedEventMemberDetail.getIsCheckedIn() != true) {
+                    listener.onFailure(String.valueOf(R.string.sync_with_server_error));
+                    return;
+                }
                 for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-                    if (eventAsMember.getObjectId().equals(eventId)) {
+                    if(eventAsMember.getObjectId().equals(eventId)) {
                         eventAsMember.updateEventMemberDetail(updatedEventMemberDetail);
                         listener.onSuccess(true);
                         return;
                     }
                 }
                 listener.onFailure(String.valueOf(R.string.sync_with_server_error));
-            } else {
+            }else {
                 listener.onFailure(response.getMsg());
             }
         }
-    }
 
+    }
 }

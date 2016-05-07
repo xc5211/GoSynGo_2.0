@@ -7,6 +7,7 @@ import edu.scu.core.R;
 import edu.scu.model.Event;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.Person;
+import edu.scu.model.StatusMember;
 
 /**
  * Created by chuanxu on 5/5/16.
@@ -23,7 +24,15 @@ public class DeclineEventAsyncTask extends BaseAsyncTask {
 
     @Override
     protected ApiResponse<EventMemberDetail> doInBackground(Object... params) {
-        return api.declineEvent(hostPerson.getObjectId(), eventId);
+        for (Event eventAsMember : hostPerson.getEventsAsMember()) {
+            if (eventAsMember.getObjectId().equals(eventId)) {
+                EventMemberDetail eventMemberDetail = eventAsMember.getEventMemberDetail().get(0);
+                eventMemberDetail.setStatusMember(StatusMember.Declined.getStatus());
+                return api.declineEvent(eventMemberDetail);
+            }
+        }
+        assert false;
+        return null;
     }
 
     @Override

@@ -1,7 +1,5 @@
 package edu.scu.core.task;
 
-import java.util.Date;
-
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
@@ -11,26 +9,23 @@ import edu.scu.model.Person;
 import edu.scu.model.StatusEvent;
 
 /**
- * Created by Hairong on 5/5/16.
+ * Created by chuanxu on 5/5/16.
  */
-public class InitiateEventAsyncTask extends BaseAsyncTask {
+public class CancelEventAsyncTask extends BaseAsyncTask {
 
     private String eventId;
-    private Date eventFinalTimestamp;
 
-    public InitiateEventAsyncTask(final Api api, final ActionCallbackListener<Integer> listener, final Person hostPerson, final String eventId, final Date eventFinalTimestamp) {
+    public CancelEventAsyncTask(final Api api, final ActionCallbackListener<Integer> listener, final Person hostPerson, final String eventId) {
         super(api, listener, hostPerson);
         this.eventId = eventId;
-        this.eventFinalTimestamp = eventFinalTimestamp;
     }
 
     @Override
     protected ApiResponse<Event> doInBackground(Object... params) {
         for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
             if (eventAsLeader.getObjectId().equals(eventId)) {
-                eventAsLeader.setTimestamp(eventFinalTimestamp);
-                eventAsLeader.setStatusEvent(StatusEvent.Ready.getStatus());
-                return api.initiateEvent(eventAsLeader);
+                eventAsLeader.setStatusEvent(StatusEvent.Cancelled.getStatus());
+                return api.cancelEvent(eventAsLeader);
             }
         }
         assert false;
@@ -42,7 +37,7 @@ public class InitiateEventAsyncTask extends BaseAsyncTask {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 Event updatedEvent = (Event) response.getObj();
-                if (updatedEvent.getStatusEvent() != StatusEvent.Ready.getStatus()) {
+                if (updatedEvent.getStatusEvent() != StatusEvent.Cancelled.getStatus()) {
                     listener.onFailure(String.valueOf(R.string.sync_with_server_error));
                     return;
                 }

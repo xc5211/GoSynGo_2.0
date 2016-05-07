@@ -56,7 +56,7 @@ public interface AppAction {
     public void acceptEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void declineEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void checkInEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
-    public void setMinsToArriveAsMember(final String eventId, final int estimateInMin, final ActionCallbackListener<Boolean> listener);
+    public void setMinsToArriveAsMember(final String eventId, final int estimateInMin, final ActionCallbackListener<Integer> listener);
 
     /**
      * Event - Shared to both leader and member

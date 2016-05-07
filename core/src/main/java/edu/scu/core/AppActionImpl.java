@@ -15,10 +15,12 @@ import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.task.AcceptEventAsyncTask;
+import edu.scu.core.task.CheckInEventAsyncTask;
 import edu.scu.core.task.DeclineEventAsyncTask;
 import edu.scu.core.task.InitiateEventAsyncTask;
 import edu.scu.core.task.LoginAsyncTask;
 import edu.scu.core.task.LogoutAsyncTask;
+import edu.scu.core.task.ProposeEventAsyncTask;
 import edu.scu.core.task.RegisterAsyncTask;
 import edu.scu.core.task.RegisterDeviceAsyncTask;
 import edu.scu.core.task.SetMinsToArriveAsMemberAsyncTask;
@@ -158,29 +160,10 @@ public class AppActionImpl implements AppAction {
 
     }
 
-    // TODO
     @Override
     public void proposeEvent(final ActionCallbackListener<Event> listener) {
-        AsyncTask<Void, Void, ApiResponse<Event>> asyncTask = new AsyncTask<Void, Void, ApiResponse<Event>>() {
-
-            @Override
-            protected ApiResponse<Event> doInBackground(Void... params) {
-                return api.proposeEvent(hostUserId);
-            }
-
-            @Override
-            protected void onPostExecute(ApiResponse<Event> response) {
-                if (listener != null && response != null) {
-                    if (response.isSuccess()) {
-                        listener.onSuccess(response.getObj());
-                    } else {
-                        listener.onFailure(response.getMsg());
-                    }
-                }
-            }
-
-        };
-        asyncTask.execute();
+        ProposeEventAsyncTask proposeEventAsyncTask = new ProposeEventAsyncTask(api, listener, hostPerson);
+        proposeEventAsyncTask.execute();
     }
 
     // TODO
@@ -203,7 +186,13 @@ public class AppActionImpl implements AppAction {
     // TODO
     @Override
     public void sendEventInvitation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final List<LeaderProposedTimestamp> proposedTimestamps, ActionCallbackListener<Event> listener) {
-
+//        event.setTitle(title);
+//        event.setLocation(location);
+//        event.setDurationInMin(durationInMin);
+//        event.setHasReminder(hasReminder);
+//        event.setReminderInMin(reminderInMin);
+//        event.getEventLeaderDetail().setProposedTimestamps(proposedTimestamps);
+//        event.setStatusEvent(StatusEvent.Pending.getStatus());
     }
 
     // TODO
@@ -252,22 +241,20 @@ public class AppActionImpl implements AppAction {
         acceptTask.execute();
     }
 
-    // TODO[Hairong]
     @Override
     public void declineEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
         DeclineEventAsyncTask declineEvent = new DeclineEventAsyncTask(api, listener, hostPerson, eventId);
         declineEvent.execute();
     }
 
-    // TODO
     @Override
     public void checkInEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
-
+        CheckInEventAsyncTask checkInEventAsyncTask = new CheckInEventAsyncTask(api, listener, hostPerson, eventId);
+        checkInEventAsyncTask.execute();
     }
 
-    // TODO[Hairong]
     @Override
-    public void setMinsToArriveAsMember(final String eventId, final int estimateInMin, final ActionCallbackListener<Boolean> listener) {
+    public void setMinsToArriveAsMember(final String eventId, final int estimateInMin, final ActionCallbackListener<Integer> listener) {
         SetMinsToArriveAsMemberAsyncTask setMinsToArriveAsMember = new SetMinsToArriveAsMemberAsyncTask(api, listener, hostPerson, eventId, estimateInMin);
         setMinsToArriveAsMember.execute();
     }

@@ -45,39 +45,38 @@ public interface Api {
     /**
      * As leader
      */
-    // Returns a newly created empty Event object
-    public ApiResponse<Event> proposeEvent(String leaderId);
+    public ApiResponse<Event> proposeEvent(Event newEvent);
 
-    public ApiResponse<Person> addEventMember(String eventId, String memberEmail);
+    public ApiResponse<Person> addEventMember(Event event, String memberEmail);
 
-    public ApiResponse<Event> removeEventMember(String eventId, String memberId);
+    public ApiResponse<Event> removeEventMember(Event event, EventMemberDetail eventMemberDetail);
 
-    public ApiResponse<Event> sendEventInvitation(String eventId, String title, String location, int durationInMin, boolean hasReminder, int reminderInMin, List<LeaderProposedTimestamp> proposedTimestamps);
+    public ApiResponse<Event> sendEventInvitation(Event event);
 
-    public ApiResponse<Event> initiateEvent(String eventId, Date eventTimestamp);
+    public ApiResponse<Event> initiateEvent(Event event);
 
-    public ApiResponse<Event> cancelEvent(String eventId);
+    public ApiResponse<Event> cancelEvent(Event event);
 
     public ApiResponse<Map<Person, Integer>> getAllEventMembersStatusAndEstimate(String eventId);
 
     public ApiResponse<List<Person>> getAllEventMembers(String eventId);
 
-    public ApiResponse<EventLeaderDetail> proposeEventTimestampsAsLeader(String leaderId, String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps);
+    public ApiResponse<EventLeaderDetail> proposeEventTimestampsAsLeader(EventLeaderDetail eventLeaderDetail, List<LeaderProposedTimestamp> proposedEventTimestamps);
 
     /**
      * As member
      */
-    public ApiResponse<EventMemberDetail> proposeEventTimestampsAsMember(String memberId, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps);
+    public ApiResponse<EventMemberDetail> proposeEventTimestampsAsMember(EventMemberDetail eventMemberDetail, List<MemberProposedTimestamp> proposedEventTimestamps);
 
-    public ApiResponse<EventMemberDetail> selectEventTimestamps(String memberId, String eventId, List<MemberSelectedTimestamp> selectedEventTimestamps);
+    public ApiResponse<EventMemberDetail> selectEventTimestamps(EventMemberDetail eventMemberDetail, List<MemberSelectedTimestamp> selectedEventTimestamps);
 
-    public ApiResponse<EventMemberDetail> acceptEvent(String memberId, String eventId);
+    public ApiResponse<EventMemberDetail> acceptEvent(EventMemberDetail eventMemberDetail);
 
-    public ApiResponse<EventMemberDetail> declineEvent(String memberId, String eventId);
+    public ApiResponse<EventMemberDetail> declineEvent(EventMemberDetail eventMemberDetail);
 
-    public ApiResponse<EventMemberDetail> checkInEvent(String memberId, String eventId);
+    public ApiResponse<EventMemberDetail> checkInEvent(EventMemberDetail eventMemberDetail);
 
-    public ApiResponse<EventMemberDetail> setMinsToArriveAsMember(String memberId, String eventId, int estimateInMin);
+    public ApiResponse<EventMemberDetail> setMinsToArriveAsMember(EventMemberDetail eventMemberDetail);
 
     /**
      * Event - Shared to both leader and member
