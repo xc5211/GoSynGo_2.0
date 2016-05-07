@@ -519,4 +519,9 @@ public class ApiImpl implements Api {
         return new ApiResponse<>(SUCCESS_EVENT, "Unregister device success");
     }
 
+    @Override
+    public ApiResponse<Person> syncHostInformation(String userId) {
+        return null;
+    }
+
 }

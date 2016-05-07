@@ -96,4 +96,9 @@ public interface Api {
 
     public ApiResponse<Void> unregisterDevice();
 
+    /**
+     * Sync
+     */
+    public ApiResponse<Person> syncHostInformation(String userId);
+
 }
