@@ -42,6 +42,7 @@ public class AddEventMemberAsyncTask extends BaseAsyncTask{
                 for (Event leaderEvent : hostPerson.getEventsAsLeader()) {
                     if (leaderEvent.getObjectId().equals(eventId)) {
                         leaderEvent.addEventMemberDetail(updatedEventMemberDetail);
+                        listener.onSuccess(updatedEventMemberDetail);
                         return;
                     }
                 }
