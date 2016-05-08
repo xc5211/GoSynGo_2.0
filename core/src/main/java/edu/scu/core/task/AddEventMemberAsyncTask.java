@@ -42,7 +42,7 @@ public class AddEventMemberAsyncTask extends BaseAsyncTask{
                 for (Event leaderEvent : hostPerson.getEventsAsLeader()) {
                     if (leaderEvent.getObjectId().equals(eventId)) {
                         leaderEvent.addEventMemberDetail(updatedEventMemberDetail);
-                        break;
+                        return;
                     }
                 }
                 listener.onFailure(String.valueOf(R.string.sync_with_server_error));
