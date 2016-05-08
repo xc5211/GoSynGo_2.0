@@ -7,8 +7,6 @@ import java.util.Map;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
-import edu.scu.model.LeaderProposedTimestamp;
-import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
 
@@ -100,5 +98,10 @@ public interface Api {
      * Sync
      */
     public ApiResponse<Person> syncHostInformation(String userId);
+
+    /**
+     * Messaging
+     */
+    public void initNewChannel(String channelName);
 
 }

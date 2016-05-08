@@ -34,7 +34,9 @@ public class ProposeEventAsyncTask extends BaseAsyncTask {
     protected void onPostExecute(ApiResponse response) {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
-                listener.onSuccess(response.getObj());
+                Event event = (Event) response.getObj();
+                api.initNewChannel(event.getObjectId());
+                listener.onSuccess(event);
             } else {
                 listener.onFailure(response.getMsg());
             }

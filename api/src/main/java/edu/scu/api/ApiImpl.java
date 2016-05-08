@@ -525,4 +525,9 @@ public class ApiImpl implements Api {
         return null;
     }
 
+    @Override
+    public void initNewChannel(String channelName) {
+        Backendless.Messaging.registerDevice(GoogleProjectSettings.GOOGLE_PROJECT_NUMBER, channelName);
+    }
+
 }
