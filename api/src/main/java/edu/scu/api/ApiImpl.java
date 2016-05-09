@@ -490,7 +490,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public void broadcastEventChannel(String channelName, int eventManagementState) {
+    public void broadcastEventChannel(String channelName, String eventManagementState) {
         String dispatchedEventName = "ChannelMessaging";
         HashMap args = new HashMap();
         args.put("eventId", channelName);
