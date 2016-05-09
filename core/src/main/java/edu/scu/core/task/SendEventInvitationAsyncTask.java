@@ -8,6 +8,7 @@ import edu.scu.model.Event;
 import edu.scu.model.enumeration.EventManagementState;
 import edu.scu.model.Person;
 import edu.scu.model.enumeration.StatusEvent;
+import edu.scu.util.lib.GoogleProjectSettings;
 
 /**
  * Created by chuanxu on 5/6/16.
@@ -41,7 +42,7 @@ public class SendEventInvitationAsyncTask extends BaseAsyncTask {
                 for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
                     if(eventAsLeader.getObjectId().equals(eventId)) {
                         eventAsLeader.setStatusEvent(updatedEvent.getStatusEvent());
-                        api.broadcastEventChannel(eventId, EventManagementState.SEND_INVITATION.getStatus());
+                        api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, EventManagementState.SEND_INVITATION.getStatus());
                         listener.onSuccess(true);
                         return;
                     }

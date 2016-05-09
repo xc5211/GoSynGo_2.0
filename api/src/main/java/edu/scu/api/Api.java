@@ -111,6 +111,6 @@ public interface Api {
 
     public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> leaderMsgResponder);
 
-    public void broadcastEventChannel(String channelName, String eventManagementState);
+    public void broadcastEventChannel(String channelName, String eventId, String eventManagementState);
 
 }
