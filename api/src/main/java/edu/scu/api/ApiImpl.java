@@ -496,6 +496,7 @@ public class ApiImpl implements Api {
         args.put("channelName", channelName);
         args.put("eventId", eventId);
         args.put("eventManagementState", eventManagementState);
+        args.put("isDelayedMsg", false);
 
         Backendless.Events.dispatch(dispatchedEventName, args, new AsyncCallback<Map>() {
             @Override
