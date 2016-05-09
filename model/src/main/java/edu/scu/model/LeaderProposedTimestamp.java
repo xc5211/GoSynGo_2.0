@@ -5,6 +5,8 @@ import java.util.Date;
 
 public class LeaderProposedTimestamp implements Serializable {
 
+    private String leaderId;
+    private String eventId;
     private Date timestamp;
     private Date created;
     private Date updated;
@@ -39,6 +41,22 @@ public class LeaderProposedTimestamp implements Serializable {
     public String getObjectId()
     {
         return objectId;
+    }
+
+    public String getLeaderId() {
+        return leaderId;
+    }
+
+    public void setLeaderId(String leaderId) {
+        this.leaderId = leaderId;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
 //    public LeaderProposedTimestamp save()

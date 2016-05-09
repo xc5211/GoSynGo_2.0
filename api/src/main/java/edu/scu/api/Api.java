@@ -1,5 +1,8 @@
 package edu.scu.api;
 
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.messaging.Message;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +105,12 @@ public interface Api {
     /**
      * Messaging
      */
-    public void initNewChannel(String channelName);
+    public void registerEventChannelMessaging(String channelName);
+
+    public void subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> memberMsgResponder);
+
+    public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> leaderMsgResponder);
+
+    public void broadcastEventChannel(String channelName, int eventManagementState);
 
 }

@@ -7,7 +7,6 @@ import edu.scu.core.R;
 import edu.scu.model.Event;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.Person;
-import edu.scu.model.StatusEvent;
 
 /**
  * Created by Hairong on 5/7/16.

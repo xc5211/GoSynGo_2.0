@@ -7,7 +7,7 @@ import edu.scu.core.R;
 import edu.scu.model.Event;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.Person;
-import edu.scu.model.StatusMember;
+import edu.scu.model.enumeration.StatusMember;
 
 /**
  * Created by chuanxu on 5/5/16.

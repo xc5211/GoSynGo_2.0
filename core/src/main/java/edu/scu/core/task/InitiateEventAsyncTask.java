@@ -8,7 +8,7 @@ import edu.scu.core.ActionCallbackListener;
 import edu.scu.core.R;
 import edu.scu.model.Event;
 import edu.scu.model.Person;
-import edu.scu.model.StatusEvent;
+import edu.scu.model.enumeration.StatusEvent;
 
 /**
  * Created by Hairong on 5/5/16.

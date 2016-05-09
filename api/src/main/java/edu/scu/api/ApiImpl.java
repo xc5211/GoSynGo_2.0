@@ -3,11 +3,13 @@ package edu.scu.api;
 import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessException;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.messaging.Message;
+import com.backendless.messaging.SubscriptionOptions;
 import com.backendless.persistence.BackendlessDataQuery;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,11 +20,9 @@ import edu.scu.api.query.BackendlessQueryHelper;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
-import edu.scu.model.LeaderProposedTimestamp;
-import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
-import edu.scu.model.StatusMember;
+import edu.scu.model.enumeration.StatusMember;
 import edu.scu.util.lib.GoogleProjectSettings;
 
 /**
@@ -33,8 +33,6 @@ public class ApiImpl implements Api {
     private final static String SUCCESS_EVENT = "0";
     private final static String FAIL_EVENT = "1";
 
-    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
     // TODO[Later]: Delete after development
     private final static String idPersonChuan = "43501AA8-843D-113C-FF5A-7F015D78F300";
     private final static String idPersonSichao = "9F289070-D392-2C21-FF7F-2D20409CA400";
@@ -42,61 +40,6 @@ public class ApiImpl implements Api {
     private final static String idUserChuan = "FA3F28DA-362E-3492-FF03-18E2DE3E2400";
     private final static String idUserSichao = "C91D6698-A1D0-0A85-FF20-9A8475F93600";
     private final static String idUserHairong = "F6651BEB-EDF4-65BD-FFA3-8CD20C756C00";
-
-
-    private static List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader(List<String> datesInString) {
-//        String dateInString = "2016/10/15 16:00:00";
-
-        List<LeaderProposedTimestamp> leaderProposedTimestamps = new ArrayList<>();
-        try {
-            Date date;
-            for (String dateInString : datesInString) {
-                date = sdf.parse(dateInString);
-                LeaderProposedTimestamp leaderProposedTimestamp = new LeaderProposedTimestamp();
-                leaderProposedTimestamp.setTimestamp(date);
-                leaderProposedTimestamps.add(leaderProposedTimestamp);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return leaderProposedTimestamps;
-    }
-
-    private static List<MemberProposedTimestamp> proposeEventTimestampsAsMember(List<String> datesInString) {
-//        String dateInString = "2016/10/15 16:00:00";
-
-        List<MemberProposedTimestamp> memberProposedTimestamps = new ArrayList<>();
-        try {
-            Date date;
-            for (String dateInString : datesInString) {
-                date = sdf.parse(dateInString);
-                MemberProposedTimestamp memberProposedTimestamp = new MemberProposedTimestamp();
-                memberProposedTimestamp.setTimestamp(date);
-                memberProposedTimestamps.add(memberProposedTimestamp);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return memberProposedTimestamps;
-    }
-
-    private static List<MemberSelectedTimestamp> selectEventTimestampsAsMember(List<String> datesInString) {
-//        String dateInString = "2016/10/15 16:00:00";
-
-        List<MemberSelectedTimestamp> memberSelectedTimestamps = new ArrayList<>();
-        try {
-            Date date;
-            for (String dateInString : datesInString) {
-                date = sdf.parse(dateInString);
-                MemberSelectedTimestamp memberSelectedTimestamp = new MemberSelectedTimestamp();
-                memberSelectedTimestamp.setTimestamp(date);
-                memberSelectedTimestamps.add(memberSelectedTimestamp);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return memberSelectedTimestamps;
-    }
 
     @Override
     public ApiResponse<Person> register(String userEmail, String password, String firstName, String lastName) {
@@ -283,6 +226,8 @@ public class ApiImpl implements Api {
         // Create new EventMemberDetail object
         Person member = result.getData().get(0);
         EventMemberDetail eventMemberDetail = new EventMemberDetail();
+        eventMemberDetail.setLeaderId(event.getEventLeaderDetail().getLeader().getObjectId());
+        eventMemberDetail.setEventId(event.getObjectId());
         eventMemberDetail.setMember(member);
         eventMemberDetail.setStatusMember(StatusMember.Pending.getStatus());
 
@@ -526,8 +471,42 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public void initNewChannel(String channelName) {
+    public void registerEventChannelMessaging(String channelName) {
         Backendless.Messaging.registerDevice(GoogleProjectSettings.GOOGLE_PROJECT_NUMBER, channelName);
+    }
+
+    @Override
+    public void subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> memberMsgResponder) {
+        SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
+        subscriptionOptions.setSelector("leaderId = '" + leaderId + "'");
+        Backendless.Messaging.subscribe(channelName, memberMsgResponder, subscriptionOptions);
+    }
+
+    @Override
+    public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> leaderMsgResponder) {
+        SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
+        subscriptionOptions.setSelector("memberId = '" + memberId + "'");
+        Backendless.Messaging.subscribe(channelName, leaderMsgResponder, subscriptionOptions);
+    }
+
+    @Override
+    public void broadcastEventChannel(String channelName, int eventManagementState) {
+        String dispatchedEventName = "ChannelMessaging";
+        HashMap args = new HashMap();
+        args.put("eventId", channelName);
+        args.put("eventManagementState", eventManagementState);
+
+        Backendless.Events.dispatch(dispatchedEventName, args, new AsyncCallback<Map>() {
+            @Override
+            public void handleResponse(Map result) {
+                System.out.println( "received result " + result );
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                System.out.println( "got error " + backendlessFault.toString() );
+            }
+        });
     }
 
 }

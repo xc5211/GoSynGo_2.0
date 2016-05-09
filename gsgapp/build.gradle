@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
 
 dependencies {
@@ -25,4 +29,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile project(':core')
     compile project(':model')
+    compile project(':lib')
 }

@@ -5,8 +5,9 @@ import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.core.R;
 import edu.scu.model.Event;
+import edu.scu.model.enumeration.EventManagementState;
 import edu.scu.model.Person;
-import edu.scu.model.StatusEvent;
+import edu.scu.model.enumeration.StatusEvent;
 
 /**
  * Created by chuanxu on 5/6/16.
@@ -40,6 +41,7 @@ public class SendEventInvitationAsyncTask extends BaseAsyncTask {
                 for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
                     if(eventAsLeader.getObjectId().equals(eventId)) {
                         eventAsLeader.setStatusEvent(updatedEvent.getStatusEvent());
+                        api.broadcastEventChannel(eventId, EventManagementState.SEND_INVITATION.getStatus());
                         listener.onSuccess(true);
                         return;
                     }

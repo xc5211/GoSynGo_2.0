@@ -1,15 +1,15 @@
-package edu.scu.model;
+package edu.scu.model.enumeration;
 
 /**
  * Created by chuanxu on 4/13/16.
  */
-public enum StatusEvent {
+public enum StatusMember {
 
-    Pending(0), Ready(1), Cancelled(2), Tentative(3), Past(4);
+    Pending(0), Accept(1), Declined(2);
 
     private int status;
 
-    StatusEvent (int status) {
+    StatusMember(int status) {
         this.status = status;
     }
 

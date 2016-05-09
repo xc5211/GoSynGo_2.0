@@ -1,25 +1,33 @@
 package edu.scu.core.task;
 
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.messaging.Message;
+
+import java.util.List;
+
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.Person;
-import edu.scu.model.StatusEvent;
+import edu.scu.model.enumeration.StatusEvent;
 
 /**
  * Created by chuanxu on 5/6/16.
  */
 public class ProposeEventAsyncTask extends BaseAsyncTask {
 
-    public ProposeEventAsyncTask(Api api, ActionCallbackListener listener, Person hostPerson) {
+    private AsyncCallback<List<Message>> memberMsgResponder;
+
+    public ProposeEventAsyncTask(Api api, ActionCallbackListener listener, AsyncCallback<List<Message>> memberMsgResponder, Person hostPerson) {
         super(api, listener, hostPerson);
+        this.memberMsgResponder = memberMsgResponder;
     }
 
     @Override
     protected ApiResponse<Event> doInBackground(Object... params) {
-        // Propose new event
+
         EventLeaderDetail eventLeaderDetail = new EventLeaderDetail();
         eventLeaderDetail.setLeader(hostPerson);
         eventLeaderDetail.setIsCheckedIn(false);
@@ -35,11 +43,16 @@ public class ProposeEventAsyncTask extends BaseAsyncTask {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 Event event = (Event) response.getObj();
-                api.initNewChannel(event.getObjectId());
+                String channelName = event.getObjectId();
+
+                api.subscribeEventChannelAsLeader(channelName, hostPerson.getObjectId(), memberMsgResponder);
+                hostPerson.addEventAsLeader(event);
+                api.registerEventChannelMessaging(channelName);
                 listener.onSuccess(event);
             } else {
                 listener.onFailure(response.getMsg());
             }
         }
     }
+
 }

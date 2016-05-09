@@ -48,13 +48,13 @@ public interface AppAction {
     public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp);
     public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void getAllEventMembersStatusAndEstimate(final String eventId, final ActionCallbackListener<Map<Person, Integer>> lisener);
-    public void proposeEventTimestampsAsLeader(final String eventId, final List<LeaderProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<EventLeaderDetail> listener);
+    public void proposeEventTimestampsAsLeader(final String eventId, final List<String> proposedEventTimestamps, final ActionCallbackListener<EventLeaderDetail> listener);
 
     /**
      * As member
      */
-    public void proposeEventTimestampsAsMember(final String eventId, final List<MemberProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener);
-    public void selectEventTimestampsAsMember(final String eventId, final List<MemberSelectedTimestamp> selectedEventTimestamps, final ActionCallbackListener<Event> listener);
+    public void proposeEventTimestampsAsMember(final String eventId, final List<String> proposedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener);
+    public void selectEventTimestampsAsMember(final String eventId, final List<String> selectedEventTimestamps, final ActionCallbackListener<Event> listener);
     public void acceptEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void declineEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void checkInEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
@@ -67,5 +67,10 @@ public interface AppAction {
     public void getEventLeader(final String eventId, final ActionCallbackListener<Person> listener);
     public void getEventLocation(final String eventId, final ActionCallbackListener<String> listener);
     public void getEventDurationInMin(final String eventId, final ActionCallbackListener<Integer> listener);
+
+    /**
+     * Publish/Subscribe
+     */
+
 
 }

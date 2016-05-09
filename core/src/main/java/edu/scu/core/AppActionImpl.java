@@ -1,19 +1,23 @@
 package edu.scu.core;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.text.TextUtils;
 
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.messaging.Message;
 import com.backendless.persistence.local.UserIdStorageFactory;
 import com.backendless.persistence.local.UserTokenStorageFactory;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
-import edu.scu.api.ApiResponse;
 import edu.scu.core.task.AcceptEventAsyncTask;
 import edu.scu.core.task.AddEventInformationAsyncTask;
 import edu.scu.core.task.AddEventMemberAsyncTask;
@@ -74,6 +78,66 @@ public class AppActionImpl implements AppAction {
     public void setHostPerson(Person hostPerson) {
         AppActionImpl.hostPerson = hostPerson;
     }
+
+
+    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+    private static List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader(String eventId, String leaderId, List<String> datesInString) {
+//        String dateInString = "2016/10/15 16:00:00";
+
+        List<LeaderProposedTimestamp> leaderProposedTimestamps = new ArrayList<>();
+        try {
+            Date date;
+            for (String dateInString : datesInString) {
+                date = sdf.parse(dateInString);
+                LeaderProposedTimestamp leaderProposedTimestamp = new LeaderProposedTimestamp();
+                leaderProposedTimestamp.setEventId(eventId);
+                leaderProposedTimestamp.setLeaderId(leaderId);
+                leaderProposedTimestamp.setTimestamp(date);
+                leaderProposedTimestamps.add(leaderProposedTimestamp);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return leaderProposedTimestamps;
+    }
+
+    private static List<MemberProposedTimestamp> proposeEventTimestampsAsMember(String eventId, String leaderId, List<String> datesInString) {
+//        String dateInString = "2016/10/15 16:00:00";
+
+        List<MemberProposedTimestamp> memberProposedTimestamps = new ArrayList<>();
+        try {
+            Date date;
+            for (String dateInString : datesInString) {
+                date = sdf.parse(dateInString);
+                MemberProposedTimestamp memberProposedTimestamp = new MemberProposedTimestamp();
+                memberProposedTimestamp.setTimestamp(date);
+                memberProposedTimestamps.add(memberProposedTimestamp);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return memberProposedTimestamps;
+    }
+
+    private static List<MemberSelectedTimestamp> selectEventTimestampsAsMember(String eventId, String leaderId, List<String> datesInString) {
+//        String dateInString = "2016/10/15 16:00:00";
+
+        List<MemberSelectedTimestamp> memberSelectedTimestamps = new ArrayList<>();
+        try {
+            Date date;
+            for (String dateInString : datesInString) {
+                date = sdf.parse(dateInString);
+                MemberSelectedTimestamp memberSelectedTimestamp = new MemberSelectedTimestamp();
+                memberSelectedTimestamp.setTimestamp(date);
+                memberSelectedTimestamps.add(memberSelectedTimestamp);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return memberSelectedTimestamps;
+    }
+
 
     @Override
     public void register(final String userEmail, final String password, final String firstName, final String lastName, final ActionCallbackListener<Person> listener) {
@@ -169,7 +233,31 @@ public class AppActionImpl implements AppAction {
 
     @Override
     public void proposeEvent(final ActionCallbackListener<Event> listener) {
-        ProposeEventAsyncTask proposeEventAsyncTask = new ProposeEventAsyncTask(api, listener, hostPerson);
+
+        AsyncCallback<List<Message>> memberMsgResponder = new AsyncCallback<List<Message>>() {
+            @Override
+            public void handleResponse(List<Message> messages) {
+
+                String memberId;
+                Map<String, String> msgHeader;
+                Object msg;
+
+                for (Message message : messages) {
+                    memberId = message.getPublisherId();
+                    msgHeader = message.getHeaders();
+                    msg = message.getData();
+                    // TODO: update model
+
+                }
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                // TODO:
+            }
+        };
+
+        ProposeEventAsyncTask proposeEventAsyncTask = new ProposeEventAsyncTask(api, listener, memberMsgResponder, hostPerson);
         proposeEventAsyncTask.execute();
     }
 
@@ -220,20 +308,22 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void proposeEventTimestampsAsLeader(final String eventId, final List<LeaderProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<EventLeaderDetail> listener) {
-        ProposeEventTimestampsAsLeaderAsyncTask proposeEventTimestampsAsLeaderAsyncTask = new ProposeEventTimestampsAsLeaderAsyncTask(api, listener, hostPerson, eventId, proposedEventTimestamps);
+    public void proposeEventTimestampsAsLeader(final String eventId, final List<String> proposedEventTimestamps, final ActionCallbackListener<EventLeaderDetail> listener) {
+        List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader = proposeEventTimestampsAsLeader(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
+        ProposeEventTimestampsAsLeaderAsyncTask proposeEventTimestampsAsLeaderAsyncTask = new ProposeEventTimestampsAsLeaderAsyncTask(api, listener, hostPerson, eventId, proposeEventTimestampsAsLeader);
         proposeEventTimestampsAsLeaderAsyncTask.execute();
     }
 
     @Override
-    public void proposeEventTimestampsAsMember(final String eventId, final List<MemberProposedTimestamp> proposedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener) {
-        ProposeEventTimestampsAsMemberAsyncTask proposeEventTimestampsAsMemberAsyncTask = new ProposeEventTimestampsAsMemberAsyncTask(api, listener, hostPerson, eventId, proposedEventTimestamps);
+    public void proposeEventTimestampsAsMember(final String eventId, final List<String> proposedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener) {
+        List<MemberProposedTimestamp> proposeEventTimestampsAsMember = proposeEventTimestampsAsMember(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
+        ProposeEventTimestampsAsMemberAsyncTask proposeEventTimestampsAsMemberAsyncTask = new ProposeEventTimestampsAsMemberAsyncTask(api, listener, hostPerson, eventId, proposeEventTimestampsAsMember);
         proposeEventTimestampsAsMemberAsyncTask.execute();
     }
 
     // TODO[Hairong]
     @Override
-    public void selectEventTimestampsAsMember(final String eventId, final List<MemberSelectedTimestamp> selectedEventTimestamps, final ActionCallbackListener<Event> listener) {
+    public void selectEventTimestampsAsMember(final String eventId, final List<String> selectedEventTimestamps, final ActionCallbackListener<Event> listener) {
 
     }
 
@@ -273,27 +363,7 @@ public class AppActionImpl implements AppAction {
 
     @Override
     public void getEventLocation(final String eventId, final ActionCallbackListener<String> listener) {
-        AsyncTask<Void, Void, ApiResponse<String>> asyncTask = new AsyncTask<Void, Void, ApiResponse<String>>() {
 
-            @Override
-            protected ApiResponse<String> doInBackground(Void... params) {
-                return api.getEventLocation(eventId);
-            }
-
-            @Override
-            protected void onPostExecute(ApiResponse<String> response) {
-                if (listener != null && response != null) {
-                    if (response.isSuccess()) {
-                        //TODO:UPDATE
-                        listener.onSuccess(response.getObj());
-                    } else {
-                        listener.onFailure(response.getMsg());
-                    }
-                }
-            }
-
-        };
-        asyncTask.execute();
     }
 
     @Override
@@ -302,52 +372,12 @@ public class AppActionImpl implements AppAction {
     }
 
     public void getEventsAsLeader(final ActionCallbackListener<List<Event>> listener) {
-        AsyncTask<Void, Void, ApiResponse<List<Event>>> asyncTask = new AsyncTask<Void, Void, ApiResponse<List<Event>>>() {
 
-            @Override
-            protected ApiResponse<List<Event>> doInBackground(Void... params) {
-                // TODO: Fix argument in the next line
-                return api.getEventsAsLeader("");
-            }
-
-            @Override
-            protected void onPostExecute(ApiResponse<List<Event>> response) {
-                if (listener != null && response != null) {
-                    if (response.isSuccess()) {
-                        listener.onSuccess(response.getObj());
-                    } else {
-                        listener.onFailure(response.getMsg());
-                    }
-                }
-            }
-
-        };
-        asyncTask.execute();
     }
 
     @Override
     public void getEventsAsMember(final ActionCallbackListener<List<Event>> listener) {
-        AsyncTask<Void, Void, ApiResponse<List<Event>>> asyncTask = new AsyncTask<Void, Void, ApiResponse<List<Event>>>() {
 
-            @Override
-            protected ApiResponse<List<Event>> doInBackground(Void... params) {
-                // TODO: Fix argument in the next line
-                return api.getEventsAsMember("");
-            }
-
-            @Override
-            protected void onPostExecute(ApiResponse<List<Event>> response) {
-                if (listener != null && response != null) {
-                    if (response.isSuccess()) {
-                        listener.onSuccess(response.getObj());
-                    } else {
-                        listener.onFailure(response.getMsg());
-                    }
-                }
-            }
-
-        };
-        asyncTask.execute();
     }
 
 }

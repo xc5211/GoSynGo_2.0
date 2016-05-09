@@ -12,6 +12,8 @@ public class EventMemberDetail implements Serializable {
     private Integer minsToArrive;
     private List<MemberSelectedTimestamp> selectedTimestamps;
     private List<MemberProposedTimestamp> proposedTimestamps;
+    private String eventId;
+    private String leaderId;
     //    private GeoPoint location;
     private String ownerId;
     private Date created;
@@ -71,6 +73,22 @@ public class EventMemberDetail implements Serializable {
     public void setStatusMember( Integer statusMember )
     {
         this.statusMember = statusMember;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getLeaderId() {
+        return leaderId;
+    }
+
+    public void setLeaderId(String leaderId) {
+        this.leaderId = leaderId;
     }
 
     public String getObjectId()
