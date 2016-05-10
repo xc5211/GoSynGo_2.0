@@ -12,7 +12,7 @@ public enum EventManagementState {
     // case 2: push all members through event channel to notify final time
     NOTIFY_FINAL_TIME("2"),
     // case 3(delay): push all members through event channel to remind
-    SEND_REMINDER("3"),
+    EVENT_REMINDER("3"),
     // case 4(delay): push all members through event channel to checkin or estimate
     CHECKIN_OR_ESTIMATE("4");
 

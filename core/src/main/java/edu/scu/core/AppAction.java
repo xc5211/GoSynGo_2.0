@@ -69,6 +69,11 @@ public interface AppAction {
     public void getEventDurationInMin(final String eventId, final ActionCallbackListener<Integer> listener);
 
     /**
+     * Timer
+     */
+    public void startMemberInvitationTimer(final AppAction appAction, final String eventId);
+
+    /**
      * Publish/Subscribe
      */
 

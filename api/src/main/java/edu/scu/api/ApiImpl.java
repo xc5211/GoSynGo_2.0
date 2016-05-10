@@ -7,6 +7,7 @@ import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessException;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.messaging.Message;
+import com.backendless.messaging.PublishOptions;
 import com.backendless.messaging.SubscriptionOptions;
 import com.backendless.persistence.BackendlessDataQuery;
 
@@ -22,6 +23,7 @@ import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
+import edu.scu.model.enumeration.BroadcastEventChannelArgKeyName;
 import edu.scu.model.enumeration.StatusMember;
 import edu.scu.util.lib.GoogleProjectSettings;
 
@@ -362,14 +364,29 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<EventMemberDetail> acceptEvent(EventMemberDetail eventMemberDetail) {
+    public ApiResponse<Event> acceptEvent(String eventId, String memberId) {
 
+        // Get Event object
+        Event event = null;
         try {
-            eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
+            event = Backendless.Data.of(Event.class).findById(eventId);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", eventMemberDetail);
+
+        for (EventMemberDetail memberDetail : event.getEventMemberDetail()) {
+            if (memberDetail.getMember().getObjectId().equals(memberId)) {
+                memberDetail.setStatusMember(StatusMember.Accept.getStatus());
+                break;
+            }
+        }
+
+        try {
+            event = Backendless.Data.of(Event.class).save(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", event);
     }
 
     @Override
@@ -490,13 +507,33 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public void broadcastEventChannel(String channelName, String eventId, String eventManagementState) {
+    public void publishEventChannelMessageAsLeader(String channelName, String leaderId, List<String> memberIds) {
+        PublishOptions publishOptions = new PublishOptions();
+        publishOptions.setPublisherId(leaderId);
+        for (String memberId : memberIds) {
+            publishOptions.putHeader(BroadcastEventChannelArgKeyName.MEMBER_ID.getKeyName(), memberId);
+        }
+        // TODO: set message object
+        Backendless.Messaging.publish(channelName, "", publishOptions);
+    }
+
+    @Override
+    public void publishEventChannelMessageAsMember(String channelName, String memberId, String leaderId) {
+        PublishOptions publishOptions = new PublishOptions();
+        publishOptions.setPublisherId(memberId);
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);
+        // TODO: set message object
+        Backendless.Messaging.publish(channelName, "", publishOptions);
+    }
+
+    @Override
+    public void broadcastEventChannel(String channelName, String eventId, String leaderId, String eventManagementState) {
         String dispatchedEventName = "ChannelMessaging";
         HashMap args = new HashMap();
-        args.put("channelName", channelName);
-        args.put("eventId", eventId);
-        args.put("eventManagementState", eventManagementState);
-        args.put("isDelayedMsg", false);
+        args.put(BroadcastEventChannelArgKeyName.CHANNEL_NAME, channelName);
+        args.put(BroadcastEventChannelArgKeyName.EVENT_ID, eventId);
+        args.put(BroadcastEventChannelArgKeyName.LEADER_ID, leaderId);
+        args.put(BroadcastEventChannelArgKeyName.EVENT_MANAGEMENT_STATE, eventManagementState);
 
         Backendless.Events.dispatch(dispatchedEventName, args, new AsyncCallback<Map>() {
             @Override

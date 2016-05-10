@@ -13,8 +13,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
@@ -48,15 +51,19 @@ import edu.scu.model.Person;
  */
 public class AppActionImpl implements AppAction {
 
+    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    private static String hostUserId;
+    private static Person hostPerson;
+
     private Context context;
     private Api api;
 
-    private static String hostUserId;
-    private static Person hostPerson;
+    private Map<String, Timer> memberInvitationTimerMap;
 
     public AppActionImpl (Context context) {
         this.context = context;
         this.api = new ApiImpl();
+        this.memberInvitationTimerMap = new HashMap<>();
     }
 
     @Override
@@ -80,10 +87,7 @@ public class AppActionImpl implements AppAction {
     }
 
 
-    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
     private static List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader(String eventId, String leaderId, List<String> datesInString) {
-//        String dateInString = "2016/10/15 16:00:00";
 
         List<LeaderProposedTimestamp> leaderProposedTimestamps = new ArrayList<>();
         try {
@@ -103,7 +107,6 @@ public class AppActionImpl implements AppAction {
     }
 
     private static List<MemberProposedTimestamp> proposeEventTimestampsAsMember(String eventId, String leaderId, List<String> datesInString) {
-//        String dateInString = "2016/10/15 16:00:00";
 
         List<MemberProposedTimestamp> memberProposedTimestamps = new ArrayList<>();
         try {
@@ -121,7 +124,6 @@ public class AppActionImpl implements AppAction {
     }
 
     private static List<MemberSelectedTimestamp> selectEventTimestampsAsMember(String eventId, String leaderId, List<String> datesInString) {
-//        String dateInString = "2016/10/15 16:00:00";
 
         List<MemberSelectedTimestamp> memberSelectedTimestamps = new ArrayList<>();
         try {
@@ -329,14 +331,44 @@ public class AppActionImpl implements AppAction {
 
     @Override
     public void acceptEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
-        AcceptEventAsyncTask acceptTask = new AcceptEventAsyncTask(api, listener, hostPerson, eventId);
+
+        AsyncCallback<List<Message>> leaderMsgResponder = new AsyncCallback<List<Message>>() {
+            @Override
+            public void handleResponse(List<Message> messages) {
+
+                String memberId;
+                Map<String, String> msgHeader;
+                Object msg;
+
+                for (Message message : messages) {
+                    memberId = message.getPublisherId();
+                    msgHeader = message.getHeaders();
+                    msg = message.getData();
+                    // TODO: update model
+
+                }
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                // TODO:
+            }
+        };
+
+        AcceptEventAsyncTask acceptTask = new AcceptEventAsyncTask(api, listener, leaderMsgResponder, hostPerson, eventId);
         acceptTask.execute();
+
+        Timer timer = memberInvitationTimerMap.get(eventId);
+        timer.cancel();
+        memberInvitationTimerMap.remove(eventId);
     }
 
     @Override
     public void declineEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
         DeclineEventAsyncTask declineEvent = new DeclineEventAsyncTask(api, listener, hostPerson, eventId);
         declineEvent.execute();
+
+        memberInvitationTimerMap.remove(eventId);
     }
 
     @Override
@@ -378,6 +410,22 @@ public class AppActionImpl implements AppAction {
     @Override
     public void getEventsAsMember(final ActionCallbackListener<List<Event>> listener) {
 
+    }
+
+    @Override
+    public void startMemberInvitationTimer(final AppAction appAction, final String eventId) {
+
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                // TODO: Decline and don't subscribe to event channel
+                appAction.declineEvent(eventId, null);
+            }
+        };
+
+        Timer timer = new Timer();
+        timer.schedule(timerTask, 30 * 60 * 1000);
+        memberInvitationTimerMap.put(eventId, timer);
     }
 
 }

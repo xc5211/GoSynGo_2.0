@@ -42,7 +42,7 @@ public class SendEventInvitationAsyncTask extends BaseAsyncTask {
                 for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
                     if(eventAsLeader.getObjectId().equals(eventId)) {
                         eventAsLeader.setStatusEvent(updatedEvent.getStatusEvent());
-                        api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, EventManagementState.SEND_INVITATION.getStatus());
+                        api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, hostPerson.getObjectId(), EventManagementState.SEND_INVITATION.getStatus());
                         listener.onSuccess(true);
                         return;
                     }

@@ -71,7 +71,7 @@ public interface Api {
 
     public ApiResponse<EventMemberDetail> selectEventTimestampsAsMember(EventMemberDetail eventMemberDetail, List<MemberSelectedTimestamp> selectedEventTimestamps);
 
-    public ApiResponse<EventMemberDetail> acceptEvent(EventMemberDetail eventMemberDetail);
+    public ApiResponse<Event> acceptEvent(String eventId, String memberId);
 
     public ApiResponse<EventMemberDetail> declineEvent(EventMemberDetail eventMemberDetail);
 
@@ -111,6 +111,10 @@ public interface Api {
 
     public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> leaderMsgResponder);
 
-    public void broadcastEventChannel(String channelName, String eventId, String eventManagementState);
+    public void publishEventChannelMessageAsLeader(String channelName, String leaderId, List<String> memberIds);
+
+    public void publishEventChannelMessageAsMember(String channelName, String memberId, String leaderId);
+
+    public void broadcastEventChannel(String channelName, String eventId, String leaderId, String eventManagementState);
 
 }

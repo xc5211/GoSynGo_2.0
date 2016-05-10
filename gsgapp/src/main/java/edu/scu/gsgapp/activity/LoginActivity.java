@@ -1,5 +1,6 @@
 package edu.scu.gsgapp.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -117,11 +118,13 @@ public class LoginActivity extends GsgBaseActivity {
         String password = this.passwordEdit.getText().toString();
         this.loginButton.setEnabled(false);
 
+        final ProgressDialog progressDialog = ProgressDialog.show( LoginActivity.this, "", "Logging in...", true );
         boolean stayLoggedIn = true;
         super.appAction.login(email, password, stayLoggedIn, new ActionCallbackListener<String>() {
 
             @Override
             public void onSuccess(String data) {
+                progressDialog.cancel();
                 Toast.makeText(context, R.string.toast_login_success, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
                 startActivity(intent);
