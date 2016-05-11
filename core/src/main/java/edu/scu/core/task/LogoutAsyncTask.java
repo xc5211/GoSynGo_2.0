@@ -1,5 +1,7 @@
 package edu.scu.core.task;
 
+import android.os.Handler;
+
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
@@ -13,8 +15,8 @@ public class LogoutAsyncTask extends BaseAsyncTask {
 
     private AppAction appAction;
 
-    public LogoutAsyncTask(Api api, ActionCallbackListener listener, Person hostPerson, AppAction appAction) {
-        super(api, listener, hostPerson);
+    public LogoutAsyncTask(Api api, ActionCallbackListener listener, Handler handler, AppAction appAction) {
+        super(api, listener, handler);
         this.appAction = appAction;
     }
 

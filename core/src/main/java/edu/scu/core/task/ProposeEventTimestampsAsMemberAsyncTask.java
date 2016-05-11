@@ -1,16 +1,13 @@
 package edu.scu.core.task;
 
-import java.util.List;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
-import edu.scu.core.R;
-import edu.scu.model.Event;
-import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
-import edu.scu.model.MemberProposedTimestamp;
-import edu.scu.model.Person;
 
 /**
  * Created by chuanxu on 5/6/16.
@@ -18,25 +15,21 @@ import edu.scu.model.Person;
 public class ProposeEventTimestampsAsMemberAsyncTask extends BaseAsyncTask {
 
     private String eventId;
-    private List<MemberProposedTimestamp> proposedEventTimestamps;
+    private String memberId;
+    private String leaderId;
+    private EventMemberDetail eventMemberDetail;
 
-    public ProposeEventTimestampsAsMemberAsyncTask(Api api, ActionCallbackListener<EventMemberDetail> listener, Person hostPerson, String eventId, List<MemberProposedTimestamp> proposedEventTimestamps) {
-        super(api, listener, hostPerson);
+    public ProposeEventTimestampsAsMemberAsyncTask(Api api, ActionCallbackListener<EventMemberDetail> listener, Handler handler, String eventId, String memberId, String leaderId, EventMemberDetail eventMemberDetail) {
+        super(api, listener, handler);
         this.eventId = eventId;
-        this.proposedEventTimestamps = proposedEventTimestamps;
+        this.memberId = memberId;
+        this.leaderId = leaderId;
+        this.eventMemberDetail = eventMemberDetail;
     }
 
     @Override
     protected ApiResponse<EventMemberDetail> doInBackground(Object... params) {
-        for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-            if (eventAsMember.getObjectId().equals(eventId)) {
-                EventMemberDetail memberDetail = eventAsMember.getEventMemberDetail().get(0);
-                memberDetail.setProposedTimestamps(proposedEventTimestamps);
-                return api.proposeEventTimestampsAsMember(memberDetail);
-            }
-        }
-        assert false;
-        return null;
+        return api.proposeEventTimestampsAsMember(eventMemberDetail);
     }
 
     @Override
@@ -44,17 +37,14 @@ public class ProposeEventTimestampsAsMemberAsyncTask extends BaseAsyncTask {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) response.getObj();
-                for (Event eventAsMember : hostPerson.getEventsAsLeader()) {
-                    if(eventAsMember.getObjectId().equals(eventId)) {
-                        eventAsMember.updateEventMemberDetail(updatedEventMemberDetail);
-                        break;
-                    }
-                }
+                api.publishEventChannelMemberProposedTimestamps(eventId, memberId, leaderId, updatedEventMemberDetail.getProposedTimestamps());
 
-                String leaderId = updatedEventMemberDetail.getLeaderId();
-                api.publishEventChannelMemberProposedTimestamps(eventId, hostPerson.getObjectId(), leaderId, updatedEventMemberDetail.getProposedTimestamps());
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(EventMemberDetail.SERIALIZE_KEY, updatedEventMemberDetail);
+                message.setData(bundle);
+                handler.sendMessage(message);
                 listener.onSuccess(updatedEventMemberDetail);
-                return;
             }else {
                 listener.onFailure(response.getMsg());
             }

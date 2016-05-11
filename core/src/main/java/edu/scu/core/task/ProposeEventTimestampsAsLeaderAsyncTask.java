@@ -1,15 +1,14 @@
 package edu.scu.core.task;
 
-import java.util.List;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
-import edu.scu.core.R;
-import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
-import edu.scu.model.LeaderProposedTimestamp;
-import edu.scu.model.Person;
+import edu.scu.model.EventMemberDetail;
 
 /**
  * Created by chuanxu on 5/6/16.
@@ -17,25 +16,17 @@ import edu.scu.model.Person;
 public class ProposeEventTimestampsAsLeaderAsyncTask extends BaseAsyncTask {
 
     private String eventId;
-    private List<LeaderProposedTimestamp> proposedEventTimestamps;
+    private EventLeaderDetail leaderDetail;
 
-    public ProposeEventTimestampsAsLeaderAsyncTask(Api api, ActionCallbackListener<EventLeaderDetail> listener, Person hostPerson, String eventId, List<LeaderProposedTimestamp> proposedEventTimestamps) {
-        super(api, listener, hostPerson);
+    public ProposeEventTimestampsAsLeaderAsyncTask(Api api, ActionCallbackListener<EventLeaderDetail> listener, Handler handler, String eventId, EventLeaderDetail leaderDetail) {
+        super(api, listener, handler);
         this.eventId = eventId;
-        this.proposedEventTimestamps = proposedEventTimestamps;
+        this.leaderDetail = leaderDetail;
     }
 
     @Override
     protected ApiResponse<EventLeaderDetail> doInBackground(Object... params) {
-        for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-            if (eventAsLeader.getObjectId().equals(eventId)) {
-                EventLeaderDetail leaderDetail = eventAsLeader.getEventLeaderDetail();
-                leaderDetail.setProposedTimestamps(proposedEventTimestamps);
-                return api.proposeEventTimestampsAsLeader(leaderDetail);
-            }
-        }
-        assert false;
-        return null;
+        return api.proposeEventTimestampsAsLeader(leaderDetail);
     }
 
     @Override
@@ -43,14 +34,12 @@ public class ProposeEventTimestampsAsLeaderAsyncTask extends BaseAsyncTask {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 EventLeaderDetail updatedEventLeaderDetail = (EventLeaderDetail) response.getObj();
-                for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-                    if(eventAsLeader.getObjectId().equals(eventId)) {
-                        eventAsLeader.setEventLeaderDetail(updatedEventLeaderDetail);
-                        listener.onSuccess(true);
-                        return;
-                    }
-                }
-                listener.onFailure(String.valueOf(R.string.sync_with_server_error));
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(EventMemberDetail.SERIALIZE_KEY, updatedEventLeaderDetail);
+                message.setData(bundle);
+                handler.sendMessage(message);
+                listener.onSuccess(updatedEventLeaderDetail);
             } else {
                 listener.onFailure(response.getMsg());
             }

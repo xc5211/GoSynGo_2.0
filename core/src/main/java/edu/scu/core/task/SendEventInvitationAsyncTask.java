@@ -1,37 +1,30 @@
 package edu.scu.core.task;
 
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.core.R;
 import edu.scu.model.Event;
-import edu.scu.model.enumeration.EventManagementState;
-import edu.scu.model.Person;
-import edu.scu.model.enumeration.StatusEvent;
-import edu.scu.util.lib.GoogleProjectSettings;
 
 /**
  * Created by chuanxu on 5/6/16.
  */
 public class SendEventInvitationAsyncTask extends BaseAsyncTask {
 
-    private String eventId;
+    private Event eventAsLeader;
 
-    public SendEventInvitationAsyncTask(Api api, ActionCallbackListener listener, Person hostPerson, String eventId) {
-        super(api, listener, hostPerson);
-        this.eventId = eventId;
+    public SendEventInvitationAsyncTask(Api api, ActionCallbackListener listener, Handler handler, Event eventAsLeader) {
+        super(api, listener, handler);
+        this.eventAsLeader = eventAsLeader;
     }
 
     @Override
     protected ApiResponse doInBackground(Object... params) {
-        for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-            if (eventAsLeader.getObjectId().equals(eventId)) {
-                eventAsLeader.setStatusEvent(StatusEvent.Pending.getStatus());
-                return api.initiateEvent(eventAsLeader);
-            }
-        }
-        assert false;
-        return null;
+        return api.initiateEvent(eventAsLeader);
     }
 
     @Override
@@ -39,19 +32,18 @@ public class SendEventInvitationAsyncTask extends BaseAsyncTask {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 Event updatedEvent = (Event) response.getObj();
-                for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-                    if(eventAsLeader.getObjectId().equals(eventId)) {
-                        eventAsLeader.setStatusEvent(updatedEvent.getStatusEvent());
-                        api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, hostPerson.getObjectId(), EventManagementState.SEND_INVITATION.getStatus());
-                        listener.onSuccess(true);
-                        return;
-                    }
-                }
-                listener.onFailure(String.valueOf(R.string.sync_with_server_error));
-            }else {
-                listener.onFailure(response.getMsg());
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(Event.SERIALIZE_KEY, updatedEvent);
+                message.setData(bundle);
+                handler.sendMessage(message);
+                listener.onSuccess(null);
             }
+            listener.onFailure(String.valueOf(R.string.sync_with_server_error));
+        } else {
+            listener.onFailure(response.getMsg());
         }
+
     }
 
 }

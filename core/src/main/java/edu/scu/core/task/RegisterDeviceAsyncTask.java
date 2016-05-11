@@ -1,5 +1,7 @@
 package edu.scu.core.task;
 
+import android.os.Handler;
+
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
@@ -10,8 +12,8 @@ import edu.scu.model.Person;
  */
 public class RegisterDeviceAsyncTask extends BaseAsyncTask {
 
-    public RegisterDeviceAsyncTask(Api api, ActionCallbackListener listener, Person hostPerson) {
-        super(api, listener, hostPerson);
+    public RegisterDeviceAsyncTask(Api api, ActionCallbackListener listener, Handler handler) {
+        super(api, listener, handler);
     }
 
     @Override

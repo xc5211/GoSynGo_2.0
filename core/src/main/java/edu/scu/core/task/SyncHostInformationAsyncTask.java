@@ -19,7 +19,6 @@ public class SyncHostInformationAsyncTask extends BaseAsyncTask {
     public SyncHostInformationAsyncTask(Api api, ActionCallbackListener<Void> listener, Handler handler, String userId) {
         super(api, listener, handler);
         this.userId = userId;
-        this.handler = handler;
     }
 
     @Override
@@ -35,6 +34,7 @@ public class SyncHostInformationAsyncTask extends BaseAsyncTask {
                 Message message = new Message();
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(Person.SERIALIZE_KEY, syncedPerson);
+                message.setData(bundle);
                 handler.sendMessage(message);
                 listener.onSuccess(null);
             } else {

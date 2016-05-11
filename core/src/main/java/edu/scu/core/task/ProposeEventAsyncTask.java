@@ -1,5 +1,7 @@
 package edu.scu.core.task;
 
+import android.os.Handler;
+
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.messaging.Message;
 
@@ -18,23 +20,19 @@ import edu.scu.model.enumeration.StatusEvent;
  */
 public class ProposeEventAsyncTask extends BaseAsyncTask {
 
+    private String leaderId;
+    private Event event;
     private AsyncCallback<List<Message>> memberMsgResponder;
 
-    public ProposeEventAsyncTask(Api api, ActionCallbackListener listener, AsyncCallback<List<Message>> memberMsgResponder, Person hostPerson) {
-        super(api, listener, hostPerson);
+    public ProposeEventAsyncTask(Api api, ActionCallbackListener listener, AsyncCallback<List<Message>> memberMsgResponder, String leaderId, Event event, Handler handler) {
+        super(api, listener, handler);
+        this.leaderId = leaderId;
+        this.event = event;
         this.memberMsgResponder = memberMsgResponder;
     }
 
     @Override
     protected ApiResponse<Event> doInBackground(Object... params) {
-
-        EventLeaderDetail eventLeaderDetail = new EventLeaderDetail();
-        eventLeaderDetail.setLeader(hostPerson);
-        eventLeaderDetail.setIsCheckedIn(false);
-
-        Event event = new Event();
-        event.setStatusEvent(StatusEvent.Tentative.getStatus());
-        event.setEventLeaderDetail(eventLeaderDetail);
         return api.proposeEvent(event);
     }
 
@@ -42,13 +40,12 @@ public class ProposeEventAsyncTask extends BaseAsyncTask {
     protected void onPostExecute(ApiResponse response) {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
-                Event event = (Event) response.getObj();
-                String channelName = event.getObjectId();
+                Event updatedEvent = (Event) response.getObj();
+                String channelName = updatedEvent.getObjectId();
 
-                api.subscribeEventChannelAsLeader(channelName, hostPerson.getObjectId(), memberMsgResponder);
-                hostPerson.addEventAsLeader(event);
+                api.subscribeEventChannelAsLeader(channelName, leaderId, memberMsgResponder);
                 api.registerEventChannelMessaging(channelName);
-                listener.onSuccess(event);
+                listener.onSuccess(updatedEvent);
             } else {
                 listener.onFailure(response.getMsg());
             }

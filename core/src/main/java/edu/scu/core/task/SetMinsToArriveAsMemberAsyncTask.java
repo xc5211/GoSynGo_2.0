@@ -1,38 +1,33 @@
 package edu.scu.core.task;
 
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
-import edu.scu.core.R;
-import edu.scu.model.Event;
 import edu.scu.model.EventMemberDetail;
-import edu.scu.model.Person;
 
 /**
  * Created by Hairong on 5/6/16.
  */
 public class SetMinsToArriveAsMemberAsyncTask extends BaseAsyncTask{
 
+    private EventMemberDetail eventMemberDetail;
     private String eventId;
-    private int estimateInMin;
+    private String memberId;
 
-    public SetMinsToArriveAsMemberAsyncTask(Api api, ActionCallbackListener<Integer> listener, Person hostPerson, String eventId, int estimateInMin) {
-        super(api, listener, hostPerson);
+    public SetMinsToArriveAsMemberAsyncTask(Api api, ActionCallbackListener<Integer> listener, Handler handler, EventMemberDetail eventMemberDetail, String eventId, String memberId) {
+        super(api, listener, handler);
+        this.eventMemberDetail = eventMemberDetail;
         this.eventId = eventId;
-        this.estimateInMin = estimateInMin;
+        this.memberId = memberId;
     }
 
     @Override
     protected ApiResponse<EventMemberDetail> doInBackground(Object... params) {
-        for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-            if (eventAsMember.getObjectId().equals(eventId)) {
-                EventMemberDetail eventMemberDetail = eventAsMember.getEventMemberDetail().get(0);
-                eventMemberDetail.setMinsToArrive(estimateInMin);
-                return api.setMinsToArriveAsMember(eventMemberDetail);
-            }
-        }
-        assert false;
-        return null;
+        return api.setMinsToArriveAsMember(eventMemberDetail);
     }
 
     @Override
@@ -40,15 +35,14 @@ public class SetMinsToArriveAsMemberAsyncTask extends BaseAsyncTask{
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) response.getObj();
-                for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-                    if (eventAsMember.getObjectId().equals(eventId)) {
-                        eventAsMember.updateEventMemberDetail(updatedEventMemberDetail);
-                        break;
-                    }
-                }
-
                 String leaderId = updatedEventMemberDetail.getLeaderId();
-                api.publishEventChannelMemberEstimateInMin(eventId, hostPerson.getObjectId(), leaderId, updatedEventMemberDetail.getMinsToArrive());
+                api.publishEventChannelMemberEstimateInMin(eventId, memberId, leaderId, updatedEventMemberDetail.getMinsToArrive());
+
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(EventMemberDetail.SERIALIZE_KEY, updatedEventMemberDetail);
+                message.setData(bundle);
+                handler.sendMessage(message);
                 listener.onSuccess(updatedEventMemberDetail.getMinsToArrive());
             } else {
                 listener.onFailure(response.getMsg());

@@ -1,9 +1,14 @@
 package edu.scu.core.task;
 
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.core.AppAction;
+import edu.scu.model.EventMemberDetail;
 import edu.scu.model.Person;
 
 /**
@@ -16,8 +21,8 @@ public class LoginAsyncTask extends BaseAsyncTask {
     private String password;
     private boolean stayLoggedIn;
 
-    public LoginAsyncTask(Api api, ActionCallbackListener listener, Person hostPerson, AppAction appAction, String userEmail, String password, boolean stayLoggedIn) {
-        super(api, listener, hostPerson);
+    public LoginAsyncTask(Api api, ActionCallbackListener listener, Handler handler, AppAction appAction, String userEmail, String password, boolean stayLoggedIn) {
+        super(api, listener, handler);
         this.appAction = appAction;
         this.userEmail = userEmail;
         this.password = password;
@@ -33,7 +38,13 @@ public class LoginAsyncTask extends BaseAsyncTask {
     protected void onPostExecute(ApiResponse response) {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
-                appAction.setHostUserId((String) response.getObj());
+                String userId = (String) response.getObj();
+
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("userId", userId);
+                message.setData(bundle);
+                handler.sendMessage(message);
                 listener.onSuccess(response.getObj());
             } else {
                 listener.onFailure(response.getMsg());

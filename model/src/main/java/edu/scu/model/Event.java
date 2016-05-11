@@ -192,4 +192,7 @@ public class Event implements Serializable {
         return false;
     }
 
+    public void updateEventLeaderDetail(EventLeaderDetail updatedEventLeaderDetail) {
+        this.eventLeaderDetail = updatedEventLeaderDetail;
+    }
 }

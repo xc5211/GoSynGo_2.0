@@ -124,17 +124,17 @@ public class LoginActivity extends GsgBaseActivity {
 
             @Override
             public void onSuccess(String data) {
-                progressDialog.cancel();
                 Toast.makeText(context, R.string.toast_login_success, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
                 startActivity(intent);
+                progressDialog.cancel();
             }
 
             @Override
             public void onFailure(String message) {
-                progressDialog.cancel();
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
                 loginButton.setEnabled(true);
+                progressDialog.cancel();
             }
 
         });
