@@ -1,6 +1,7 @@
 package edu.scu.core.task;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
@@ -14,12 +15,12 @@ public abstract class BaseAsyncTask extends AsyncTask<Object, Object, ApiRespons
 
     protected Api api;
     protected ActionCallbackListener listener;
-    protected Person hostPerson;
+    protected Handler handler;
 
-    public BaseAsyncTask(final Api api, final ActionCallbackListener listener, final Person hostPerson) {
+    public BaseAsyncTask(final Api api, final ActionCallbackListener listener, final Handler handler) {
         this.api = api;
         this.listener = listener;
-        this.hostPerson = hostPerson;
+        this.handler = handler;
     }
 
     @Override

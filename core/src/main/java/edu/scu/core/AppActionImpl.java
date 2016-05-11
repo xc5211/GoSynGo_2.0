@@ -1,6 +1,8 @@
 package edu.scu.core;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 
 import com.backendless.async.callback.AsyncCallback;
@@ -421,7 +423,16 @@ public class AppActionImpl implements AppAction {
 
     @Override
     public void syncHostInformation(String userId, ActionCallbackListener<Void> listener) {
-        SyncHostInformationAsyncTask syncHostInformationAsyncTask = new SyncHostInformationAsyncTask(api, listener, hostPerson, userId);
+
+        Handler handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(android.os.Message msg) {
+                Bundle bundle = msg.getData();
+                hostPerson = (Person) bundle.getSerializable(Person.SERIALIZE_KEY);
+                return true;
+            }
+        });
+        SyncHostInformationAsyncTask syncHostInformationAsyncTask = new SyncHostInformationAsyncTask(api, listener, handler, userId);
         syncHostInformationAsyncTask.execute();
     }
 

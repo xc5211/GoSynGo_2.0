@@ -1,5 +1,9 @@
 package edu.scu.core.task;
 
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
@@ -12,9 +16,10 @@ public class SyncHostInformationAsyncTask extends BaseAsyncTask {
 
     private String userId;
 
-    public SyncHostInformationAsyncTask(Api api, ActionCallbackListener<Void> listener, Person hostPerson, String userId) {
-        super(api, listener, hostPerson);
+    public SyncHostInformationAsyncTask(Api api, ActionCallbackListener<Void> listener, Handler handler, String userId) {
+        super(api, listener, handler);
         this.userId = userId;
+        this.handler = handler;
     }
 
     @Override
@@ -27,7 +32,10 @@ public class SyncHostInformationAsyncTask extends BaseAsyncTask {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 Person syncedPerson = (Person) response.getObj();
-                hostPerson = syncedPerson;
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(Person.SERIALIZE_KEY, syncedPerson);
+                handler.sendMessage(message);
                 listener.onSuccess(null);
             } else {
                 listener.onFailure(response.getMsg());

@@ -25,10 +25,10 @@ import edu.scu.model.Person;
 public abstract class GsgBaseActivity extends AppCompatActivity {
 
     public Context context;
-    public static GsgApplication gsgApplication;
-    public static AppAction appAction;
-    public static Person hostPerson;
-    public static String fileUri = "PersonMap";
+    public GsgApplication gsgApplication;
+    public AppAction appAction;
+    public Person hostPerson;
+    public String fileUri = "PersonMap";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
