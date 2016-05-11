@@ -6,6 +6,8 @@ import java.util.List;
 
 public class EventMemberDetail implements Serializable {
 
+    public static String SERIALIZE_KEY = "eventMemberDetail";
+
     private Person member;
     private Integer statusMember;
     private Boolean isCheckedIn;

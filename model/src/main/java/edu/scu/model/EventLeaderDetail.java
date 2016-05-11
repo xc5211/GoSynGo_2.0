@@ -6,6 +6,8 @@ import java.util.List;
 
 public class EventLeaderDetail implements Serializable {
 
+    public static String SERIALIZE_KEY = "eventLeaderDetail";
+
     private Person leader;
     private Boolean isCheckedIn;
     private Integer minsToArrive;

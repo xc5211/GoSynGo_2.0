@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Event implements Serializable{
+public class Event implements Serializable {
+
+    public static String SERIALIZE_KEY = "event";
 
     private String title;
     private String note;

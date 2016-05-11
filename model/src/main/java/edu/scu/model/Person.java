@@ -6,6 +6,8 @@ import java.util.List;
 
 public class Person implements Serializable {
 
+    public static String SERIALIZE_KEY = "person";
+
     private String userId;
     private String email;
     private String name;

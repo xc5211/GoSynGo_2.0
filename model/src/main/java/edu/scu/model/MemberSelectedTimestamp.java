@@ -5,6 +5,8 @@ import java.util.Date;
 
 public class MemberSelectedTimestamp implements Serializable {
 
+    public static String SERIALIZE_KEY = "memberSelectedTimestamp";
+
     private Date timestamp;
     private Date updated;
     private Date created;

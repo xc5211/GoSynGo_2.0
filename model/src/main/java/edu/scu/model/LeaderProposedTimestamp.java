@@ -5,6 +5,8 @@ import java.util.Date;
 
 public class LeaderProposedTimestamp implements Serializable {
 
+    public static String SERIALIZE_KEY = "leaderProposedTimestamp";
+
     private String leaderId;
     private String eventId;
     private Date timestamp;
