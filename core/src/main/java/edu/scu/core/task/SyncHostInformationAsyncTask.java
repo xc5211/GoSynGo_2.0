@@ -12,7 +12,7 @@ public class SyncHostInformationAsyncTask extends BaseAsyncTask {
 
     private String userId;
 
-    public SyncHostInformationAsyncTask(Api api, ActionCallbackListener<Person> listener, Person hostPerson, String userId) {
+    public SyncHostInformationAsyncTask(Api api, ActionCallbackListener<Void> listener, Person hostPerson, String userId) {
         super(api, listener, hostPerson);
         this.userId = userId;
     }
@@ -27,7 +27,8 @@ public class SyncHostInformationAsyncTask extends BaseAsyncTask {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 Person syncedPerson = (Person) response.getObj();
-                listener.onSuccess(syncedPerson);
+                hostPerson = syncedPerson;
+                listener.onSuccess(null);
             } else {
                 listener.onFailure(response.getMsg());
             }
