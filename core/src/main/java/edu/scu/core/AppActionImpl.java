@@ -420,7 +420,7 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void syncHostInformation(String userId, ActionCallbackListener<Person> listener) {
+    public void syncHostInformation(String userId, ActionCallbackListener<Void> listener) {
         SyncHostInformationAsyncTask syncHostInformationAsyncTask = new SyncHostInformationAsyncTask(api, listener, hostPerson, userId);
         syncHostInformationAsyncTask.execute();
     }

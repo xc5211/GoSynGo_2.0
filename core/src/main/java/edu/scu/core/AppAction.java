@@ -71,7 +71,7 @@ public interface AppAction {
     /**
      * Sync
      */
-    public void syncHostInformation(final String userId, final ActionCallbackListener<Person> listener);
+    public void syncHostInformation(final String userId, final ActionCallbackListener<Void> listener);
 
     /**
      * Timer
