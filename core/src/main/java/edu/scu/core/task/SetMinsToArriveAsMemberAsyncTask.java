@@ -43,11 +43,13 @@ public class SetMinsToArriveAsMemberAsyncTask extends BaseAsyncTask{
                 for (Event eventAsMember : hostPerson.getEventsAsMember()) {
                     if (eventAsMember.getObjectId().equals(eventId)) {
                         eventAsMember.updateEventMemberDetail(updatedEventMemberDetail);
-                        listener.onSuccess(true);
-                        return;
+                        break;
                     }
                 }
-                listener.onFailure(String.valueOf(R.string.sync_with_server_error));
+
+                String leaderId = updatedEventMemberDetail.getLeaderId();
+                api.publishEventChannelMemberEstimateInMin(eventId, hostPerson.getObjectId(), leaderId, updatedEventMemberDetail.getMinsToArrive());
+                listener.onSuccess(updatedEventMemberDetail.getMinsToArrive());
             } else {
                 listener.onFailure(response.getMsg());
             }

@@ -38,6 +38,7 @@ import edu.scu.core.task.RegisterDeviceAsyncTask;
 import edu.scu.core.task.RemoveEventMemberAsyncTask;
 import edu.scu.core.task.SendEventInvitationAsyncTask;
 import edu.scu.core.task.SetMinsToArriveAsMemberAsyncTask;
+import edu.scu.core.task.SyncHostInformationAsyncTask;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
@@ -45,6 +46,7 @@ import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
+import edu.scu.model.enumeration.PublishEventChannelArgKeyName;
 
 /**
  * Created by chuanxu on 4/14/16.
@@ -52,13 +54,13 @@ import edu.scu.model.Person;
 public class AppActionImpl implements AppAction {
 
     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
     private static String hostUserId;
     private static Person hostPerson;
+    private static Map<String, Timer> memberInvitationTimerMap;
 
     private Context context;
     private Api api;
-
-    private Map<String, Timer> memberInvitationTimerMap;
 
     public AppActionImpl (Context context) {
         this.context = context;
@@ -243,7 +245,6 @@ public class AppActionImpl implements AppAction {
                 String memberId;
                 Map<String, String> msgHeader;
                 Object msg;
-
                 for (Message message : messages) {
                     memberId = message.getPublisherId();
                     msgHeader = message.getHeaders();
@@ -338,13 +339,28 @@ public class AppActionImpl implements AppAction {
 
                 String memberId;
                 Map<String, String> msgHeader;
-                Object msg;
+                EventMemberDetail eventMemberDetail;
 
                 for (Message message : messages) {
                     memberId = message.getPublisherId();
                     msgHeader = message.getHeaders();
-                    msg = message.getData();
-                    // TODO: update model
+                    eventMemberDetail = hostPerson.getEventMemberMemberDetail(eventId, memberId);
+
+                    if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_STATUS.getKeyName()).equals("true")) {
+                        int memberStatus = (int) message.getData();
+                        eventMemberDetail.setStatusMember(memberStatus);
+                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_PROPOSED_TIME.getKeyName()).equals("true")) {
+                        List<MemberProposedTimestamp> memberProposedTimestamps = (List<MemberProposedTimestamp>) message.getData();
+                        eventMemberDetail.setProposedTimestamps(memberProposedTimestamps);
+                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_SELECTED_TIME.getKeyName()).equals("true")) {
+                        List<MemberSelectedTimestamp> memberSelectedTimestamps = (List<MemberSelectedTimestamp>) message.getData();
+                        eventMemberDetail.setSelectedTimestamps(memberSelectedTimestamps);
+                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_MINS_TO_ARRIVE.getKeyName()).equals("true")) {
+                        int estimateInMin = (int) message.getData();
+                        eventMemberDetail.setMinsToArrive(estimateInMin);
+                    } else {
+                        assert false;
+                    }
 
                 }
             }
@@ -401,6 +417,12 @@ public class AppActionImpl implements AppAction {
     @Override
     public void getEventDurationInMin(final String eventId, final ActionCallbackListener<Integer> listener) {
 
+    }
+
+    @Override
+    public void syncHostInformation(String userId, ActionCallbackListener<Person> listener) {
+        SyncHostInformationAsyncTask syncHostInformationAsyncTask = new SyncHostInformationAsyncTask(api, listener, hostPerson, userId);
+        syncHostInformationAsyncTask.execute();
     }
 
     public void getEventsAsLeader(final ActionCallbackListener<List<Event>> listener) {

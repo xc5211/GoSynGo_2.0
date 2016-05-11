@@ -23,7 +23,9 @@ public enum BroadcastEventChannelArgKeyName {
 
     EVENT_LEADER("eventLeader"),
 
-    MEMBER_ID("memberId");
+    MEMBER_ID("memberId"),
+
+    EVENT_MEMBER_DETAIL("eventMemberDetail");
 
 
     private String keyName;

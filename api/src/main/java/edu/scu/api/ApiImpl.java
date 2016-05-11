@@ -21,9 +21,11 @@ import edu.scu.api.query.BackendlessQueryHelper;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
 import edu.scu.model.enumeration.BroadcastEventChannelArgKeyName;
+import edu.scu.model.enumeration.PublishEventChannelArgKeyName;
 import edu.scu.model.enumeration.StatusMember;
 import edu.scu.util.lib.GoogleProjectSettings;
 
@@ -484,7 +486,58 @@ public class ApiImpl implements Api {
 
     @Override
     public ApiResponse<Person> syncHostInformation(String userId) {
-        return null;
+        Person hostPerson = null;
+        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
+        StringBuilder whereClause = null;
+
+        //get this person
+        whereClause = new StringBuilder();
+        whereClause.append("userId = '").append(userId).append("'");
+        dataQuery.setWhereClause(whereClause.toString());
+        BackendlessCollection<Person> hostPersonCollection = null;
+        try {
+            hostPersonCollection = Backendless.Data.of(Person.class).find(dataQuery);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        List<Person> personList = hostPersonCollection.getData();
+        if(personList.size() != 0) {
+            hostPerson = personList.get(0);
+        }
+
+
+        ArrayList<String> relationProps = new ArrayList<String>();
+        //first level
+        relationProps.add( "contacts" );
+        relationProps.add( "eventsAsLeader" );
+        relationProps.add( "eventsAsMember" );
+
+        //second level
+        relationProps.add( "eventsAsLeader.eventLeaderDetail" );
+        relationProps.add( "eventsAsLeader.eventMemberDetail" );
+
+        relationProps.add( "eventsAsMember.eventLeaderDetail" );
+        relationProps.add( "eventsAsMember.eventMemberDetail" );
+
+        //third level
+        relationProps.add( "eventsAsLeader.eventLeaderDetail.proposedTimestamps" );
+        relationProps.add( "eventsAsLeader.eventLeaderDetail.leader" );
+        relationProps.add( "eventsAsLeader.eventMemberDetail.selectedTimestamps" );
+        relationProps.add( "eventsAsLeader.eventMemberDetail.proposedTimestamps" );
+        relationProps.add( "eventsAsLeader.eventMemberDetail.member" );
+
+        relationProps.add( "eventsAsMember.eventLeaderDetail.proposedTimestamps" );
+        relationProps.add( "eventsAsMember.eventLeaderDetail.leader" );
+        relationProps.add( "eventsAsMember.eventMemberDetail.selectedTimestamps" );
+        relationProps.add( "eventsAsMember.eventMemberDetail.proposedTimestamps" );
+        relationProps.add( "eventsAsMember.eventMemberDetail.member" );
+
+        try {
+            Backendless.Data.of( Person.class ).loadRelations( hostPerson, relationProps );
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<> (SUCCESS_EVENT, "Sync with server success", hostPerson);
     }
 
     @Override
@@ -507,10 +560,10 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public void publishEventChannelMessageAsLeader(String channelName, String leaderId, List<String> memberIds) {
+    public void publishEventChannelMessageAsLeader(String channelName, String publisherId, List<String> receiverIds) {
         PublishOptions publishOptions = new PublishOptions();
-        publishOptions.setPublisherId(leaderId);
-        for (String memberId : memberIds) {
+        publishOptions.setPublisherId(publisherId);
+        for (String memberId : receiverIds) {
             publishOptions.putHeader(BroadcastEventChannelArgKeyName.MEMBER_ID.getKeyName(), memberId);
         }
         // TODO: set message object
@@ -518,12 +571,48 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public void publishEventChannelMessageAsMember(String channelName, String memberId, String leaderId) {
+    public void publishEventChannelMessageAsMember(String channelName, String publisherId, String receiverId) {
         PublishOptions publishOptions = new PublishOptions();
-        publishOptions.setPublisherId(memberId);
-        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);
+        publishOptions.setPublisherId(publisherId);
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), receiverId);
         // TODO: set message object
         Backendless.Messaging.publish(channelName, "", publishOptions);
+    }
+
+    @Override
+    public void publishEventChannelMemberStatus(String channelName, String publisherId, String receiverId, int memberStatus) {
+        PublishOptions publishOptions = new PublishOptions();
+        publishOptions.setPublisherId(publisherId);
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), receiverId);
+        publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_STATUS.getKeyName(), "true");
+        Backendless.Messaging.publish(channelName, memberStatus, publishOptions);
+    }
+
+    @Override
+    public void publishEventChannelMemberSelectedTimestamps(String channelName, String publisherId, String receiverId, List<MemberSelectedTimestamp> memberSelectedTimestamps) {
+        PublishOptions publishOptions = new PublishOptions();
+        publishOptions.setPublisherId(publisherId);
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), receiverId);
+        publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_SELECTED_TIME.getKeyName(), "true");
+        Backendless.Messaging.publish(channelName, memberSelectedTimestamps, publishOptions);
+    }
+
+    @Override
+    public void publishEventChannelMemberProposedTimestamps(String channelName, String publisherId, String receiverId, List<MemberProposedTimestamp> memberProposedTimestamps) {
+        PublishOptions publishOptions = new PublishOptions();
+        publishOptions.setPublisherId(publisherId);
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), receiverId);
+        publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_PROPOSED_TIME.getKeyName(), "true");
+        Backendless.Messaging.publish(channelName, memberProposedTimestamps, publishOptions);
+    }
+
+    @Override
+    public void publishEventChannelMemberEstimateInMin(String channelName, String publisherId, String receiverId, int estimateInMin) {
+        PublishOptions publishOptions = new PublishOptions();
+        publishOptions.setPublisherId(publisherId);
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), receiverId);
+        publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_MINS_TO_ARRIVE.getKeyName(), "true");
+        Backendless.Messaging.publish(channelName, estimateInMin, publishOptions);
     }
 
     @Override

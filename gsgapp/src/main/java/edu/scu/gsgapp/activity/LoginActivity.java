@@ -132,6 +132,7 @@ public class LoginActivity extends GsgBaseActivity {
 
             @Override
             public void onFailure(String message) {
+                progressDialog.cancel();
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
                 loginButton.setEnabled(true);
             }

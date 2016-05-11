@@ -47,11 +47,14 @@ public class ProposeEventTimestampsAsMemberAsyncTask extends BaseAsyncTask {
                 for (Event eventAsMember : hostPerson.getEventsAsLeader()) {
                     if(eventAsMember.getObjectId().equals(eventId)) {
                         eventAsMember.updateEventMemberDetail(updatedEventMemberDetail);
-                        listener.onSuccess(true);
-                        return;
+                        break;
                     }
                 }
-                listener.onFailure(String.valueOf(R.string.sync_with_server_error));
+
+                String leaderId = updatedEventMemberDetail.getLeaderId();
+                api.publishEventChannelMemberProposedTimestamps(eventId, hostPerson.getObjectId(), leaderId, updatedEventMemberDetail.getProposedTimestamps());
+                listener.onSuccess(updatedEventMemberDetail);
+                return;
             }else {
                 listener.onFailure(response.getMsg());
             }

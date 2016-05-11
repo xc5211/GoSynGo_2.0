@@ -10,6 +10,7 @@ import java.util.Map;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
 
@@ -111,9 +112,17 @@ public interface Api {
 
     public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> leaderMsgResponder);
 
-    public void publishEventChannelMessageAsLeader(String channelName, String leaderId, List<String> memberIds);
+    public void publishEventChannelMessageAsLeader(String channelName, String publisherId, List<String> receiverIds);
 
-    public void publishEventChannelMessageAsMember(String channelName, String memberId, String leaderId);
+    public void publishEventChannelMessageAsMember(String channelName, String publisherId, String receiverId);
+
+    public void publishEventChannelMemberStatus(String channelName, String publisherId, String receiverId, int memberStatus);
+
+    public void publishEventChannelMemberSelectedTimestamps(String channelName, String publisherId, String receiverId, List<MemberSelectedTimestamp> memberSelectedTimestamps);
+
+    public void publishEventChannelMemberProposedTimestamps(String channelName, String publisherId, String receiverId, List<MemberProposedTimestamp> memberProposedTimestamps);
+
+    public void publishEventChannelMemberEstimateInMin(String channelName, String publisherId, String receiverId, int estimateInMin);
 
     public void broadcastEventChannel(String channelName, String eventId, String leaderId, String eventManagementState);
 

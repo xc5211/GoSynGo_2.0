@@ -10,7 +10,9 @@ import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.core.R;
 import edu.scu.model.Event;
+import edu.scu.model.EventMemberDetail;
 import edu.scu.model.Person;
+import edu.scu.model.enumeration.StatusMember;
 
 /**
  * Created by chuanxu on 5/5/16.
@@ -40,7 +42,12 @@ public class AcceptEventAsyncTask extends BaseAsyncTask {
 
                 api.subscribeEventChannelAsMember(eventId, hostPerson.getObjectId(), leaderMsgResponder);
                 String leaderId = updatedEvent.getEventLeaderDetail().getLeader().getObjectId();
-                api.publishEventChannelMessageAsMember(eventId, hostPerson.getObjectId(), leaderId);
+                for (EventMemberDetail eventMemberDetail : updatedEvent.getEventMemberDetail()) {
+                    if (eventMemberDetail.getMember().getObjectId().equals(hostPerson.getObjectId())) {
+                        api.publishEventChannelMemberStatus(eventId, hostPerson.getObjectId(), leaderId, StatusMember.Accept.getStatus());
+                        break;
+                    }
+                }
                 listener.onSuccess(true);
                 return;
             }

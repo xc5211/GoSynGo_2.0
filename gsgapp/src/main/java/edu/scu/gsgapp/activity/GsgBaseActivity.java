@@ -25,9 +25,9 @@ import edu.scu.model.Person;
 public abstract class GsgBaseActivity extends AppCompatActivity {
 
     public Context context;
-    public GsgApplication gsgApplication;
-    public AppAction appAction;
-    //sichao
+    public static GsgApplication gsgApplication;
+    public static AppAction appAction;
+    public static Person hostPerson;
     public static String fileUri = "PersonMap";
 
     @Override
@@ -36,6 +36,7 @@ public abstract class GsgBaseActivity extends AppCompatActivity {
         context = getApplicationContext();
         gsgApplication = (GsgApplication) this.getApplication();
         appAction = gsgApplication.getAppAction();
+        hostPerson = appAction.getHostPerson();
     }
 
     public void saveHostPerson() {
