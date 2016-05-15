@@ -3,12 +3,10 @@ package edu.scu.gsgapp.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
-import java.util.Date;
-import java.util.List;
 
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.gsgapp.R;
@@ -19,6 +17,8 @@ import edu.scu.gsgapp.R;
 public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLayout.OnRefreshListener{
 
     private SwipeRefreshLayout swipeRefreshLayout;
+    private Toolbar toolbarTop;
+    private Toolbar toolbarBottom;
     private Button logoutButton;
 
     @Override
@@ -29,7 +29,17 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         initViews();
         initListener();
         getData();
-        // TODO: Explain when to use initListener() vs "onclick" behavior defined in xml
+
+        // prepare the argument
+        Bundle bundle = new Bundle();
+        // TODO: pass host person object to fragment
+        //bundle.putSerializable(Person.SERIALIZE_KEY, appAction.getHostPerson());
+        DashboardCalendarFragment dashboardCalendarFragment = new DashboardCalendarFragment();
+        dashboardCalendarFragment.setArguments(bundle);
+
+        getFragmentManager().beginTransaction()
+                .replace(R.id.dashboard_container, dashboardCalendarFragment)
+                .commit();
     }
 
     @Override
@@ -48,6 +58,11 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
 //        listView = (ListView) findViewById(R.id.list_view);
 //        listAdapter = new CouponListAdapter(this);
 //        listView.setAdapter(listAdapter);
+
+        toolbarTop = (Toolbar) findViewById(R.id.toolbar_top);
+        setSupportActionBar(toolbarTop);
+        toolbarBottom = (Toolbar) findViewById(R.id.toolbar_bottom);
+        setSupportActionBar(toolbarBottom);
 
         this.logoutButton = (Button) findViewById(R.id.button_logout);
     }
@@ -98,21 +113,6 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
     }
 
     private void getData() {
-        super.appAction.getMonthlyScheduledDates(new ActionCallbackListener<List<Date>>() {
-            @Override
-            public void onSuccess(List<Date> data) {
-                if (!data.isEmpty()) {
-                    // TODO: fill data in calendar view
-                }
-                swipeRefreshLayout.setEnabled(false);
-            }
-
-            @Override
-            public void onFailure(String message) {
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setEnabled(false);
-            }
-        });
     }
 
 }

@@ -19,6 +19,7 @@
 
         <receiver android:name="com.backendless.push.BackendlessBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
+
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION"/>
@@ -26,18 +27,27 @@
             </intent-filter>
         </receiver>
 
+<!-- TODO: add service
+        <service
+            android:name=".service.MemberInvitationTimerService"
+            android:exported="false" >
+        </service>
+-->
         <activity android:name=".activity.LoginActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity android:name=".activity.RegisterActivity"
             android:label="@string/title_register_display_message"
-            android:parentActivityName=".activity.LoginActivity" >
+            android:parentActivityName=".activity.LoginActivity"
+            android:screenOrientation="portrait">
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LoginActivity" />
@@ -45,7 +55,9 @@
 
         <activity android:name=".activity.DashboardActivity"
             android:label="@string/title_dashboard_display_message"
-            android:parentActivityName=".activity.LoginActivity" >
+            android:parentActivityName=".activity.LoginActivity"
+            android:screenOrientation="portrait">
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LoginActivity" />

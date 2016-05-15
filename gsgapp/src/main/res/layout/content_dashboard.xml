@@ -1,12 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Log out"
-        android:id="@+id/button_logout"
-        android:layout_gravity="center_horizontal" />
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:id="@+id/toolbar_top"
+        android:background="@color/title_background_color">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="@string/app_name"
+            android:id="@+id/lbl_title"
+            android:textColor="@color/title_text_color"
+            android:layout_gravity="center" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Log out"
+            android:id="@+id/button_logout"
+            android:layout_gravity="center_horizontal" />
+    </android.support.v7.widget.Toolbar>
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="5"
+        android:id="@+id/dashboard_container"
+        android:name="edu.scu.gsgapp.activity.DashboardCalendarFragment"
+        tools:layout="@layout/fragment_dashboard_calendar_monthly">
+    </fragment>
+
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:id="@+id/toolbar_bottom"
+        android:background="@color/title_background_color">
+    </android.support.v7.widget.Toolbar>
+
 </LinearLayout>
