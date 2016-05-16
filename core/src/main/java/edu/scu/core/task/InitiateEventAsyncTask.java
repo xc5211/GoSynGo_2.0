@@ -39,10 +39,9 @@ public class InitiateEventAsyncTask extends BaseAsyncTask {
                 message.setData(bundle);
                 handler.sendMessage(message);
                 listener.onSuccess(null);
+            } else {
+                listener.onFailure(response.getMsg());
             }
-            listener.onFailure(String.valueOf(R.string.sync_with_server_error));
-        } else {
-            listener.onFailure(response.getMsg());
         }
     }
 

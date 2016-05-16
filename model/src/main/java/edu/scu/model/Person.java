@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Person implements Serializable {
 
-    public static String SERIALIZE_KEY = "person";
+    public final static String SERIALIZE_KEY = "person";
 
     private String userId;
     private String email;
@@ -21,6 +21,21 @@ public class Person implements Serializable {
     private java.util.Date created;
     private java.util.Date updated;
     private String ownerId;
+
+    public Person getBasePerson() {
+        Person basePerson = new Person();
+        basePerson.setUserId(userId);
+        basePerson.setEmail(email);
+        basePerson.setName(name);
+        basePerson.setFirstName(firstName);
+        basePerson.setLastName(lastName);
+        basePerson.setIsGoogleCalendarImported(isGoogleCalendarImported);
+        basePerson.setObjectId(objectId);
+        basePerson.setCreated(created);
+        basePerson.setUpdated(updated);
+        basePerson.setOwnerId(ownerId);
+        return basePerson;
+    }
 
     public String getEmail()
     {
@@ -67,9 +82,17 @@ public class Person implements Serializable {
         return objectId;
     }
 
+    public void setObjectId(String objectId) {
+       this.objectId = objectId;
+    }
+
     public Date getCreated()
     {
         return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     public Date getUpdated()
@@ -77,9 +100,17 @@ public class Person implements Serializable {
         return updated;
     }
 
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+
     public String getOwnerId()
     {
         return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Boolean getIsGoogleCalendarImported()

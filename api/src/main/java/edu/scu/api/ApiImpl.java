@@ -21,6 +21,7 @@ import edu.scu.api.query.BackendlessQueryHelper;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
@@ -211,7 +212,7 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<EventMemberDetail> addEventMember(Event event, String memberEmail) {
+    public ApiResponse<Event> addEventMember(Event event, String leaderId, String memberEmail) {
 
         // Query member
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
@@ -222,7 +223,6 @@ public class ApiImpl implements Api {
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-
         if (result.getData().size() != 1) {
             return new ApiResponse<>(FAIL_EVENT, "Member doesn't exist");
         }
@@ -230,20 +230,25 @@ public class ApiImpl implements Api {
         // Create new EventMemberDetail object
         Person member = result.getData().get(0);
         EventMemberDetail eventMemberDetail = new EventMemberDetail();
-        eventMemberDetail.setLeaderId(event.getEventLeaderDetail().getLeader().getObjectId());
+        eventMemberDetail.setLeaderId(leaderId);
         eventMemberDetail.setEventId(event.getObjectId());
         eventMemberDetail.setMember(member);
         eventMemberDetail.setStatusMember(StatusMember.Pending.getStatus());
 
-        event.getEventMemberDetail().add(eventMemberDetail);
-        member.getEventsAsMember().add(event);
+        List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
+        eventMemberDetails.add(eventMemberDetail);
+        event.setEventMemberDetail(eventMemberDetails);
+
+        List<Event> eventsAsMember = new ArrayList<>();
+        eventsAsMember.add(event);
+        member.setEventsAsMember(eventsAsMember);
+
         try {
-            // NOTE: Saved object is not returned one
-            member = Backendless.Data.of(Person.class).save(member);
+            event = Backendless.Data.of(Event.class).save(event);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Add event member success", eventMemberDetail);
+        return new ApiResponse<>(SUCCESS_EVENT, "Add event member success", event);
     }
 
     @Override
@@ -501,10 +506,10 @@ public class ApiImpl implements Api {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
         List<Person> personList = hostPersonCollection.getData();
-        if(personList.size() != 0) {
-            hostPerson = personList.get(0);
+        if (personList.size() != 1) {
+            return new ApiResponse<>(FAIL_EVENT, "User doesn't exist");
         }
-
+        hostPerson = personList.get(0);
 
         ArrayList<String> relationProps = new ArrayList<String>();
         //first level
@@ -639,14 +644,77 @@ public class ApiImpl implements Api {
 
     @Override
     public ApiResponse<Person> savePerson(Person person) {
-        // TODO:
-        return null;
+        try {
+            person = Backendless.Persistence.save(person);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Save person success", person);
     }
 
     @Override
     public ApiResponse<Event> saveEvent(Event event) {
-        // TODO:
-        return null;
+        try {
+            event = Backendless.Persistence.save(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Save event success", event);
+    }
+
+    @Override
+    public ApiResponse<Long> removeEvent(Event event) {
+        Long result;
+        try {
+            result = Backendless.Data.of(Event.class).remove(event);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Remove event success", result);
+    }
+
+    @Override
+    public ApiResponse<Long> removeEventMember(EventMemberDetail eventMemberDetail) {
+        Long result;
+        try {
+            result = Backendless.Data.of(EventMemberDetail.class).remove(eventMemberDetail);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Remove event success", result);
+    }
+
+    @Override
+    public ApiResponse<Long> removeLeaderProposedTimestamp(LeaderProposedTimestamp leaderProposedTimestamp) {
+        Long result;
+        try {
+            result = Backendless.Data.of(LeaderProposedTimestamp.class).remove(leaderProposedTimestamp);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Remove event success", result);
+    }
+
+    @Override
+    public ApiResponse<Long> removeMemberProposedTimestamp(MemberProposedTimestamp memberProposedTimestamp) {
+        Long result;
+        try {
+            result = Backendless.Data.of(MemberProposedTimestamp.class).remove(memberProposedTimestamp);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Remove event success", result);
+    }
+
+    @Override
+    public ApiResponse<Long> removeMemberSelectedTimestamp(MemberSelectedTimestamp memberSelectedTimestamp) {
+        Long result;
+        try {
+            result = Backendless.Data.of(MemberSelectedTimestamp.class).remove(memberSelectedTimestamp);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        return new ApiResponse<>(SUCCESS_EVENT, "Remove event success", result);
     }
 
 }

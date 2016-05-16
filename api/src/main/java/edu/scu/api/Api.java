@@ -10,6 +10,7 @@ import java.util.Map;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
@@ -49,7 +50,7 @@ public interface Api {
      */
     public ApiResponse<Event> proposeEvent(Event newEvent);
 
-    public ApiResponse<EventMemberDetail> addEventMember(Event event, String memberEmail);
+    public ApiResponse<Event> addEventMember(Event event, String leaderId, String memberEmail);
 
     public ApiResponse<Event> removeEventMember(Event event);
 
@@ -127,10 +128,21 @@ public interface Api {
     public void broadcastEventChannel(String channelName, String eventId, String leaderId, String eventManagementState);
 
     /**
-     * Tend to use below for finalized transaction
+     * Data Persistence
      */
     public ApiResponse<Person> savePerson(Person person);
 
     public ApiResponse<Event> saveEvent(Event event);
+
+    // TODO[sichao]: check following API implementation
+    public ApiResponse<Long> removeEvent(Event event);
+
+    public ApiResponse<Long> removeEventMember(EventMemberDetail eventMemberDetail);
+
+    public ApiResponse<Long> removeLeaderProposedTimestamp(LeaderProposedTimestamp leaderProposedTimestamp);
+
+    public ApiResponse<Long> removeMemberProposedTimestamp(MemberProposedTimestamp memberProposedTimestamp);
+
+    public ApiResponse<Long> removeMemberSelectedTimestamp(MemberSelectedTimestamp memberSelectedTimestamp);
 
 }

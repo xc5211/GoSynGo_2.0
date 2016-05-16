@@ -39,7 +39,7 @@ public class CancelEventAsyncTask extends BaseAsyncTask {
                 message.setData(bundle);
                 handler.sendMessage(message);
                 listener.onSuccess(true);
-            }else {
+            } else {
                 listener.onFailure(response.getMsg());
             }
         }

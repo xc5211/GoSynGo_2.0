@@ -18,31 +18,32 @@ public class AddEventMemberAsyncTask extends BaseAsyncTask{
     private String eventId;
     private String memberEmail;
     private Event event;
+    private String leaderId;
 
-    public AddEventMemberAsyncTask(Api api, ActionCallbackListener<EventMemberDetail> listener, Handler handler, String eventId, String memberEmail, Event event) {
+    public AddEventMemberAsyncTask(Api api, ActionCallbackListener<Event> listener, Handler handler, String eventId, String leaderId, String memberEmail, Event event) {
         super(api, listener, handler);
         this.eventId = eventId;
         this.memberEmail = memberEmail;
         this.event = event;
+        this.leaderId = leaderId;
     }
 
     @Override
-    protected ApiResponse<EventMemberDetail> doInBackground(Object... params) {
-        return api.addEventMember(event, memberEmail);
+    protected ApiResponse<Event> doInBackground(Object... params) {
+        return api.addEventMember(event, leaderId, memberEmail);
     }
 
     @Override
     protected void onPostExecute(ApiResponse response) {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
-                EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) response.getObj();
+                Event updatedEvent = (Event) response.getObj();
                 Message message = new Message();
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(EventMemberDetail.SERIALIZE_KEY, updatedEventMemberDetail);
+                bundle.putSerializable(EventMemberDetail.SERIALIZE_KEY, updatedEvent);
                 message.setData(bundle);
                 handler.sendMessage(message);
-                listener.onSuccess(updatedEventMemberDetail);
-            }else {
+            } else {
                 listener.onFailure(response.getMsg());
             }
         }

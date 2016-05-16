@@ -41,15 +41,14 @@ public class ProposeEventAsyncTask extends BaseAsyncTask {
                 Event updatedEvent = (Event) response.getObj();
                 String channelName = updatedEvent.getObjectId();
 
-                api.registerEventChannelMessaging(channelName);
-                api.subscribeEventChannelAsLeader(channelName, leaderId, memberMsgResponder);
+//                api.registerEventChannelMessaging(channelName);
+//                api.subscribeEventChannelAsLeader(channelName, leaderId, memberMsgResponder);
 
                 android.os.Message message = new android.os.Message();
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(Event.SERIALIZE_KEY, updatedEvent);
                 message.setData(bundle);
                 handler.sendMessage(message);
-                listener.onSuccess(updatedEvent);
             } else {
                 listener.onFailure(response.getMsg());
             }

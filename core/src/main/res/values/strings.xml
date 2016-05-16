@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Core</string>
     <string name="sync_with_server_error">Sync with server error</string>
+    <string name="local_update_error">Local update error</string>
 </resources>

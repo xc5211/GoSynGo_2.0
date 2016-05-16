@@ -7,7 +7,6 @@ import android.os.Message;
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
-import edu.scu.core.R;
 import edu.scu.model.Event;
 
 /**
@@ -19,7 +18,6 @@ public class AddEventInformationAsyncTask extends BaseAsyncTask {
     public AddEventInformationAsyncTask(Api api, ActionCallbackListener<Event> listener, Handler handler, Event eventAsLeader) {
         super(api, listener, handler);
         this.eventAsLeader = eventAsLeader;
-
     }
 
     @Override
@@ -38,10 +36,9 @@ public class AddEventInformationAsyncTask extends BaseAsyncTask {
                 message.setData(bundle);
                 handler.sendMessage(message);
                 listener.onSuccess(null);
+            } else {
+                listener.onFailure(response.getMsg());
             }
-            listener.onFailure(String.valueOf(R.string.sync_with_server_error));
-        }else {
-            listener.onFailure(response.getMsg());
         }
     }
 }

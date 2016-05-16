@@ -45,7 +45,7 @@ public class ProposeEventTimestampsAsMemberAsyncTask extends BaseAsyncTask {
                 message.setData(bundle);
                 handler.sendMessage(message);
                 listener.onSuccess(updatedEventMemberDetail);
-            }else {
+            } else {
                 listener.onFailure(response.getMsg());
             }
         }

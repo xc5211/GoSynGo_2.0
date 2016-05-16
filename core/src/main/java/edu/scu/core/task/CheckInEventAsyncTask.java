@@ -50,8 +50,7 @@ public class CheckInEventAsyncTask extends BaseAsyncTask {
 //                        return;
 //                    }
 //                }
-                listener.onFailure(String.valueOf(R.string.sync_with_server_error));
-            }else {
+            } else {
                 listener.onFailure(response.getMsg());
             }
         }

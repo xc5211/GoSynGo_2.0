@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Event implements Serializable {
 
-    public static String SERIALIZE_KEY = "event";
+    public final static String SERIALIZE_KEY = "event";
 
     private String title;
     private String note;
@@ -19,10 +19,25 @@ public class Event implements Serializable {
     private Date timestamp;
     private EventLeaderDetail eventLeaderDetail;
     private List<EventMemberDetail> eventMemberDetail;
-    private String ownerId;
     private String objectId;
+    private String ownerId;
     private Date updated;
     private Date created;
+
+    public Event getBaseEvent() {
+        Event baseEvent = new Event();
+        baseEvent.setTitle(title);
+        baseEvent.setNote(note);
+        baseEvent.setDurationInMin(durationInMin);
+        baseEvent.setStatusEvent(statusEvent);
+        baseEvent.setHasReminder(hasReminder);
+        baseEvent.setTimestamp(timestamp);
+        baseEvent.setObjectId(objectId);
+        baseEvent.setOwnerId(ownerId);
+        baseEvent.setUpdated(updated);
+        baseEvent.setCreated(created);
+        return baseEvent;
+    }
 
     public Integer getReminderInMin() {
         return reminderInMin;
@@ -52,12 +67,24 @@ public class Event implements Serializable {
         return ownerId;
     }
 
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
     public String getObjectId() {
         return objectId;
     }
 
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
+
     public java.util.Date getUpdated() {
         return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
     }
 
     public String getNote() {
@@ -70,6 +97,10 @@ public class Event implements Serializable {
 
     public Date getCreated() {
         return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     public Boolean getHasReminder() {
