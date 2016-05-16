@@ -36,7 +36,6 @@ public class SyncHostInformationAsyncTask extends BaseAsyncTask {
                 bundle.putSerializable(Person.SERIALIZE_KEY, syncedPerson);
                 message.setData(bundle);
                 handler.sendMessage(message);
-                listener.onSuccess(null);
             } else {
                 listener.onFailure(response.getMsg());
             }

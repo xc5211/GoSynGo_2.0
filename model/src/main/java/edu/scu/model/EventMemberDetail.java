@@ -22,9 +22,27 @@ public class EventMemberDetail implements Serializable {
     private Date updated;
     private String objectId;
 
+    public EventMemberDetail getBaseEventMemberDetail() {
+        EventMemberDetail baseEventMemberDetail = new EventMemberDetail();
+        baseEventMemberDetail.setStatusMember(statusMember);
+        baseEventMemberDetail.setIsCheckedIn(isCheckedIn);
+        baseEventMemberDetail.setMinsToArrive(minsToArrive);
+        baseEventMemberDetail.setEventId(eventId);
+        baseEventMemberDetail.setLeaderId(leaderId);
+        baseEventMemberDetail.setObjectId(objectId);
+        baseEventMemberDetail.setOwnerId(ownerId);
+        baseEventMemberDetail.setUpdated(updated);
+        baseEventMemberDetail.setCreated(created);
+        return baseEventMemberDetail;
+    }
+
     public String getOwnerId()
     {
         return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Integer getMinsToArrive()
@@ -42,9 +60,17 @@ public class EventMemberDetail implements Serializable {
         return created;
     }
 
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
     public Date getUpdated()
     {
         return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
     }
 
     public Person getMember()
@@ -96,6 +122,10 @@ public class EventMemberDetail implements Serializable {
     public String getObjectId()
     {
         return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
     }
 
     public List<MemberSelectedTimestamp> getSelectedTimestamps()

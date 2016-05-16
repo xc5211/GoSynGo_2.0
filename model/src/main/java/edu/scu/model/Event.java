@@ -226,4 +226,15 @@ public class Event implements Serializable {
     public void updateEventLeaderDetail(EventLeaderDetail updatedEventLeaderDetail) {
         this.eventLeaderDetail = updatedEventLeaderDetail;
     }
+
+    public EventMemberDetail getEventMemberDetail(String memberId) {
+        for (EventMemberDetail memberDetail : this.eventMemberDetail) {
+            if (memberDetail.getMember().getObjectId().equals(memberId)) {
+                return memberDetail;
+            }
+        }
+        assert false;
+        return null;
+    }
+
 }

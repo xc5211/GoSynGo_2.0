@@ -18,9 +18,24 @@ public class EventLeaderDetail implements Serializable {
     private Date updated;
     private String objectId;
 
+    public EventLeaderDetail getBaseEventLeaderDetail() {
+        EventLeaderDetail baseEventLeaderDetail = new EventLeaderDetail();
+        baseEventLeaderDetail.setIsCheckedIn(isCheckedIn);
+        baseEventLeaderDetail.setMinsToArrive(minsToArrive);
+        baseEventLeaderDetail.setObjectId(objectId);
+        baseEventLeaderDetail.setOwnerId(ownerId);
+        baseEventLeaderDetail.setUpdated(updated);
+        baseEventLeaderDetail.setCreated(created);
+        return baseEventLeaderDetail;
+    }
+
     public String getOwnerId()
     {
         return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Integer getMinsToArrive()
@@ -38,9 +53,17 @@ public class EventLeaderDetail implements Serializable {
         return created;
     }
 
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
     public Date getUpdated()
     {
         return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
     }
 
     public Person getLeader()
@@ -66,6 +89,10 @@ public class EventLeaderDetail implements Serializable {
     public String getObjectId()
     {
         return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
     }
 
     public List<LeaderProposedTimestamp> getProposedTimestamps()

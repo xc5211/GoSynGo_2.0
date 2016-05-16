@@ -214,6 +214,7 @@ public class AppActionImpl implements AppAction {
                 Bundle bundle = msg.getData();
                 String userId = bundle.getString("userId");
                 hostUserId = userId;
+                listener.onSuccess(userId);
                 return true;
             }
         });
@@ -238,11 +239,13 @@ public class AppActionImpl implements AppAction {
     }
 
     // TODO[later]
+    // TODO[test]
     @Override
     public void importGoogleCalendar(final ActionCallbackListener<Void> listener) {
 
     }
 
+    // TODO[test]
     @Override
     public void proposeEvent(final ActionCallbackListener<Event> listener) {
 
@@ -295,8 +298,12 @@ public class AppActionImpl implements AppAction {
         proposeEventAsyncTask.execute();
     }
 
+    // TODO[test]
     @Override
     public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener) {
+
+        Event targetEvent = hostPerson.getEventAsLeader(eventId);
+        Event targetEventInProgress = targetEvent.getBaseEvent();
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
@@ -316,30 +323,16 @@ public class AppActionImpl implements AppAction {
             }
         });
 
-        Event targetEvent = null;
-        for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-            if (eventAsLeader.getObjectId().equals(eventId)) {
-                targetEvent = eventAsLeader.getBaseEvent();
-                break;
-            }
-        }
-        Event targetEventInProgress = targetEvent.getBaseEvent();
-
         AddEventMemberAsyncTask addEventMemberAsyncTask = new AddEventMemberAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId(), memberEmail, targetEventInProgress);
         addEventMemberAsyncTask.execute();
     }
 
     // TODO[refactor]
+    // TODO[test]
     @Override
     public void removeEventMember(final String eventId, final String memberId, final ActionCallbackListener<Event> listener) {
-        Event passEvent = null;
-        for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-            if (eventAsLeader.getObjectId().equals(eventId)) {
-                passEvent = eventAsLeader;
-                break;
-            }
-        }
 
+        Event passEvent = hostPerson.getEventAsLeader(eventId);
         for (EventMemberDetail memberDetail : passEvent.getEventMemberDetail()) {
             if (memberDetail.getObjectId().equals(memberId)) {
                 // TODO: Check if event needs to be removed from member eventsAsMember list
@@ -360,164 +353,146 @@ public class AppActionImpl implements AppAction {
         removeEventMemberAsyncTask.execute();
     }
 
-    // TODO[refactor]
+    // TODO[test]
     @Override
-    public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, ActionCallbackListener<Event> listener) {
-        Event passEvent = null;
-        for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-            if (eventAsLeader.getObjectId().equals(eventId)) {
-                eventAsLeader.setTitle(title);
-                eventAsLeader.setLocation(location);
-                eventAsLeader.setDurationInMin(durationInMin);
-                eventAsLeader.setHasReminder(hasReminder);
-                eventAsLeader.setReminderInMin(reminderInMin);
-                passEvent = eventAsLeader;
-            }
-        }
+    public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final ActionCallbackListener<Event> listener) {
 
-        final Handler handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(android.os.Message msg) {
-                Bundle bundle = msg.getData();
-                Event event = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
-                return true;
-            }
-        });
-
-        AddEventInformationAsyncTask addEventInformationAsyncTask = new AddEventInformationAsyncTask(api, listener, handler, passEvent);
-        addEventInformationAsyncTask.execute();
-    }
-
-    // TODO[refactor]
-    @Override
-    public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener) {
-        Event passEvent = null;
-        for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-            if (eventAsLeader.getObjectId().equals(eventId)) {
-                eventAsLeader.setStatusEvent(StatusEvent.Pending.getStatus());
-                passEvent = eventAsLeader;
-            }
-        }
-
-        final Handler handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(android.os.Message msg) {
-                Bundle bundle = msg.getData();
-                Event event = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
-                return true;
-            }
-        });
-
-        SendEventInvitationAsyncTask sendEventInvitationAsyncTask = new SendEventInvitationAsyncTask(api, listener,handler, passEvent);
-        sendEventInvitationAsyncTask.execute();
-    }
-
-    // TODO[refactor]
-    @Override
-    public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp) {
-        Event passEvent = null;
-        for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-            if (eventAsLeader.getObjectId().equals(eventId)) {
-                eventAsLeader.setTimestamp(eventFinalTimestamp);
-                eventAsLeader.setStatusEvent(StatusEvent.Ready.getStatus());
-                passEvent = eventAsLeader;
-            }
-        }
-
-        final Handler handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(android.os.Message msg) {
-                Bundle bundle = msg.getData();
-                Event event = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
-                return true;
-            }
-        });
-
-        InitiateEventAsyncTask initiateEvent = new InitiateEventAsyncTask(api, listener, handler, passEvent);
-        initiateEvent.execute();
-    }
-
-    // TODO[refactor]
-    @Override
-    public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
+        Event targetEvent = hostPerson.getEventAsLeader(eventId);
+        Event targetEventInProgress = targetEvent.getBaseEvent();
+        targetEventInProgress.setTitle(title);
+        targetEventInProgress.setLocation(location);
+        targetEventInProgress.setDurationInMin(durationInMin);
+        targetEventInProgress.setHasReminder(hasReminder);
+        targetEventInProgress.setReminderInMin(reminderInMin);
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
                 Event updatedEvent = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
-                return hostPerson.getEventsAsLeader().remove(updatedEvent);
+                hostPerson.updateEventAsLeader(updatedEvent);
+                listener.onSuccess(null);
+                return true;
             }
         });
 
-        Event targetEvent = null;
-        for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-            if (eventAsLeader.getObjectId().equals(eventId)) {
-                targetEvent = eventAsLeader;
-                break;
-            }
-        }
-        targetEvent.setStatusEvent(StatusEvent.Cancelled.getStatus());
+        AddEventInformationAsyncTask addEventInformationAsyncTask = new AddEventInformationAsyncTask(api, listener, handler, targetEventInProgress);
+        addEventInformationAsyncTask.execute();
+    }
 
-        CancelEventAsyncTask cancelEventAsyncTask = new CancelEventAsyncTask(api, listener, handler, eventId, targetEvent);
+    // TODO[test]
+    @Override
+    public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener) {
+
+        Event targetEvent = hostPerson.getEventAsLeader(eventId);
+        Event targetEventInProgress = targetEvent.getBaseEvent();
+        targetEventInProgress.setStatusEvent(StatusEvent.Pending.getStatus());
+
+        Handler handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(android.os.Message msg) {
+                Bundle bundle = msg.getData();
+                Event updatedEvent = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
+                hostPerson.updateEventAsLeader(updatedEvent);
+                listener.onSuccess(null);
+                return true;
+            }
+        });
+
+        SendEventInvitationAsyncTask sendEventInvitationAsyncTask = new SendEventInvitationAsyncTask(api, listener, handler, targetEventInProgress);
+        sendEventInvitationAsyncTask.execute();
+    }
+
+    // TODO[test]
+    @Override
+    public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp) {
+
+        Event targetEvent = hostPerson.getEventAsLeader(eventId);
+        Event targetEventInProgress = targetEvent.getBaseEvent();
+        targetEventInProgress.setTimestamp(eventFinalTimestamp);
+        targetEventInProgress.setStatusEvent(StatusEvent.Ready.getStatus());
+
+        final Handler handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(android.os.Message msg) {
+                Bundle bundle = msg.getData();
+                Event updatedEvent = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
+                hostPerson.updateEventAsLeader(updatedEvent);
+                listener.onSuccess(null);
+                return true;
+            }
+        });
+
+        InitiateEventAsyncTask initiateEvent = new InitiateEventAsyncTask(api, listener, handler, targetEventInProgress);
+        initiateEvent.execute();
+    }
+
+    // TODO[refactor]
+    // TODO[test]
+    @Override
+    public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
+
+        Event targetEvent = hostPerson.getEventAsLeader(eventId);
+        Event targetEventInProgress = targetEvent.getBaseEvent();
+        targetEventInProgress.setStatusEvent(StatusEvent.Cancelled.getStatus());
+
+        Handler handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(android.os.Message msg) {
+                Bundle bundle = msg.getData();
+                Event updatedEvent = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
+                boolean isSuccess = hostPerson.getEventsAsLeader().remove(updatedEvent);
+                if (isSuccess) {
+                    listener.onSuccess(true);
+                } else {
+                    listener.onFailure(String.valueOf(R.string.local_update_error));
+                }
+                return isSuccess;
+            }
+        });
+
+        CancelEventAsyncTask cancelEventAsyncTask = new CancelEventAsyncTask(api, listener, handler, eventId, targetEventInProgress);
         cancelEventAsyncTask.execute();
     }
 
     // TODO[refactor]
+    // TODO[test]
     @Override
     public void proposeEventTimestampsAsLeader(final String eventId, final List<String> proposedEventTimestamps, final ActionCallbackListener<EventLeaderDetail> listener) {
+
+        final Event targetEvent = hostPerson.getEventAsLeader(eventId);
+        EventLeaderDetail targetEventLeaderDetail = targetEvent.getEventLeaderDetail();
+        EventLeaderDetail targetEventLeaderDetailInProgress = targetEventLeaderDetail.getBaseEventLeaderDetail();
+
+        List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader = proposeEventTimestampsAsLeader(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
+        targetEventLeaderDetailInProgress.setProposedTimestamps(proposeEventTimestampsAsLeader);
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
                 EventLeaderDetail updatedEventLeaderDetail = (EventLeaderDetail) bundle.getSerializable(EventLeaderDetail.SERIALIZE_KEY);
-                for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-                    if (eventAsLeader.getObjectId().equals(eventId)) {
-                        eventAsLeader.updateEventLeaderDetail(updatedEventLeaderDetail);
-                        return true;
-                    }
-                }
+                targetEvent.updateEventLeaderDetail(updatedEventLeaderDetail);
+                listener.onSuccess(updatedEventLeaderDetail);
                 return false;
             }
         });
 
-        List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader = proposeEventTimestampsAsLeader(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
-        Event targetEvent = null;
-        for (Event eventAsLeader : hostPerson.getEventsAsLeader()) {
-            if (eventAsLeader.getObjectId().equals(eventId)) {
-                targetEvent = eventAsLeader;
-                break;
-            }
-        }
-        EventLeaderDetail leaderDetail = targetEvent.getEventLeaderDetail();
-        leaderDetail.setProposedTimestamps(proposeEventTimestampsAsLeader);
-
-        ProposeEventTimestampsAsLeaderAsyncTask proposeEventTimestampsAsLeaderAsyncTask = new ProposeEventTimestampsAsLeaderAsyncTask(api, listener, handler, eventId, leaderDetail);
+        ProposeEventTimestampsAsLeaderAsyncTask proposeEventTimestampsAsLeaderAsyncTask = new ProposeEventTimestampsAsLeaderAsyncTask(api, listener, handler, eventId, targetEventLeaderDetailInProgress);
         proposeEventTimestampsAsLeaderAsyncTask.execute();
     }
 
-    // TODO[refactor]
+    // TODO[test]
     @Override
     public void proposeEventTimestampsAsMember(final String eventId, final List<String> proposedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener) {
 
-        Handler handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(android.os.Message msg) {
-                Bundle bundle = msg.getData();
-                EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) bundle.getSerializable(EventMemberDetail.SERIALIZE_KEY);
-                for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-                    if (eventAsMember.getObjectId().equals(eventId)) {
-                        eventAsMember.updateEventMemberDetail(updatedEventMemberDetail);
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
-
+        final Event targetEvent = hostPerson.getEventAsMember(eventId);
+        EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
+        EventMemberDetail targetEventMemberDetailInProgress = targetEventMemberDetail.getBaseEventMemberDetail();
         List<MemberProposedTimestamp> proposeEventTimestampsAsMember = proposeEventTimestampsAsMember(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
-        EventMemberDetail targetEventMemberDetail = null;
+        targetEventMemberDetailInProgress.setProposedTimestamps(proposeEventTimestampsAsMember);
+
+        // TODO[not done yet]: get leaderId
         String leaderId = null;
         for (Event eventAsMember : hostPerson.getEventsAsMember()) {
             if (eventAsMember.getObjectId().equals(eventId)) {
@@ -526,19 +501,31 @@ public class AppActionImpl implements AppAction {
                 break;
             }
         }
-        targetEventMemberDetail.setProposedTimestamps(proposeEventTimestampsAsMember);
 
-        ProposeEventTimestampsAsMemberAsyncTask proposeEventTimestampsAsMemberAsyncTask = new ProposeEventTimestampsAsMemberAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId(), leaderId, targetEventMemberDetail);
+        Handler handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(android.os.Message msg) {
+                Bundle bundle = msg.getData();
+                EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) bundle.getSerializable(EventMemberDetail.SERIALIZE_KEY);
+                targetEvent.updateEventMemberDetail(updatedEventMemberDetail);
+                listener.onSuccess(updatedEventMemberDetail);
+                return false;
+            }
+        });
+
+        ProposeEventTimestampsAsMemberAsyncTask proposeEventTimestampsAsMemberAsyncTask = new ProposeEventTimestampsAsMemberAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId(), leaderId, targetEventMemberDetailInProgress);
         proposeEventTimestampsAsMemberAsyncTask.execute();
     }
 
     // TODO[refactor]
+    // TODO[test]
     @Override
     public void selectEventTimestampsAsMember(final String eventId, final List<String> selectedEventTimestamps, final ActionCallbackListener<Event> listener) {
 
     }
 
     // TODO[refactor]
+    // TODO[test]
     @Override
     public void acceptEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
 
@@ -597,6 +584,7 @@ public class AppActionImpl implements AppAction {
     }
 
     // TODO[refactor]
+    // TODO[test]
     @Override
     public void declineEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
 
@@ -636,6 +624,7 @@ public class AppActionImpl implements AppAction {
     }
 
     // TODO[refactor]
+    // TODO[test]
     @Override
     public void setMinsToArriveAsMember(final String eventId, final int estimateInMin, final ActionCallbackListener<Integer> listener) {
 
@@ -667,14 +656,16 @@ public class AppActionImpl implements AppAction {
         setMinsToArriveAsMember.execute();
     }
 
+    // TODO[test]
     @Override
-    public void syncHostInformation(String userId, ActionCallbackListener<Void> listener) {
+    public void syncHostInformation(final String userId, final ActionCallbackListener<Void> listener) {
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
                 hostPerson = (Person) bundle.getSerializable(Person.SERIALIZE_KEY);
+                listener.onSuccess(null);
                 return true;
             }
         });

@@ -44,7 +44,6 @@ public class ProposeEventTimestampsAsMemberAsyncTask extends BaseAsyncTask {
                 bundle.putSerializable(EventMemberDetail.SERIALIZE_KEY, updatedEventMemberDetail);
                 message.setData(bundle);
                 handler.sendMessage(message);
-                listener.onSuccess(updatedEventMemberDetail);
             } else {
                 listener.onFailure(response.getMsg());
             }

@@ -45,7 +45,6 @@ public class LoginAsyncTask extends BaseAsyncTask {
                 bundle.putSerializable("userId", userId);
                 message.setData(bundle);
                 handler.sendMessage(message);
-                listener.onSuccess(response.getObj());
             } else {
                 listener.onFailure(response.getMsg());
             }

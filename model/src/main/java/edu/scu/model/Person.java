@@ -334,4 +334,24 @@ public class Person implements Serializable {
         return null;
     }
 
+    public Event getEventAsLeader(String eventId) {
+        for (Event eventAsLeader : this.eventsAsLeader) {
+            if (eventAsLeader.getObjectId().equals(eventId)) {
+                return eventAsLeader;
+            }
+        }
+        assert false;
+        return null;
+    }
+
+    public Event getEventAsMember(String eventId) {
+        for (Event eventAsMember : this.eventsAsMember) {
+            if (eventAsMember.getObjectId().equals(eventId)) {
+                return eventAsMember;
+            }
+        }
+        assert false;
+        return null;
+    }
+
 }

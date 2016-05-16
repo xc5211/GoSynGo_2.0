@@ -15,7 +15,6 @@ import edu.scu.model.Event;
  */
 public class InitiateEventAsyncTask extends BaseAsyncTask {
 
-
     private Event eventAsLeader;
 
     public InitiateEventAsyncTask(final Api api, final ActionCallbackListener<Integer> listener, final Handler handler, final Event eventAsLeader) {
@@ -38,7 +37,6 @@ public class InitiateEventAsyncTask extends BaseAsyncTask {
                 bundle.putSerializable(Event.SERIALIZE_KEY, updatedEvent);
                 message.setData(bundle);
                 handler.sendMessage(message);
-                listener.onSuccess(null);
             } else {
                 listener.onFailure(response.getMsg());
             }

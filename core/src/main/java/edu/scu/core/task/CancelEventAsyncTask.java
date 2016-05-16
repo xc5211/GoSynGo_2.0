@@ -38,7 +38,6 @@ public class CancelEventAsyncTask extends BaseAsyncTask {
                 bundle.putSerializable(Event.SERIALIZE_KEY, updatedEvent);
                 message.setData(bundle);
                 handler.sendMessage(message);
-                listener.onSuccess(true);
             } else {
                 listener.onFailure(response.getMsg());
             }
