@@ -637,4 +637,16 @@ public class ApiImpl implements Api {
         });
     }
 
+    @Override
+    public ApiResponse<Person> savePerson(Person person) {
+        // TODO:
+        return null;
+    }
+
+    @Override
+    public ApiResponse<Event> saveEvent(Event event) {
+        // TODO:
+        return null;
+    }
+
 }

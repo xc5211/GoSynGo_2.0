@@ -126,4 +126,11 @@ public interface Api {
 
     public void broadcastEventChannel(String channelName, String eventId, String leaderId, String eventManagementState);
 
+    /**
+     * Tend to use below for finalized transaction
+     */
+    public ApiResponse<Person> savePerson(Person person);
+
+    public ApiResponse<Event> saveEvent(Event event);
+
 }

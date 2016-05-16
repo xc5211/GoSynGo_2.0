@@ -83,4 +83,9 @@ public interface AppAction {
      */
 
 
+    /**
+     * Test
+     */
+    public void proposeEventTest(final ActionCallbackListener<Event> listner);
+
 }

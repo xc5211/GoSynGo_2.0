@@ -34,7 +34,6 @@ import edu.scu.core.task.ProposeEventAsyncTask;
 import edu.scu.core.task.ProposeEventTimestampsAsLeaderAsyncTask;
 import edu.scu.core.task.ProposeEventTimestampsAsMemberAsyncTask;
 import edu.scu.core.task.RegisterAsyncTask;
-import edu.scu.core.task.RegisterDeviceAsyncTask;
 import edu.scu.core.task.RemoveEventMemberAsyncTask;
 import edu.scu.core.task.SendEventInvitationAsyncTask;
 import edu.scu.core.task.SetMinsToArriveAsMemberAsyncTask;
@@ -59,6 +58,7 @@ public class AppActionImpl implements AppAction {
 
     private static String hostUserId;
     private static Person hostPerson;
+    private static Person hostPersonTemp;
 
     private Context context;
     private Api api;
@@ -729,6 +729,52 @@ public class AppActionImpl implements AppAction {
 
         Timer timer = new Timer();
         timer.schedule(timerTask, 30 * 60 * 1000);
+    }
+
+
+    @Override
+    public void proposeEventTest(final ActionCallbackListener<Event> listener) {
+
+//        AsyncCallback<List<Message>> memberMsgResponder = new AsyncCallback<List<Message>>() {
+//            @Override
+//            public void handleResponse(List<Message> messages) {
+//
+//                String memberId;
+//                Map<String, String> msgHeader;
+//                Object msg;
+//                for (Message message : messages) {
+//                    memberId = message.getPublisherId();
+//                    msgHeader = message.getHeaders();
+//                    msg = message.getData();
+//                    // TODO: update model
+//
+//                }
+//            }
+//
+//            @Override
+//            public void handleFault(BackendlessFault backendlessFault) {
+//                // TODO:
+//            }
+//        };
+
+        Handler handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(android.os.Message msg) {
+                Bundle bundle = msg.getData();
+                Event updatedEvent = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
+                return hostPerson.addEventAsLeader(updatedEvent);
+            }
+        });
+
+        EventLeaderDetail eventLeaderDetail = new EventLeaderDetail();
+        eventLeaderDetail.setLeader(hostPerson);
+        eventLeaderDetail.setIsCheckedIn(false);
+        Event event = new Event();
+        event.setStatusEvent(StatusEvent.Tentative.getStatus());
+        event.setEventLeaderDetail(eventLeaderDetail);
+
+        ProposeEventAsyncTask proposeEventAsyncTask = new ProposeEventAsyncTask(api, listener, null, hostPerson.getObjectId(), event, handler);
+        proposeEventAsyncTask.execute();
     }
 
 }

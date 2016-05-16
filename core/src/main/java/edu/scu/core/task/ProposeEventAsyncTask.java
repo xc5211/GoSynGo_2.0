@@ -1,5 +1,6 @@
 package edu.scu.core.task;
 
+import android.os.Bundle;
 import android.os.Handler;
 
 import com.backendless.async.callback.AsyncCallback;
@@ -11,9 +12,6 @@ import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.model.Event;
-import edu.scu.model.EventLeaderDetail;
-import edu.scu.model.Person;
-import edu.scu.model.enumeration.StatusEvent;
 
 /**
  * Created by chuanxu on 5/6/16.
@@ -43,8 +41,14 @@ public class ProposeEventAsyncTask extends BaseAsyncTask {
                 Event updatedEvent = (Event) response.getObj();
                 String channelName = updatedEvent.getObjectId();
 
-                api.subscribeEventChannelAsLeader(channelName, leaderId, memberMsgResponder);
                 api.registerEventChannelMessaging(channelName);
+                api.subscribeEventChannelAsLeader(channelName, leaderId, memberMsgResponder);
+
+                android.os.Message message = new android.os.Message();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(Event.SERIALIZE_KEY, updatedEvent);
+                message.setData(bundle);
+                handler.sendMessage(message);
                 listener.onSuccess(updatedEvent);
             } else {
                 listener.onFailure(response.getMsg());
