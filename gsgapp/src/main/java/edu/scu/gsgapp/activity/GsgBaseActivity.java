@@ -24,10 +24,10 @@ import edu.scu.model.Person;
  */
 public abstract class GsgBaseActivity extends AppCompatActivity {
 
-    public Context context;
-    public GsgApplication gsgApplication;
-    public AppAction appAction;
-    public Person hostPerson;
+    protected Context context;
+    protected GsgApplication gsgApplication;
+    protected AppAction appAction;
+    protected Person hostPerson;
     public String fileUri = "PersonMap";
 
     @Override
@@ -37,6 +37,10 @@ public abstract class GsgBaseActivity extends AppCompatActivity {
         gsgApplication = (GsgApplication) this.getApplication();
         appAction = gsgApplication.getAppAction();
         hostPerson = appAction.getHostPerson();
+    }
+
+    protected AppAction getAppAction() {
+        return this.appAction;
     }
 
     public void saveHostPerson() {

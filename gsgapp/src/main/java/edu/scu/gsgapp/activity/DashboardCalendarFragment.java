@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CalendarView;
 import android.widget.ListView;
 
+import edu.scu.gsgapp.GsgApplication;
 import edu.scu.gsgapp.R;
 
 /**
@@ -15,10 +16,14 @@ import edu.scu.gsgapp.R;
  */
 public class DashboardCalendarFragment extends Fragment {
 
+    private GsgApplication gsgApplication;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_dashboard_calendar_monthly, container, false);
+
+        this.gsgApplication = (GsgApplication) getActivity().getApplication();
 
         CalendarView calendarView = (CalendarView) view.findViewById(R.id.calendarview_calendar_monthly);
         ListView listView = (ListView) view.findViewById(R.id.listview_calendar_event);

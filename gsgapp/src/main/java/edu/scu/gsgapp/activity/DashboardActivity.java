@@ -20,7 +20,6 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private Toolbar toolbar;
-    private Button logoutButton;
     private Button calendarButton;
     private Button eventsButton;
     private Button meButton;
@@ -79,20 +78,12 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         });
         toolbar.inflateMenu(R.menu.menu_dashboard_toolbar);
 
-        this.logoutButton = (Button) findViewById(R.id.button_logout);
         this.calendarButton = (Button) findViewById(R.id.dashboard_button_calendar);
         this.eventsButton = (Button) findViewById(R.id.dashboard_button_events);
         this.meButton = (Button) findViewById(R.id.dashboard_button_me);
     }
 
     private void initListener() {
-
-        this.logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logout();
-            }
-        });
 
         this.calendarButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,38 +108,47 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
 
     }
 
-    public void logout() {
-        final ProgressDialog progressDialog = ProgressDialog.show( DashboardActivity.this, "", "Logging out...", true );
-
-        super.appAction.logout(new ActionCallbackListener<Void>() {
-            @Override
-            public void onSuccess(Void v) {
-                Toast.makeText(context, R.string.toast_logout_success, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-                progressDialog.cancel();
-            }
-
-            @Override
-            public void onFailure(String message) {
-                progressDialog.cancel();
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void switchFragment(String fragmentName) {
+        Bundle bundle = new Bundle();
+
         switch (fragmentName) {
             case "calendar":
+                // prepare the argument
+                // TODO: pass args to pass
+                //bundle.putSerializable(Person.SERIALIZE_KEY, appAction.getHostPerson());
+                DashboardCalendarFragment dashboardCalendarFragment = new DashboardCalendarFragment();
+                dashboardCalendarFragment.setArguments(bundle);
+
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.dashboard_container, dashboardCalendarFragment)
+                        .commit();
                 break;
             case "events":
+                // prepare the argument
+                // TODO: pass args to pass
+                //bundle.putSerializable(Person.SERIALIZE_KEY, appAction.getHostPerson());
+                DashboardEventFragment dashboardEventFragment = new DashboardEventFragment();
+                dashboardEventFragment.setArguments(bundle);
+
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.dashboard_container, dashboardEventFragment)
+                        .commit();
                 break;
             case "me":
+                // prepare the argument
+                // TODO: pass args to pass
+                //bundle.putSerializable(Person.SERIALIZE_KEY, appAction.getHostPerson());
+                DashboardMeFragment dashboardMeFragment = new DashboardMeFragment();
+                dashboardMeFragment.setArguments(bundle);
+
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.dashboard_container, dashboardMeFragment)
+                        .commit();
                 break;
             default:
                 assert false;
         }
+
     }
 
     private void validateLogin() {

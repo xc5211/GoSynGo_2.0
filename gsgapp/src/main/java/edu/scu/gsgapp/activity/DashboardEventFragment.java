@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import edu.scu.gsgapp.GsgApplication;
 import edu.scu.gsgapp.R;
 
 /**
@@ -14,10 +15,14 @@ import edu.scu.gsgapp.R;
  */
 public class DashboardEventFragment extends Fragment {
 
+    private GsgApplication gsgApplication;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_dashboard_event, container, false);
+
+        this.gsgApplication = (GsgApplication) getActivity().getApplication();
 
         ListView eventAsLeaderView = (ListView) view.findViewById(R.id.listview_event_asleader);
         ListView eventAsMemberView = (ListView) view.findViewById(R.id.listview_event_asmember);
