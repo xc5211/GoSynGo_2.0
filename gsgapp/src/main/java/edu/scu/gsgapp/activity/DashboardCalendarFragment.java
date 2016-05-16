@@ -9,7 +9,6 @@ import android.widget.CalendarView;
 import android.widget.ListView;
 
 import edu.scu.gsgapp.R;
-import edu.scu.model.Person;
 
 /**
  * Created by chuanxu on 5/14/16.
