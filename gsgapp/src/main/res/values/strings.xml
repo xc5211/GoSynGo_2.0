@@ -16,5 +16,6 @@
 
     <!-- Dashboard page -->
     <string name="title_dashboard_display_message">GoSynGo</string>
+    <string name="title_propose_event">New Event</string>
 
 </resources>

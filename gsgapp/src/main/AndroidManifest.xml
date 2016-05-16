@@ -10,6 +10,9 @@
     <uses-permission android:name="edu.scu.gsgapp.permission.C2D_MESSAGE"/>
     <permission android:name="edu.scu.gsgapp.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
 
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+
     <application android:name=".GsgApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -61,6 +64,12 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.LoginActivity" />
+        </activity>
+
+        <activity android:name=".activity.ProposeEventActivity"
+            android:label="@string/title_propose_event"
+            android:screenOrientation="portrait">
+
         </activity>
 
     </application>
