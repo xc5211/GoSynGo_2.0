@@ -146,21 +146,33 @@ public class AppActionImpl implements AppAction {
     @Override
     public void register(final String userEmail, final String password, final String firstName, final String lastName, final ActionCallbackListener<Person> listener) {
 
-//        // check userEmail
-//        if (TextUtils.isEmpty(userEmail)) {
-//            if (listener != null) {
-//                listener.onFailure("Email is empty");
-//            }
-//        }
-//
-//        // check password
-//        if (TextUtils.isEmpty(password)) {
-//            if (listener != null) {
-//                listener.onFailure("Password is empty");
-//            }
-//        }
+        // check userEmail
+        if (TextUtils.isEmpty(userEmail)) {
+            if (listener != null) {
+                listener.onFailure("Please enter your email");
+            }
+        }
 
-        // TODO: check name
+        // check password
+        if (TextUtils.isEmpty(password)) {
+            if (listener != null) {
+                listener.onFailure("Please enter your password");
+            }
+        }
+
+        // check first name
+        if (TextUtils.isEmpty(firstName)) {
+            if (listener != null) {
+                listener.onFailure("Please enter your first name");
+            }
+        }
+
+        // check last name
+        if (TextUtils.isEmpty(password)) {
+            if (listener != null) {
+                listener.onFailure("Please enter your last name");
+            }
+        }
 
         // TODO: validate parameters...
 
