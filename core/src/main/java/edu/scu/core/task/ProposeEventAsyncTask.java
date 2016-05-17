@@ -20,13 +20,13 @@ public class ProposeEventAsyncTask extends BaseAsyncTask {
 
     private String leaderId;
     private Event event;
-    private AsyncCallback<List<Message>> memberMsgResponder;
+    private AsyncCallback<List<Message>> channelMsgResponderForLeader;
 
-    public ProposeEventAsyncTask(Api api, ActionCallbackListener listener, AsyncCallback<List<Message>> memberMsgResponder, String leaderId, Event event, Handler handler) {
+    public ProposeEventAsyncTask(Api api, ActionCallbackListener listener, AsyncCallback<List<Message>> channelMsgResponderForLeader, String leaderId, Event event, Handler handler) {
         super(api, listener, handler);
         this.leaderId = leaderId;
         this.event = event;
-        this.memberMsgResponder = memberMsgResponder;
+        this.channelMsgResponderForLeader = channelMsgResponderForLeader;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ProposeEventAsyncTask extends BaseAsyncTask {
                 String channelName = updatedEvent.getObjectId();
 
 //                api.registerEventChannelMessaging(channelName);
-//                api.subscribeEventChannelAsLeader(channelName, leaderId, memberMsgResponder);
+//                api.subscribeEventChannelAsLeader(channelName, leaderId, channelMsgResponderForLeader);
 
                 android.os.Message message = new android.os.Message();
                 Bundle bundle = new Bundle();

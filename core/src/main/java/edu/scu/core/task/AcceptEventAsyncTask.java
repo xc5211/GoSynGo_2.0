@@ -11,7 +11,6 @@ import java.util.List;
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
-import edu.scu.core.R;
 import edu.scu.model.Event;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.enumeration.StatusMember;
@@ -23,13 +22,13 @@ public class AcceptEventAsyncTask extends BaseAsyncTask {
 
     private String eventId;
     private String memberId;
-    private AsyncCallback<List<Message>> leaderMsgResponder;
+    private AsyncCallback<List<Message>> channelMsgResponderForMember;
 
-    public AcceptEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, AsyncCallback<List<Message>> leaderMsgResponder, Handler handler, String eventId, String memberId) {
+    public AcceptEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, AsyncCallback<List<Message>> channelMsgResponderForMember, Handler handler, String eventId, String memberId) {
         super(api, listener, handler);
         this.eventId = eventId;
         this.memberId = memberId;
-        this.leaderMsgResponder = leaderMsgResponder;
+        this.channelMsgResponderForMember = channelMsgResponderForMember;
     }
 
     @Override
@@ -43,7 +42,7 @@ public class AcceptEventAsyncTask extends BaseAsyncTask {
             if (response.isSuccess()) {
                 Event updatedEvent = (Event) response.getObj();
 
-                api.subscribeEventChannelAsMember(eventId, memberId, leaderMsgResponder);
+                api.subscribeEventChannelAsMember(eventId, memberId, channelMsgResponderForMember);
                 String leaderId = updatedEvent.getEventLeaderDetail().getLeader().getObjectId();
                 for (EventMemberDetail eventMemberDetail : updatedEvent.getEventMemberDetail()) {
                     if (eventMemberDetail.getMember().getObjectId().equals(memberId)) {
@@ -57,7 +56,6 @@ public class AcceptEventAsyncTask extends BaseAsyncTask {
                 bundle.putSerializable(Event.SERIALIZE_KEY, updatedEvent);
                 message.setData(bundle);
                 handler.sendMessage(message);
-                listener.onSuccess(true);
             } else {
                 listener.onFailure(response.getMsg());
             }

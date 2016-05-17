@@ -109,9 +109,9 @@ public interface Api {
      */
     public void registerEventChannelMessaging(String channelName);
 
-    public void subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> memberMsgResponder);
+    public void subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> memberMsgResponderForLeader);
 
-    public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> leaderMsgResponder);
+    public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> channelMsgResponderForMember);
 
     public void publishEventChannelMessageAsLeader(String channelName, String publisherId, List<String> receiverIds);
 

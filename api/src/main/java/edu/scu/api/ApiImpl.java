@@ -548,17 +548,17 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public void subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> memberMsgResponder) {
+    public void subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> channelMsgResponderForLeader) {
         SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
         subscriptionOptions.setSelector("leaderId = '" + leaderId + "'");
-        Backendless.Messaging.subscribe(channelName, memberMsgResponder, subscriptionOptions);
+        Backendless.Messaging.subscribe(channelName, channelMsgResponderForLeader, subscriptionOptions);
     }
 
     @Override
-    public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> leaderMsgResponder) {
+    public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> channelMsgResponderForMember) {
         SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
         subscriptionOptions.setSelector("memberId = '" + memberId + "'");
-        Backendless.Messaging.subscribe(channelName, leaderMsgResponder, subscriptionOptions);
+        Backendless.Messaging.subscribe(channelName, channelMsgResponderForMember, subscriptionOptions);
     }
 
     @Override
