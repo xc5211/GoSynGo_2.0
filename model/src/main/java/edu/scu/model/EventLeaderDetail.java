@@ -18,17 +18,6 @@ public class EventLeaderDetail implements Serializable {
     private Date updated;
     private String objectId;
 
-    public EventLeaderDetail getBaseEventLeaderDetail() {
-        EventLeaderDetail baseEventLeaderDetail = new EventLeaderDetail();
-        baseEventLeaderDetail.setIsCheckedIn(isCheckedIn);
-        baseEventLeaderDetail.setMinsToArrive(minsToArrive);
-        baseEventLeaderDetail.setObjectId(objectId);
-        baseEventLeaderDetail.setOwnerId(ownerId);
-        baseEventLeaderDetail.setUpdated(updated);
-        baseEventLeaderDetail.setCreated(created);
-        return baseEventLeaderDetail;
-    }
-
     public String getOwnerId()
     {
         return ownerId;

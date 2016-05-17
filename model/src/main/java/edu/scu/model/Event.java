@@ -24,21 +24,6 @@ public class Event implements Serializable {
     private Date updated;
     private Date created;
 
-    public Event getBaseEvent() {
-        Event baseEvent = new Event();
-        baseEvent.setTitle(title);
-        baseEvent.setNote(note);
-        baseEvent.setDurationInMin(durationInMin);
-        baseEvent.setStatusEvent(statusEvent);
-        baseEvent.setHasReminder(hasReminder);
-        baseEvent.setTimestamp(timestamp);
-        baseEvent.setObjectId(objectId);
-        baseEvent.setOwnerId(ownerId);
-        baseEvent.setUpdated(updated);
-        baseEvent.setCreated(created);
-        return baseEvent;
-    }
-
     public Integer getReminderInMin() {
         return reminderInMin;
     }

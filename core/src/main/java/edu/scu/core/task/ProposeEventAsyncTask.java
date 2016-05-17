@@ -11,42 +11,41 @@ import java.util.List;
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
-import edu.scu.model.Event;
+import edu.scu.model.Person;
 
 /**
  * Created by chuanxu on 5/6/16.
  */
 public class ProposeEventAsyncTask extends BaseAsyncTask {
 
-    private String leaderId;
-    private Event event;
+    private Person person;
     private AsyncCallback<List<Message>> channelMsgResponderForLeader;
 
-    public ProposeEventAsyncTask(Api api, ActionCallbackListener listener, AsyncCallback<List<Message>> channelMsgResponderForLeader, String leaderId, Event event, Handler handler) {
+    public ProposeEventAsyncTask(Api api, ActionCallbackListener listener, AsyncCallback<List<Message>> channelMsgResponderForLeader, Person person, Handler handler) {
         super(api, listener, handler);
-        this.leaderId = leaderId;
-        this.event = event;
+        this.person = person;
         this.channelMsgResponderForLeader = channelMsgResponderForLeader;
     }
 
     @Override
-    protected ApiResponse<Event> doInBackground(Object... params) {
-        return api.proposeEvent(event);
+    protected ApiResponse<Person> doInBackground(Object... params) {
+        return api.proposeEvent(person);
     }
 
     @Override
     protected void onPostExecute(ApiResponse response) {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
-                Event updatedEvent = (Event) response.getObj();
-                String channelName = updatedEvent.getObjectId();
+                Person updatedPerson = (Person) response.getObj();
+                // TODO: check channelName
+                String channelName = updatedPerson.getEventsAsLeader().get(0).getObjectId();
 
 //                api.registerEventChannelMessaging(channelName);
 //                api.subscribeEventChannelAsLeader(channelName, leaderId, channelMsgResponderForLeader);
 
                 android.os.Message message = new android.os.Message();
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(Event.SERIALIZE_KEY, updatedEvent);
+                bundle.putSerializable(Person.SERIALIZE_KEY, updatedPerson);
                 message.setData(bundle);
                 handler.sendMessage(message);
             } else {

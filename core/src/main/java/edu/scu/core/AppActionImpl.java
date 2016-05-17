@@ -88,6 +88,60 @@ public class AppActionImpl implements AppAction {
         AppActionImpl.hostPerson = hostPerson;
     }
 
+    private Person getBasePerson() {
+        Person basePerson = new Person();
+        basePerson.setUserId(hostPerson.getUserId());
+        basePerson.setEmail(hostPerson.getEmail());
+        basePerson.setName(hostPerson.getName());
+        basePerson.setFirstName(hostPerson.getFirstName());
+        basePerson.setLastName(hostPerson.getLastName());
+        basePerson.setIsGoogleCalendarImported(hostPerson.getIsGoogleCalendarImported());
+        basePerson.setObjectId(hostPerson.getObjectId());
+        basePerson.setCreated(hostPerson.getCreated());
+        basePerson.setUpdated(hostPerson.getUpdated());
+        basePerson.setOwnerId(hostPerson.getOwnerId());
+        return basePerson;
+    }
+
+    private Event getBaseEvent(Event event) {
+        Event baseEvent = new Event();
+        baseEvent.setTitle(event.getTitle());
+        baseEvent.setNote(event.getNote());
+        baseEvent.setDurationInMin(event.getDurationInMin());
+        baseEvent.setStatusEvent(event.getStatusEvent());
+        baseEvent.setHasReminder(event.getHasReminder());
+        baseEvent.setTimestamp(event.getTimestamp());
+        baseEvent.setObjectId(event.getObjectId());
+        baseEvent.setOwnerId(event.getOwnerId());
+        baseEvent.setUpdated(event.getUpdated());
+        baseEvent.setCreated(event.getCreated());
+        return baseEvent;
+    }
+
+    public EventLeaderDetail getBaseEventLeaderDetail(EventLeaderDetail eventLeaderDetail) {
+        EventLeaderDetail baseEventLeaderDetail = new EventLeaderDetail();
+        baseEventLeaderDetail.setIsCheckedIn(eventLeaderDetail.getIsCheckedIn());
+        baseEventLeaderDetail.setMinsToArrive(eventLeaderDetail.getMinsToArrive());
+        baseEventLeaderDetail.setObjectId(eventLeaderDetail.getObjectId());
+        baseEventLeaderDetail.setOwnerId(eventLeaderDetail.getOwnerId());
+        baseEventLeaderDetail.setUpdated(eventLeaderDetail.getUpdated());
+        baseEventLeaderDetail.setCreated(eventLeaderDetail.getCreated());
+        return baseEventLeaderDetail;
+    }
+
+    public EventMemberDetail getBaseEventMemberDetail(EventMemberDetail eventMemberDetail) {
+        EventMemberDetail baseEventMemberDetail = new EventMemberDetail();
+        baseEventMemberDetail.setStatusMember(eventMemberDetail.getStatusMember());
+        baseEventMemberDetail.setIsCheckedIn(eventMemberDetail.getIsCheckedIn());
+        baseEventMemberDetail.setMinsToArrive(eventMemberDetail.getMinsToArrive());
+        baseEventMemberDetail.setEventId(eventMemberDetail.getObjectId());
+        baseEventMemberDetail.setLeaderId(eventMemberDetail.getLeaderId());
+        baseEventMemberDetail.setObjectId(eventMemberDetail.getObjectId());
+        baseEventMemberDetail.setOwnerId(eventMemberDetail.getOwnerId());
+        baseEventMemberDetail.setUpdated(eventMemberDetail.getUpdated());
+        baseEventMemberDetail.setCreated(eventMemberDetail.getCreated());
+        return baseEventMemberDetail;
+    }
 
     private static List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader(String eventId, String leaderId, List<String> datesInString) {
 
@@ -290,10 +344,11 @@ public class AppActionImpl implements AppAction {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
-                Event updatedEvent = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
-                boolean isSuccess = hostPerson.addEventAsLeader(updatedEvent);
+                Person updatedPerson = (Person) bundle.getSerializable(Person.SERIALIZE_KEY);
+                Event newEvent = updatedPerson.getEventsAsLeader().get(0);
+                boolean isSuccess = hostPerson.addEventAsLeader(newEvent);
                 if (isSuccess) {
-                    listener.onSuccess(updatedEvent);
+                    listener.onSuccess(newEvent);
                 } else {
                     listener.onFailure(String.valueOf(R.string.local_update_error));
                 }
@@ -302,14 +357,17 @@ public class AppActionImpl implements AppAction {
         });
 
         EventLeaderDetail eventLeaderDetail = new EventLeaderDetail();
-        Person hostPersonInProgress = hostPerson.getBasePerson();
+        Person hostPersonInProgress = getBasePerson();
         eventLeaderDetail.setLeader(hostPersonInProgress);
         eventLeaderDetail.setIsCheckedIn(false);
+
         Event event = new Event();
         event.setStatusEvent(StatusEvent.Tentative.getStatus());
         event.setEventLeaderDetail(eventLeaderDetail);
 
-        ProposeEventAsyncTask proposeEventAsyncTask = new ProposeEventAsyncTask(api, listener, channelMsgResponderForLeader, hostPerson.getObjectId(), event, handler);
+        hostPersonInProgress.getEventsAsLeader().add(event);
+
+        ProposeEventAsyncTask proposeEventAsyncTask = new ProposeEventAsyncTask(api, listener, channelMsgResponderForLeader, hostPersonInProgress, handler);
         proposeEventAsyncTask.execute();
     }
 
@@ -318,7 +376,7 @@ public class AppActionImpl implements AppAction {
     public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = targetEvent.getBaseEvent();
+        Event targetEventInProgress = getBaseEvent(targetEvent);
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
@@ -368,7 +426,7 @@ public class AppActionImpl implements AppAction {
     public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final ActionCallbackListener<Event> listener) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = targetEvent.getBaseEvent();
+        Event targetEventInProgress = getBaseEvent(targetEvent);
         targetEventInProgress.setTitle(title);
         targetEventInProgress.setLocation(location);
         targetEventInProgress.setDurationInMin(durationInMin);
@@ -400,7 +458,7 @@ public class AppActionImpl implements AppAction {
     public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = targetEvent.getBaseEvent();
+        Event targetEventInProgress = getBaseEvent(targetEvent);
         targetEventInProgress.setStatusEvent(StatusEvent.Pending.getStatus());
 
         Handler handler = new Handler(new Handler.Callback() {
@@ -424,7 +482,7 @@ public class AppActionImpl implements AppAction {
     public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = targetEvent.getBaseEvent();
+        Event targetEventInProgress = getBaseEvent(targetEvent);
         targetEventInProgress.setTimestamp(eventFinalTimestamp);
         targetEventInProgress.setStatusEvent(StatusEvent.Ready.getStatus());
 
@@ -451,7 +509,7 @@ public class AppActionImpl implements AppAction {
     public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
 
         Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = targetEvent.getBaseEvent();
+        Event targetEventInProgress = getBaseEvent(targetEvent);
         targetEventInProgress.setStatusEvent(StatusEvent.Cancelled.getStatus());
 
         Handler handler = new Handler(new Handler.Callback() {
@@ -479,7 +537,7 @@ public class AppActionImpl implements AppAction {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
         EventLeaderDetail targetEventLeaderDetail = targetEvent.getEventLeaderDetail();
-        EventLeaderDetail targetEventLeaderDetailInProgress = targetEventLeaderDetail.getBaseEventLeaderDetail();
+        EventLeaderDetail targetEventLeaderDetailInProgress = getBaseEventLeaderDetail(targetEventLeaderDetail);
 
         List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader = proposeEventTimestampsAsLeader(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
         targetEventLeaderDetailInProgress.setProposedTimestamps(proposeEventTimestampsAsLeader);
@@ -506,7 +564,7 @@ public class AppActionImpl implements AppAction {
 
         final Event targetEvent = hostPerson.getEventAsMember(eventId);
         final EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
-        EventMemberDetail targetEventMemberDetailInProgress = targetEventMemberDetail.getBaseEventMemberDetail();
+        EventMemberDetail targetEventMemberDetailInProgress = getBaseEventMemberDetail(targetEventMemberDetail);
         List<MemberProposedTimestamp> proposeEventTimestampsAsMember = proposeEventTimestampsAsMember(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
         targetEventMemberDetailInProgress.setProposedTimestamps(proposeEventTimestampsAsMember);
 
@@ -542,7 +600,7 @@ public class AppActionImpl implements AppAction {
 
         final Event targetEvent = hostPerson.getEventAsMember(eventId);
         final EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
-        EventMemberDetail targetEventMemberDetailInProgress = targetEventMemberDetail.getBaseEventMemberDetail();
+        EventMemberDetail targetEventMemberDetailInProgress = getBaseEventMemberDetail(targetEventMemberDetail);
         List<MemberSelectedTimestamp> selectEventTimestampsAsMember = selectEventTimestampsAsMember(eventId, hostPerson.getObjectId(), selectedEventTimestamps);
         targetEventMemberDetailInProgress.setSelectedTimestamps(selectEventTimestampsAsMember);
 
@@ -683,7 +741,7 @@ public class AppActionImpl implements AppAction {
 
         final Event targetEvent = hostPerson.getEventAsMember(eventId);
         final EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
-        EventMemberDetail targetEventMemberDetailInProgress = targetEventMemberDetail.getBaseEventMemberDetail();
+        EventMemberDetail targetEventMemberDetailInProgress = getBaseEventMemberDetail(targetEventMemberDetail);
         targetEventMemberDetailInProgress.setMinsToArrive(estimateInMin);
 
         Handler handler = new Handler(new Handler.Callback() {

@@ -22,20 +22,6 @@ public class EventMemberDetail implements Serializable {
     private Date updated;
     private String objectId;
 
-    public EventMemberDetail getBaseEventMemberDetail() {
-        EventMemberDetail baseEventMemberDetail = new EventMemberDetail();
-        baseEventMemberDetail.setStatusMember(statusMember);
-        baseEventMemberDetail.setIsCheckedIn(isCheckedIn);
-        baseEventMemberDetail.setMinsToArrive(minsToArrive);
-        baseEventMemberDetail.setEventId(eventId);
-        baseEventMemberDetail.setLeaderId(leaderId);
-        baseEventMemberDetail.setObjectId(objectId);
-        baseEventMemberDetail.setOwnerId(ownerId);
-        baseEventMemberDetail.setUpdated(updated);
-        baseEventMemberDetail.setCreated(created);
-        return baseEventMemberDetail;
-    }
-
     public String getOwnerId()
     {
         return ownerId;

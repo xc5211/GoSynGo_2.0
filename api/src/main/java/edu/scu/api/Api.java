@@ -48,7 +48,7 @@ public interface Api {
     /**
      * As leader
      */
-    public ApiResponse<Event> proposeEvent(Event newEvent);
+    public ApiResponse<Person> proposeEvent(Person person);
 
     public ApiResponse<Event> addEventMember(Event event, String leaderId, String memberEmail);
 

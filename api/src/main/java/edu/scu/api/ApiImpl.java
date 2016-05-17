@@ -201,14 +201,14 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Event> proposeEvent(Event newEvent) {
+    public ApiResponse<Person> proposeEvent(Person person) {
 
         try {
-            newEvent = Backendless.Data.of(Event.class).save(newEvent);
+            person = Backendless.Data.of(Person.class).save(person);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Propose event success", newEvent);
+        return new ApiResponse<>(SUCCESS_EVENT, "Propose event success", person);
     }
 
     @Override

@@ -22,21 +22,6 @@ public class Person implements Serializable {
     private java.util.Date updated;
     private String ownerId;
 
-    public Person getBasePerson() {
-        Person basePerson = new Person();
-        basePerson.setUserId(userId);
-        basePerson.setEmail(email);
-        basePerson.setName(name);
-        basePerson.setFirstName(firstName);
-        basePerson.setLastName(lastName);
-        basePerson.setIsGoogleCalendarImported(isGoogleCalendarImported);
-        basePerson.setObjectId(objectId);
-        basePerson.setCreated(created);
-        basePerson.setUpdated(updated);
-        basePerson.setOwnerId(ownerId);
-        return basePerson;
-    }
-
     public String getEmail()
     {
         return email;
