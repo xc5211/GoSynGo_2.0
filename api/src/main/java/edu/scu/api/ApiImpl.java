@@ -239,6 +239,7 @@ public class ApiImpl implements Api {
         eventMemberDetails.add(eventMemberDetail);
         event.setEventMemberDetail(eventMemberDetails);
 
+        // TODO: Member shouldn't add event until accept the event
         List<Event> eventsAsMember = new ArrayList<>();
         eventsAsMember.add(event);
         member.setEventsAsMember(eventsAsMember);

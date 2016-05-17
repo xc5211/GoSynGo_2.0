@@ -21,7 +21,6 @@ public class RegisterAsyncTask extends BaseAsyncTask {
 
     public RegisterAsyncTask(Api api, ActionCallbackListener listener, Handler handler, String userEmail, String password, String firstName, String lastName) {
         super(api, listener, handler);
-
         this.userEmail = userEmail;
         this.password = password;
         this.firstName = firstName;
@@ -43,8 +42,6 @@ public class RegisterAsyncTask extends BaseAsyncTask {
                 bundle.putSerializable(Person.SERIALIZE_KEY, hostPerson);
                 message.setData(bundle);
                 handler.sendMessage(message);
-                listener.onSuccess(null);
-                listener.onSuccess(response.getObj());
             } else {
                 listener.onFailure(response.getMsg());
             }

@@ -169,6 +169,8 @@ public class AppActionImpl implements AppAction {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
+                hostPerson = (Person) bundle.getSerializable(Person.SERIALIZE_KEY);
+                listener.onSuccess(hostPerson);
                 return true;
             }
         });
