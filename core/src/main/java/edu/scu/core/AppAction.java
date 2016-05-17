@@ -47,7 +47,7 @@ public interface AppAction {
      * As member
      */
     public void proposeEventTimestampsAsMember(final String eventId, final List<String> proposedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener);
-    public void selectEventTimestampsAsMember(final String eventId, final List<String> selectedEventTimestamps, final ActionCallbackListener<Event> listener);
+    public void selectEventTimestampsAsMember(final String eventId, final List<String> selectedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener);
     public void acceptEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void declineEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void checkInEvent(final String eventId, final ActionCallbackListener<Boolean> listener);

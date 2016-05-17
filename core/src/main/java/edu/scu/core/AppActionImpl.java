@@ -35,6 +35,7 @@ import edu.scu.core.task.ProposeEventTimestampsAsLeaderAsyncTask;
 import edu.scu.core.task.ProposeEventTimestampsAsMemberAsyncTask;
 import edu.scu.core.task.RegisterAsyncTask;
 import edu.scu.core.task.RemoveEventMemberAsyncTask;
+import edu.scu.core.task.SelectEventTimestampsAsMemberAsyncTask;
 import edu.scu.core.task.SendEventInvitationAsyncTask;
 import edu.scu.core.task.SetMinsToArriveAsMemberAsyncTask;
 import edu.scu.core.task.SyncHostInformationAsyncTask;
@@ -516,11 +517,39 @@ public class AppActionImpl implements AppAction {
         proposeEventTimestampsAsMemberAsyncTask.execute();
     }
 
-    // TODO[refactor]
     // TODO[test]
     @Override
-    public void selectEventTimestampsAsMember(final String eventId, final List<String> selectedEventTimestamps, final ActionCallbackListener<Event> listener) {
+    public void selectEventTimestampsAsMember(final String eventId, final List<String> selectedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener) {
 
+        final Event targetEvent = hostPerson.getEventAsMember(eventId);
+        EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
+        EventMemberDetail targetEventMemberDetailInProgress = targetEventMemberDetail.getBaseEventMemberDetail();
+        List<MemberSelectedTimestamp> selectEventTimestampsAsMember = selectEventTimestampsAsMember(eventId, hostPerson.getObjectId(), selectedEventTimestamps);
+        targetEventMemberDetailInProgress.setSelectedTimestamps(selectEventTimestampsAsMember);
+
+        // TODO[not done yet]: get leaderId
+        String leaderId = null;
+        for (Event eventAsMember : hostPerson.getEventsAsMember()) {
+            if (eventAsMember.getObjectId().equals(eventId)) {
+                targetEventMemberDetail = eventAsMember.getEventMemberDetail().get(0);
+                leaderId = eventAsMember.getEventLeaderDetail().getLeader().getObjectId();
+                break;
+            }
+        }
+
+        Handler handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(android.os.Message msg) {
+                Bundle bundle = msg.getData();
+                EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) bundle.getSerializable(EventMemberDetail.SERIALIZE_KEY);
+                targetEvent.updateEventMemberDetail(updatedEventMemberDetail);
+                listener.onSuccess(updatedEventMemberDetail);
+                return false;
+            }
+        });
+
+        SelectEventTimestampsAsMemberAsyncTask selectEventTimestampsAsMemberAsyncTask = new SelectEventTimestampsAsMemberAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId(), leaderId, targetEventMemberDetailInProgress);
+        selectEventTimestampsAsMemberAsyncTask.execute();
     }
 
     // TODO[refactor]
@@ -622,36 +651,27 @@ public class AppActionImpl implements AppAction {
 //        checkInEventAsyncTask.execute();
     }
 
-    // TODO[refactor]
     // TODO[test]
     @Override
     public void setMinsToArriveAsMember(final String eventId, final int estimateInMin, final ActionCallbackListener<Integer> listener) {
+
+        final Event targetEvent = hostPerson.getEventAsMember(eventId);
+        EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
+        EventMemberDetail targetEventMemberDetailInProgress = targetEventMemberDetail.getBaseEventMemberDetail();
+        targetEventMemberDetailInProgress.setMinsToArrive(estimateInMin);
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
                 EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) bundle.getSerializable(EventMemberDetail.SERIALIZE_KEY);
-                for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-                    if (eventAsMember.getObjectId().equals(eventId)) {
-                        eventAsMember.updateEventMemberDetail(updatedEventMemberDetail);
-                        return true;
-                    }
-                }
-                return false;
+                targetEvent.updateEventMemberDetail(updatedEventMemberDetail);
+                listener.onSuccess(updatedEventMemberDetail.getMinsToArrive());
+                return true;
             }
         });
 
-        EventMemberDetail targetEventMemberDetail = null;
-        for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-            if (eventAsMember.getObjectId().equals(eventId)) {
-                targetEventMemberDetail = eventAsMember.getEventMemberDetail().get(0);
-                break;
-            }
-        }
-        targetEventMemberDetail.setMinsToArrive(estimateInMin);
-
-        SetMinsToArriveAsMemberAsyncTask setMinsToArriveAsMember = new SetMinsToArriveAsMemberAsyncTask(api, listener, handler, targetEventMemberDetail, eventId, hostPerson.getObjectId());
+        SetMinsToArriveAsMemberAsyncTask setMinsToArriveAsMember = new SetMinsToArriveAsMemberAsyncTask(api, listener, handler, targetEventMemberDetailInProgress, eventId, hostPerson.getObjectId());
         setMinsToArriveAsMember.execute();
     }
 

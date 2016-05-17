@@ -71,7 +71,7 @@ public interface Api {
      */
     public ApiResponse<EventMemberDetail> proposeEventTimestampsAsMember(EventMemberDetail eventMemberDetail);
 
-    public ApiResponse<EventMemberDetail> selectEventTimestampsAsMember(EventMemberDetail eventMemberDetail, List<MemberSelectedTimestamp> selectedEventTimestamps);
+    public ApiResponse<EventMemberDetail> selectEventTimestampsAsMember(EventMemberDetail eventMemberDetail);
 
     public ApiResponse<Event> acceptEvent(String eventId, String memberId);
 

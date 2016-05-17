@@ -356,12 +356,8 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<EventMemberDetail> selectEventTimestampsAsMember(EventMemberDetail eventMemberDetail, List<MemberSelectedTimestamp> selectedEventTimestamps) {
+    public ApiResponse<EventMemberDetail> selectEventTimestampsAsMember(EventMemberDetail eventMemberDetail) {
 
-        // Set member selected time
-        eventMemberDetail.setSelectedTimestamps(selectedEventTimestamps);
-
-        // Send back the event
         try {
             eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
         } catch (BackendlessException exception) {

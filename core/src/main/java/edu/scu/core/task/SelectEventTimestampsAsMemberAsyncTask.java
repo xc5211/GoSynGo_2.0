@@ -10,24 +10,26 @@ import edu.scu.core.ActionCallbackListener;
 import edu.scu.model.EventMemberDetail;
 
 /**
- * Created by Hairong on 5/6/16.
+ * Created by chuanxu on 5/16/16.
  */
-public class SetMinsToArriveAsMemberAsyncTask extends BaseAsyncTask{
+public class SelectEventTimestampsAsMemberAsyncTask extends BaseAsyncTask {
 
-    private EventMemberDetail eventMemberDetail;
     private String eventId;
     private String memberId;
+    private String leaderId;
+    private EventMemberDetail eventMemberDetail;
 
-    public SetMinsToArriveAsMemberAsyncTask(Api api, ActionCallbackListener<Integer> listener, Handler handler, EventMemberDetail eventMemberDetail, String eventId, String memberId) {
+    public SelectEventTimestampsAsMemberAsyncTask(Api api, ActionCallbackListener<EventMemberDetail> listener, Handler handler, String eventId, String memberId, String leaderId, EventMemberDetail eventMemberDetail) {
         super(api, listener, handler);
-        this.eventMemberDetail = eventMemberDetail;
         this.eventId = eventId;
         this.memberId = memberId;
+        this.leaderId = leaderId;
+        this.eventMemberDetail = eventMemberDetail;
     }
 
     @Override
     protected ApiResponse<EventMemberDetail> doInBackground(Object... params) {
-        return api.setMinsToArriveAsMember(eventMemberDetail);
+        return api.selectEventTimestampsAsMember(eventMemberDetail);
     }
 
     @Override
@@ -35,8 +37,7 @@ public class SetMinsToArriveAsMemberAsyncTask extends BaseAsyncTask{
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) response.getObj();
-                String leaderId = updatedEventMemberDetail.getLeaderId();
-                api.publishEventChannelMemberEstimateInMin(eventId, memberId, leaderId, updatedEventMemberDetail.getMinsToArrive());
+                api.publishEventChannelMemberSelectedTimestamps(eventId, memberId, leaderId, updatedEventMemberDetail.getSelectedTimestamps());
 
                 Message message = new Message();
                 Bundle bundle = new Bundle();
