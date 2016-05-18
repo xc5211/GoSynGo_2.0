@@ -29,10 +29,22 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        initViews();
+        initWidgetable();
         initListener();
-        getData();
+        initFragment();
 
+        getData();
+    }
+
+    @Override
+    public void onRefresh() {
+        // TODO: clear old data
+
+
+        //getData();
+    }
+
+    private void initFragment() {
         // prepare the argument
         Bundle bundle = new Bundle();
         // TODO: pass host person object to fragment
@@ -45,16 +57,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
                 .commit();
     }
 
-    @Override
-    public void onRefresh() {
-        // TODO: clear old data
-
-
-        // get new data
-        getData();
-    }
-
-    private void initViews() {
+    private void initWidgetable() {
 //        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
 //        swipeRefreshLayout.setOnRefreshListener(this);
 //        listView = (ListView) findViewById(R.id.list_view);
@@ -171,6 +174,27 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
     }
 
     private void getData() {
+        syncHostInformation();
+    }
+
+    private void syncHostInformation() {
+
+        final ProgressDialog progressDialog = ProgressDialog.show( DashboardActivity.this, "", "Sync with server...", true );
+
+        ActionCallbackListener<Void> callBackListener = new ActionCallbackListener<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                progressDialog.cancel();
+                Toast.makeText(context, "Sync with server success", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(String message) {
+                progressDialog.cancel();
+                Toast.makeText(context, "Sync with server fail", Toast.LENGTH_SHORT).show();
+            }
+        };
+        getAppAction().syncHostInformation(getAppAction().getHostUserId(), callBackListener);
     }
 
 }
