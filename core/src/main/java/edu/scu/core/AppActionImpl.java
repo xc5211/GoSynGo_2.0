@@ -11,8 +11,6 @@ import com.backendless.messaging.Message;
 import com.backendless.persistence.local.UserIdStorageFactory;
 import com.backendless.persistence.local.UserTokenStorageFactory;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,8 +53,6 @@ import edu.scu.model.enumeration.StatusMember;
  */
 public class AppActionImpl implements AppAction {
 
-    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
     private static String hostUserId;
     private static Person hostPerson;
 
@@ -87,115 +83,6 @@ public class AppActionImpl implements AppAction {
     public void setHostPerson(Person hostPerson) {
         AppActionImpl.hostPerson = hostPerson;
     }
-
-    private Person getBasePerson() {
-        Person basePerson = new Person();
-        basePerson.setUserId(hostPerson.getUserId());
-        basePerson.setEmail(hostPerson.getEmail());
-        basePerson.setName(hostPerson.getName());
-        basePerson.setFirstName(hostPerson.getFirstName());
-        basePerson.setLastName(hostPerson.getLastName());
-        basePerson.setIsGoogleCalendarImported(hostPerson.getIsGoogleCalendarImported());
-        basePerson.setObjectId(hostPerson.getObjectId());
-        basePerson.setCreated(hostPerson.getCreated());
-        basePerson.setUpdated(hostPerson.getUpdated());
-        basePerson.setOwnerId(hostPerson.getOwnerId());
-        return basePerson;
-    }
-
-    private Event getBaseEvent(Event event) {
-        Event baseEvent = new Event();
-        baseEvent.setTitle(event.getTitle());
-        baseEvent.setNote(event.getNote());
-        baseEvent.setDurationInMin(event.getDurationInMin());
-        baseEvent.setStatusEvent(event.getStatusEvent());
-        baseEvent.setHasReminder(event.getHasReminder());
-        baseEvent.setTimestamp(event.getTimestamp());
-        baseEvent.setObjectId(event.getObjectId());
-        baseEvent.setOwnerId(event.getOwnerId());
-        baseEvent.setUpdated(event.getUpdated());
-        baseEvent.setCreated(event.getCreated());
-        return baseEvent;
-    }
-
-    public EventLeaderDetail getBaseEventLeaderDetail(EventLeaderDetail eventLeaderDetail) {
-        EventLeaderDetail baseEventLeaderDetail = new EventLeaderDetail();
-        baseEventLeaderDetail.setIsCheckedIn(eventLeaderDetail.getIsCheckedIn());
-        baseEventLeaderDetail.setMinsToArrive(eventLeaderDetail.getMinsToArrive());
-        baseEventLeaderDetail.setObjectId(eventLeaderDetail.getObjectId());
-        baseEventLeaderDetail.setOwnerId(eventLeaderDetail.getOwnerId());
-        baseEventLeaderDetail.setUpdated(eventLeaderDetail.getUpdated());
-        baseEventLeaderDetail.setCreated(eventLeaderDetail.getCreated());
-        return baseEventLeaderDetail;
-    }
-
-    public EventMemberDetail getBaseEventMemberDetail(EventMemberDetail eventMemberDetail) {
-        EventMemberDetail baseEventMemberDetail = new EventMemberDetail();
-        baseEventMemberDetail.setStatusMember(eventMemberDetail.getStatusMember());
-        baseEventMemberDetail.setIsCheckedIn(eventMemberDetail.getIsCheckedIn());
-        baseEventMemberDetail.setMinsToArrive(eventMemberDetail.getMinsToArrive());
-        baseEventMemberDetail.setEventId(eventMemberDetail.getObjectId());
-        baseEventMemberDetail.setLeaderId(eventMemberDetail.getLeaderId());
-        baseEventMemberDetail.setObjectId(eventMemberDetail.getObjectId());
-        baseEventMemberDetail.setOwnerId(eventMemberDetail.getOwnerId());
-        baseEventMemberDetail.setUpdated(eventMemberDetail.getUpdated());
-        baseEventMemberDetail.setCreated(eventMemberDetail.getCreated());
-        return baseEventMemberDetail;
-    }
-
-    private static List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader(String eventId, String leaderId, List<String> datesInString) {
-
-        List<LeaderProposedTimestamp> leaderProposedTimestamps = new ArrayList<>();
-        try {
-            Date date;
-            for (String dateInString : datesInString) {
-                date = sdf.parse(dateInString);
-                LeaderProposedTimestamp leaderProposedTimestamp = new LeaderProposedTimestamp();
-                leaderProposedTimestamp.setEventId(eventId);
-                leaderProposedTimestamp.setLeaderId(leaderId);
-                leaderProposedTimestamp.setTimestamp(date);
-                leaderProposedTimestamps.add(leaderProposedTimestamp);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return leaderProposedTimestamps;
-    }
-
-    private static List<MemberProposedTimestamp> proposeEventTimestampsAsMember(String eventId, String leaderId, List<String> datesInString) {
-
-        List<MemberProposedTimestamp> memberProposedTimestamps = new ArrayList<>();
-        try {
-            Date date;
-            for (String dateInString : datesInString) {
-                date = sdf.parse(dateInString);
-                MemberProposedTimestamp memberProposedTimestamp = new MemberProposedTimestamp();
-                memberProposedTimestamp.setTimestamp(date);
-                memberProposedTimestamps.add(memberProposedTimestamp);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return memberProposedTimestamps;
-    }
-
-    private static List<MemberSelectedTimestamp> selectEventTimestampsAsMember(String eventId, String leaderId, List<String> datesInString) {
-
-        List<MemberSelectedTimestamp> memberSelectedTimestamps = new ArrayList<>();
-        try {
-            Date date;
-            for (String dateInString : datesInString) {
-                date = sdf.parse(dateInString);
-                MemberSelectedTimestamp memberSelectedTimestamp = new MemberSelectedTimestamp();
-                memberSelectedTimestamp.setTimestamp(date);
-                memberSelectedTimestamps.add(memberSelectedTimestamp);
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return memberSelectedTimestamps;
-    }
-
 
     @Override
     public void register(final String userEmail, final String password, final String firstName, final String lastName, final ActionCallbackListener<Person> listener) {
@@ -357,7 +244,7 @@ public class AppActionImpl implements AppAction {
         });
 
         EventLeaderDetail eventLeaderDetail = new EventLeaderDetail();
-        Person hostPersonInProgress = getBasePerson();
+        Person hostPersonInProgress = AppActionImplHelper.getBasePerson(hostPerson);
         eventLeaderDetail.setLeader(hostPersonInProgress);
         eventLeaderDetail.setIsCheckedIn(false);
 
@@ -376,7 +263,7 @@ public class AppActionImpl implements AppAction {
     public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = getBaseEvent(targetEvent);
+        Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
@@ -426,7 +313,7 @@ public class AppActionImpl implements AppAction {
     public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final ActionCallbackListener<Event> listener) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = getBaseEvent(targetEvent);
+        Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
         targetEventInProgress.setTitle(title);
         targetEventInProgress.setLocation(location);
         targetEventInProgress.setDurationInMin(durationInMin);
@@ -458,7 +345,7 @@ public class AppActionImpl implements AppAction {
     public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = getBaseEvent(targetEvent);
+        Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
         targetEventInProgress.setStatusEvent(StatusEvent.Pending.getStatus());
 
         Handler handler = new Handler(new Handler.Callback() {
@@ -482,7 +369,7 @@ public class AppActionImpl implements AppAction {
     public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = getBaseEvent(targetEvent);
+        Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
         targetEventInProgress.setTimestamp(eventFinalTimestamp);
         targetEventInProgress.setStatusEvent(StatusEvent.Ready.getStatus());
 
@@ -509,7 +396,7 @@ public class AppActionImpl implements AppAction {
     public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
 
         Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = getBaseEvent(targetEvent);
+        Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
         targetEventInProgress.setStatusEvent(StatusEvent.Cancelled.getStatus());
 
         Handler handler = new Handler(new Handler.Callback() {
@@ -537,9 +424,9 @@ public class AppActionImpl implements AppAction {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
         EventLeaderDetail targetEventLeaderDetail = targetEvent.getEventLeaderDetail();
-        EventLeaderDetail targetEventLeaderDetailInProgress = getBaseEventLeaderDetail(targetEventLeaderDetail);
+        EventLeaderDetail targetEventLeaderDetailInProgress = AppActionImplHelper.getBaseEventLeaderDetail(targetEventLeaderDetail);
 
-        List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader = proposeEventTimestampsAsLeader(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
+        List<LeaderProposedTimestamp> proposeEventTimestampsAsLeader = AppActionImplHelper.proposeEventTimestampsAsLeader(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
         targetEventLeaderDetailInProgress.setProposedTimestamps(proposeEventTimestampsAsLeader);
 
         Handler handler = new Handler(new Handler.Callback() {
@@ -564,8 +451,8 @@ public class AppActionImpl implements AppAction {
 
         final Event targetEvent = hostPerson.getEventAsMember(eventId);
         final EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
-        EventMemberDetail targetEventMemberDetailInProgress = getBaseEventMemberDetail(targetEventMemberDetail);
-        List<MemberProposedTimestamp> proposeEventTimestampsAsMember = proposeEventTimestampsAsMember(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
+        EventMemberDetail targetEventMemberDetailInProgress = AppActionImplHelper.getBaseEventMemberDetail(targetEventMemberDetail);
+        List<MemberProposedTimestamp> proposeEventTimestampsAsMember = AppActionImplHelper.proposeEventTimestampsAsMember(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
         targetEventMemberDetailInProgress.setProposedTimestamps(proposeEventTimestampsAsMember);
 
         // TODO[not done yet]: get leaderId
@@ -600,8 +487,8 @@ public class AppActionImpl implements AppAction {
 
         final Event targetEvent = hostPerson.getEventAsMember(eventId);
         final EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
-        EventMemberDetail targetEventMemberDetailInProgress = getBaseEventMemberDetail(targetEventMemberDetail);
-        List<MemberSelectedTimestamp> selectEventTimestampsAsMember = selectEventTimestampsAsMember(eventId, hostPerson.getObjectId(), selectedEventTimestamps);
+        EventMemberDetail targetEventMemberDetailInProgress = AppActionImplHelper.getBaseEventMemberDetail(targetEventMemberDetail);
+        List<MemberSelectedTimestamp> selectEventTimestampsAsMember = AppActionImplHelper.selectEventTimestampsAsMember(eventId, hostPerson.getObjectId(), selectedEventTimestamps);
         targetEventMemberDetailInProgress.setSelectedTimestamps(selectEventTimestampsAsMember);
 
         // TODO[not done yet]: get leaderId
@@ -741,7 +628,7 @@ public class AppActionImpl implements AppAction {
 
         final Event targetEvent = hostPerson.getEventAsMember(eventId);
         final EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
-        EventMemberDetail targetEventMemberDetailInProgress = getBaseEventMemberDetail(targetEventMemberDetail);
+        EventMemberDetail targetEventMemberDetailInProgress = AppActionImplHelper.getBaseEventMemberDetail(targetEventMemberDetail);
         targetEventMemberDetailInProgress.setMinsToArrive(estimateInMin);
 
         Handler handler = new Handler(new Handler.Callback() {
@@ -760,7 +647,6 @@ public class AppActionImpl implements AppAction {
         setMinsToArriveAsMember.execute();
     }
 
-    // TODO[test]
     @Override
     public void syncHostInformation(final String userId, final ActionCallbackListener<Void> listener) {
 
@@ -777,6 +663,7 @@ public class AppActionImpl implements AppAction {
         syncHostInformationAsyncTask.execute();
     }
 
+    // TODO: refactor timer vs service
     @Override
     public void startMemberInvitationTimer(final AppAction appAction, final String eventId) {
 
