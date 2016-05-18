@@ -40,7 +40,7 @@ public class AddEventMemberAsyncTask extends BaseAsyncTask{
                 Event updatedEvent = (Event) response.getObj();
                 Message message = new Message();
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(EventMemberDetail.SERIALIZE_KEY, updatedEvent);
+                bundle.putSerializable(Event.SERIALIZE_KEY, updatedEvent);
                 message.setData(bundle);
                 handler.sendMessage(message);
             } else {

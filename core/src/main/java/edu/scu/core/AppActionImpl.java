@@ -11,7 +11,6 @@ import com.backendless.messaging.Message;
 import com.backendless.persistence.local.UserIdStorageFactory;
 import com.backendless.persistence.local.UserTokenStorageFactory;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -247,6 +246,7 @@ public class AppActionImpl implements AppAction {
         Person hostPersonInProgress = AppActionImplHelper.getBasePerson(hostPerson);
         eventLeaderDetail.setLeader(hostPersonInProgress);
         eventLeaderDetail.setIsCheckedIn(false);
+        eventLeaderDetail.setMinsToArrive(-1);
 
         Event event = new Event();
         event.setStatusEvent(StatusEvent.Tentative.getStatus());
@@ -258,7 +258,6 @@ public class AppActionImpl implements AppAction {
         proposeEventAsyncTask.execute();
     }
 
-    // TODO[test]
     @Override
     public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener) {
 
@@ -282,7 +281,7 @@ public class AppActionImpl implements AppAction {
         addEventMemberAsyncTask.execute();
     }
 
-    // TODO[refactor]: notify member
+    // TODO[later/refactor]: notify member
     // TODO[test]
     @Override
     public void removeEventMember(final String eventId, final String memberId, final ActionCallbackListener<Event> listener) {
@@ -390,7 +389,7 @@ public class AppActionImpl implements AppAction {
         initiateEvent.execute();
     }
 
-    // TODO[refactor]
+    // TODO[later/refactor]
     // TODO[test]
     @Override
     public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
@@ -654,11 +653,14 @@ public class AppActionImpl implements AppAction {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
-                hostPerson = (Person) bundle.getSerializable(Person.SERIALIZE_KEY);
+                Person syncedPerson = (Person) bundle.getSerializable(Person.SERIALIZE_KEY);
+
+                hostPerson = syncedPerson;
                 listener.onSuccess(null);
                 return true;
             }
         });
+
         SyncHostInformationAsyncTask syncHostInformationAsyncTask = new SyncHostInformationAsyncTask(api, listener, handler, userId);
         syncHostInformationAsyncTask.execute();
     }
