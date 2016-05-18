@@ -15,14 +15,12 @@ import edu.scu.model.EventMemberDetail;
  */
 public class AddEventMemberAsyncTask extends BaseAsyncTask{
 
-    private String eventId;
     private String memberEmail;
     private Event event;
     private String leaderId;
 
-    public AddEventMemberAsyncTask(Api api, ActionCallbackListener<Event> listener, Handler handler, String eventId, String leaderId, String memberEmail, Event event) {
+    public AddEventMemberAsyncTask(Api api, ActionCallbackListener<Event> listener, Handler handler, String leaderId, String memberEmail, Event event) {
         super(api, listener, handler);
-        this.eventId = eventId;
         this.memberEmail = memberEmail;
         this.event = event;
         this.leaderId = leaderId;

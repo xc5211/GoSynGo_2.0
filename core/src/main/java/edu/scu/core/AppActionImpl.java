@@ -277,7 +277,7 @@ public class AppActionImpl implements AppAction {
             }
         });
 
-        AddEventMemberAsyncTask addEventMemberAsyncTask = new AddEventMemberAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId(), memberEmail, targetEventInProgress);
+        AddEventMemberAsyncTask addEventMemberAsyncTask = new AddEventMemberAsyncTask(api, listener, handler, hostPerson.getObjectId(), memberEmail, targetEventInProgress);
         addEventMemberAsyncTask.execute();
     }
 
