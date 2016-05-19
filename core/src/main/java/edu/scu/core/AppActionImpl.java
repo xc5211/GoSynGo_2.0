@@ -418,7 +418,6 @@ public class AppActionImpl implements AppAction {
         cancelEventAsyncTask.execute();
     }
 
-    // TODO[test]
     @Override
     public void proposeEventTimestampsAsLeader(final String eventId, final List<String> proposedEventTimestamps, final ActionCallbackListener<EventLeaderDetail> listener) {
 

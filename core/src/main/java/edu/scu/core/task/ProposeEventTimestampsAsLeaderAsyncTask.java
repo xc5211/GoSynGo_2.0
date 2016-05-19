@@ -36,7 +36,7 @@ public class ProposeEventTimestampsAsLeaderAsyncTask extends BaseAsyncTask {
                 EventLeaderDetail updatedEventLeaderDetail = (EventLeaderDetail) response.getObj();
                 Message message = new Message();
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(EventMemberDetail.SERIALIZE_KEY, updatedEventLeaderDetail);
+                bundle.putSerializable(EventLeaderDetail.SERIALIZE_KEY, updatedEventLeaderDetail);
                 message.setData(bundle);
                 handler.sendMessage(message);
             } else {
