@@ -61,10 +61,10 @@ public class RegisterActivity extends GsgBaseActivity {
 
         final ProgressDialog progressDialog = ProgressDialog.show( RegisterActivity.this, "", "Regisrering...", true );
 
-        getAppAction().register(password,firstname,lastname, userEmail,new ActionCallbackListener<Person>() {
+        getAppAction().register( userEmail,password,firstname,lastname,new ActionCallbackListener<Person>() {
 
             public void onSuccess(Person data) {
-                Toast.makeText(context, R.string.toast_login_success, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Register successfully!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(RegisterActivity.this, DashboardActivity.class);
                 startActivity(intent);
                 finish();
