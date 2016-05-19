@@ -69,9 +69,14 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = null;
                 switch(item.getItemId()) {
                     case R.id.menu_dashboard_toolbar_add_event:
-                        Intent intent = new Intent(DashboardActivity.this, ProposeEventActivity.class);
+                        intent = new Intent(DashboardActivity.this, ProposeEventActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.menu_dashboard_toolbar_test:
+                        intent = new Intent(DashboardActivity.this, TestEventActivity.class);
                         startActivity(intent);
                         break;
                     default:

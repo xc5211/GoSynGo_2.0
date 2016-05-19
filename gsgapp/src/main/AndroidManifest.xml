@@ -36,6 +36,12 @@
             android:exported="false" >
         </service>
 -->
+
+        <activity android:name=".activity.TestEventActivity"
+            android:label="@string/title_propose_event"
+            android:screenOrientation="portrait">
+        </activity>
+
         <activity android:name=".activity.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
@@ -69,7 +75,6 @@
         <activity android:name=".activity.ProposeEventActivity"
             android:label="@string/title_propose_event"
             android:screenOrientation="portrait">
-
         </activity>
 
     </application>

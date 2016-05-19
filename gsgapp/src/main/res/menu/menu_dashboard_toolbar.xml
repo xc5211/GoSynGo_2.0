@@ -10,4 +10,11 @@
         app:showAsAction="always">
     </item>
 
+    <item
+        android:title="Test"
+        android:id="@+id/menu_dashboard_toolbar_test"
+        android:orderInCategory="0"
+        app:showAsAction="always">
+    </item>
+
 </menu>
