@@ -340,7 +340,6 @@ public class AppActionImpl implements AppAction {
         addEventInformationAsyncTask.execute();
     }
 
-    // TODO[test]
     @Override
     public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener) {
 
