@@ -7,7 +7,6 @@ import android.os.Message;
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
-import edu.scu.core.R;
 import edu.scu.model.Event;
 
 /**
@@ -15,16 +14,16 @@ import edu.scu.model.Event;
  */
 public class InitiateEventAsyncTask extends BaseAsyncTask {
 
-    private Event eventAsLeader;
+    private Event event;
 
-    public InitiateEventAsyncTask(final Api api, final ActionCallbackListener<Integer> listener, final Handler handler, final Event eventAsLeader) {
+    public InitiateEventAsyncTask(final Api api, final ActionCallbackListener<Integer> listener, final Handler handler, final Event event) {
         super(api, listener, handler);
-        this.eventAsLeader = eventAsLeader;
+        this.event = event;
     }
 
     @Override
     protected ApiResponse<Event> doInBackground(Object... params) {
-        return api.initiateEvent(eventAsLeader);
+        return api.initiateEvent(event);
     }
 
     @Override

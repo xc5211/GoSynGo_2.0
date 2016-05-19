@@ -200,7 +200,7 @@ public class AppActionImpl implements AppAction {
 
     }
 
-    // TODO[test]
+    // TODO[test-messaging]
     @Override
     public void proposeEvent(final ActionCallbackListener<Event> listener) {
 
@@ -307,9 +307,8 @@ public class AppActionImpl implements AppAction {
         removeEventMemberAsyncTask.execute();
     }
 
-    // TODO[test]
     @Override
-    public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final ActionCallbackListener<Event> listener) {
+    public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final String note, final ActionCallbackListener<Event> listener) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
         Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
@@ -318,6 +317,7 @@ public class AppActionImpl implements AppAction {
         targetEventInProgress.setDurationInMin(durationInMin);
         targetEventInProgress.setHasReminder(hasReminder);
         targetEventInProgress.setReminderInMin(reminderInMin);
+        targetEventInProgress.setNote(note);
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
@@ -330,6 +330,7 @@ public class AppActionImpl implements AppAction {
                 targetEvent.setDurationInMin(updatedEvent.getDurationInMin());
                 targetEvent.setHasReminder(updatedEvent.getHasReminder());
                 targetEvent.setReminderInMin(updatedEvent.getReminderInMin());
+                targetEvent.setNote(updatedEvent.getNote());
                 listener.onSuccess(null);
                 return true;
             }

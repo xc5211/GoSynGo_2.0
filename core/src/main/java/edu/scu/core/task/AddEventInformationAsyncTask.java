@@ -13,16 +13,17 @@ import edu.scu.model.Event;
  * Created by chuanxu on 5/6/16.
  */
 public class AddEventInformationAsyncTask extends BaseAsyncTask {
-    private Event eventAsLeader;
 
-    public AddEventInformationAsyncTask(Api api, ActionCallbackListener<Event> listener, Handler handler, Event eventAsLeader) {
+    private Event event;
+
+    public AddEventInformationAsyncTask(Api api, ActionCallbackListener<Event> listener, Handler handler, Event event) {
         super(api, listener, handler);
-        this.eventAsLeader = eventAsLeader;
+        this.event = event;
     }
 
     @Override
     protected ApiResponse<Event> doInBackground(Object... params) {
-        return api.initiateEvent(eventAsLeader);
+        return api.saveEvent(event);
     }
 
     @Override

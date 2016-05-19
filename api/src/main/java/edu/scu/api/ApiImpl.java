@@ -64,9 +64,9 @@ public class ApiImpl implements Api {
         // Create Person object
         Person person = new Person();
         person.setUserId(user.getObjectId());
-        person.setEmail(user.getEmail());
-        person.setFirstName((String) user.getProperty("firstName"));
-        person.setLastName((String) user.getProperty("lastName"));
+        person.setEmail(userEmail);
+        person.setFirstName(firstName);
+        person.setLastName(lastName);
         person.setIsGoogleCalendarImported(false);
         try {
             person = Backendless.Data.of(Person.class).save(person);
@@ -234,15 +234,12 @@ public class ApiImpl implements Api {
         eventMemberDetail.setEventId(event.getObjectId());
         eventMemberDetail.setMember(member);
         eventMemberDetail.setStatusMember(StatusMember.Pending.getStatus());
+        eventMemberDetail.setIsCheckedIn(false);
+        eventMemberDetail.setMinsToArrive(-1);
 
         List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
         eventMemberDetails.add(eventMemberDetail);
         event.setEventMemberDetail(eventMemberDetails);
-
-        // TODO: Member shouldn't add event until accept the event
-        List<Event> eventsAsMember = new ArrayList<>();
-        eventsAsMember.add(event);
-        member.setEventsAsMember(eventsAsMember);
 
         try {
             event = Backendless.Data.of(Event.class).save(event);
@@ -370,6 +367,7 @@ public class ApiImpl implements Api {
     @Override
     public ApiResponse<Event> acceptEvent(String eventId, String memberId) {
 
+        // TODO: note -- target event object should be pushed to host person
         // Get Event object
         Event event = null;
         try {
@@ -384,6 +382,11 @@ public class ApiImpl implements Api {
                 break;
             }
         }
+
+        // TODO: Member accepts the event
+//        List<Event> eventsAsMember = new ArrayList<>();
+//        eventsAsMember.add(event);
+//        member.setEventsAsMember(eventsAsMember);
 
         try {
             event = Backendless.Data.of(Event.class).save(event);
