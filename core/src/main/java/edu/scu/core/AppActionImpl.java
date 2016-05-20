@@ -45,8 +45,10 @@ import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
+import edu.scu.model.enumeration.EventManagementState;
 import edu.scu.model.enumeration.StatusEvent;
 import edu.scu.model.enumeration.StatusMember;
+import edu.scu.util.lib.GoogleProjectSettings;
 
 /**
  * Created by chuanxu on 4/14/16.
@@ -295,7 +297,7 @@ public class AppActionImpl implements AppAction {
         targetEventInProgress.setDurationInMin(durationInMin);
         targetEventInProgress.setHasReminder(hasReminder);
         targetEventInProgress.setReminderInMin(reminderInMin);
-        targetEventInProgress.setNote(note);
+        targetEventInProgress.setNote(note == null ? "" : note);
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
@@ -380,7 +382,7 @@ public class AppActionImpl implements AppAction {
 
         api.registerEventChannelMessaging(eventId);
         api.subscribeEventChannelAsLeader(eventId, hostPerson.getObjectId(), channelMsgResponderForLeader, subscriptionResponder);
-//        api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, hostPerson.getObjectId(), EventManagementState.SEND_INVITATION.getStatus());
+        api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, hostPerson, EventManagementState.SEND_INVITATION.getStatus());
 
         // TODO[later]: refactor using BaseMessagingAsyncTask below?
 //        SendEventInvitationMessagingAsyncTask sendEventInvitationMessagingAsyncTask = new SendEventInvitationMessagingAsyncTask(api, null, null, eventId, hostPerson.getObjectId(), channelMsgResponderForLeader, subscriptionResponder);

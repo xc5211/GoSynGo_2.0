@@ -98,6 +98,7 @@ public class AppActionImplHelper {
     public static Event getBaseEvent(Event event) {
         Event baseEvent = new Event();
         baseEvent.setTitle(event.getTitle());
+        baseEvent.setLocation(event.getLocation());
         baseEvent.setNote(event.getNote());
         baseEvent.setDurationInMin(event.getDurationInMin());
         baseEvent.setStatusEvent(event.getStatusEvent());

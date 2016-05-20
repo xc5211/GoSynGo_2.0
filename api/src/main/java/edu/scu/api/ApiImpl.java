@@ -630,13 +630,14 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public void broadcastEventChannel(String channelName, String eventId, String leaderId, String eventManagementState) {
+    public void broadcastEventChannel(String channelName, String eventId, Person eventLeader, String eventManagementState) {
         String dispatchedEventName = "ChannelMessaging";
         HashMap args = new HashMap();
-        args.put(BroadcastEventChannelArgKeyName.CHANNEL_NAME, channelName);
-        args.put(BroadcastEventChannelArgKeyName.EVENT_ID, eventId);
-        args.put(BroadcastEventChannelArgKeyName.LEADER_ID, leaderId);
-        args.put(BroadcastEventChannelArgKeyName.EVENT_MANAGEMENT_STATE, eventManagementState);
+        args.put(BroadcastEventChannelArgKeyName.CHANNEL_NAME.getKeyName(), channelName);
+        args.put(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), eventId);
+        args.put(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), eventLeader.getObjectId());
+        args.put(BroadcastEventChannelArgKeyName.EVENT_MANAGEMENT_STATE.getKeyName(), eventManagementState);
+        args.put(BroadcastEventChannelArgKeyName.EVENT_LEADER.getKeyName(), eventLeader.getFirstName() + " " + eventLeader.getLastName());
 
         Backendless.Events.dispatch(dispatchedEventName, args, new AsyncCallback<Map>() {
             @Override

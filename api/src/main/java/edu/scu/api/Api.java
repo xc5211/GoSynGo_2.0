@@ -128,7 +128,7 @@ public interface Api {
 
     public void publishEventChannelMemberEstimateInMin(String channelName, String publisherId, String receiverId, int estimateInMin);
 
-    public void broadcastEventChannel(String channelName, String eventId, String leaderId, String eventManagementState);
+    public void broadcastEventChannel(String channelName, String eventId, Person eventLeader, String eventManagementState);
 
     /**
      * Data Persistence
