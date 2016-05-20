@@ -23,7 +23,7 @@ public class SendEventInvitationAsyncTask extends BaseAsyncTask {
 
     @Override
     protected ApiResponse doInBackground(Object... params) {
-        return api.initiateEvent(event);
+        return api.sendEventInvitation(event);
     }
 
     @Override

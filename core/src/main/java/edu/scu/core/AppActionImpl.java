@@ -4,7 +4,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.backendless.Subscription;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.messaging.Message;
@@ -43,7 +45,6 @@ import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
 import edu.scu.model.Person;
-import edu.scu.model.enumeration.PublishEventChannelArgKeyName;
 import edu.scu.model.enumeration.StatusEvent;
 import edu.scu.model.enumeration.StatusMember;
 
@@ -200,31 +201,8 @@ public class AppActionImpl implements AppAction {
 
     }
 
-    // TODO[test-messaging]
     @Override
     public void proposeEvent(final ActionCallbackListener<Event> listener) {
-
-        AsyncCallback<List<Message>> channelMsgResponderForLeader = new AsyncCallback<List<Message>>() {
-            @Override
-            public void handleResponse(List<Message> messages) {
-
-                String memberId;
-                Map<String, String> msgHeader;
-                Object msg;
-                for (Message message : messages) {
-                    memberId = message.getPublisherId();
-                    msgHeader = message.getHeaders();
-                    msg = message.getData();
-                    // TODO: update model
-
-                }
-            }
-
-            @Override
-            public void handleFault(BackendlessFault backendlessFault) {
-                // TODO:
-            }
-        };
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
@@ -254,7 +232,7 @@ public class AppActionImpl implements AppAction {
 
         hostPersonInProgress.getEventsAsLeader().add(event);
 
-        ProposeEventAsyncTask proposeEventAsyncTask = new ProposeEventAsyncTask(api, listener, channelMsgResponderForLeader, hostPersonInProgress, handler);
+        ProposeEventAsyncTask proposeEventAsyncTask = new ProposeEventAsyncTask(api, listener, handler, hostPersonInProgress);
         proposeEventAsyncTask.execute();
     }
 
@@ -340,9 +318,11 @@ public class AppActionImpl implements AppAction {
         addEventInformationAsyncTask.execute();
     }
 
+    // TODO[test-messaging]
     @Override
     public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener) {
 
+        // Handle data
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
         Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
         targetEventInProgress.setStatusEvent(StatusEvent.Pending.getStatus());
@@ -361,6 +341,50 @@ public class AppActionImpl implements AppAction {
 
         SendEventInvitationAsyncTask sendEventInvitationAsyncTask = new SendEventInvitationAsyncTask(api, listener, handler, targetEventInProgress);
         sendEventInvitationAsyncTask.execute();
+
+        // Handle messaging
+        AsyncCallback<List<Message>> channelMsgResponderForLeader = new AsyncCallback<List<Message>>() {
+            @Override
+            public void handleResponse(List<Message> messages) {
+
+                String memberId;
+                Map<String, String> msgHeader;
+                Object msg;
+                for (Message message : messages) {
+                    memberId = message.getPublisherId();
+                    msgHeader = message.getHeaders();
+                    msg = message.getData();
+                    // TODO: update model
+
+                }
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                // TODO:
+                Log.i("cxu", backendlessFault.getMessage());
+            }
+        };
+
+        AsyncCallback<Subscription> subscriptionResponder = new AsyncCallback<Subscription>() {
+            @Override
+            public void handleResponse(Subscription subscription) {
+                Log.i("cxu", subscription.getChannelName());
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                Log.i("cxu", backendlessFault.getMessage());
+            }
+        };
+
+        api.registerEventChannelMessaging(eventId);
+        api.subscribeEventChannelAsLeader(eventId, hostPerson.getObjectId(), channelMsgResponderForLeader, subscriptionResponder);
+//        api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, hostPerson.getObjectId(), EventManagementState.SEND_INVITATION.getStatus());
+
+        // TODO[later]: refactor using BaseMessagingAsyncTask below?
+//        SendEventInvitationMessagingAsyncTask sendEventInvitationMessagingAsyncTask = new SendEventInvitationMessagingAsyncTask(api, null, null, eventId, hostPerson.getObjectId(), channelMsgResponderForLeader, subscriptionResponder);
+//        sendEventInvitationMessagingAsyncTask.execute();
     }
 
     // TODO[test]

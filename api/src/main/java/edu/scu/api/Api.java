@@ -1,5 +1,6 @@
 package edu.scu.api;
 
+import com.backendless.Subscription;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.messaging.Message;
 
@@ -109,7 +110,9 @@ public interface Api {
      */
     public void registerEventChannelMessaging(String channelName);
 
-    public void subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> memberMsgResponderForLeader);
+    public void subscribeDefaultChannel(String channelName, AsyncCallback<List<Message>> defaultChannelMsgResponder);
+
+    public ApiResponse<Void> subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> memberMsgResponderForLeader, AsyncCallback<Subscription> subscriptionResponder);
 
     public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> channelMsgResponderForMember);
 

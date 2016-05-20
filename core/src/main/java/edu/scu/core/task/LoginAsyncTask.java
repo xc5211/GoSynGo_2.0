@@ -8,8 +8,7 @@ import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.core.AppAction;
-import edu.scu.model.EventMemberDetail;
-import edu.scu.model.Person;
+import edu.scu.util.lib.GoogleProjectSettings;
 
 /**
  * Created by chuanxu on 5/6/16.
@@ -39,6 +38,8 @@ public class LoginAsyncTask extends BaseAsyncTask {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
                 String userId = (String) response.getObj();
+
+                api.registerEventChannelMessaging(GoogleProjectSettings.DEFAULT_CHANNEL);
 
                 Message message = new Message();
                 Bundle bundle = new Bundle();

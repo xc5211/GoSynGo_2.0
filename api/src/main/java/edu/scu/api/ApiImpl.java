@@ -1,8 +1,11 @@
 package edu.scu.api;
 
+import android.util.Log;
+
 import com.backendless.Backendless;
 import com.backendless.BackendlessCollection;
 import com.backendless.BackendlessUser;
+import com.backendless.Subscription;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessException;
 import com.backendless.exceptions.BackendlessFault;
@@ -551,10 +554,16 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public void subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> channelMsgResponderForLeader) {
+    public void subscribeDefaultChannel(String channelName, AsyncCallback<List<Message>> defaultChannelMsgResponder) {
+        Backendless.Messaging.subscribe(channelName, defaultChannelMsgResponder);
+    }
+
+    @Override
+    public ApiResponse<Void> subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> channelMsgResponderForLeader, AsyncCallback<Subscription> subscriptionResponder) {
         SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
         subscriptionOptions.setSelector("leaderId = '" + leaderId + "'");
-        Backendless.Messaging.subscribe(channelName, channelMsgResponderForLeader, subscriptionOptions);
+        Backendless.Messaging.subscribe(channelName, channelMsgResponderForLeader, subscriptionOptions, subscriptionResponder);
+        return new ApiResponse<>(SUCCESS_EVENT, "Subscribe to event channel success");
     }
 
     @Override
@@ -632,12 +641,12 @@ public class ApiImpl implements Api {
         Backendless.Events.dispatch(dispatchedEventName, args, new AsyncCallback<Map>() {
             @Override
             public void handleResponse(Map result) {
-                System.out.println( "received result " + result );
+                Log.i( "cxu", "received result " + result );
             }
 
             @Override
             public void handleFault(BackendlessFault backendlessFault) {
-                System.out.println( "got error " + backendlessFault.toString() );
+                Log.i( "cxu", "got error " + backendlessFault.toString() );
             }
         });
     }
