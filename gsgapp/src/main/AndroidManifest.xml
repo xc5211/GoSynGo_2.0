@@ -74,7 +74,8 @@
 
         <activity android:name=".activity.ProposeEventActivity"
             android:label="@string/title_propose_event"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan">
         </activity>
 
         <activity android:name=".activity.LeaderProposeEventTimeActivity"

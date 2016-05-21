@@ -34,13 +34,15 @@ public class ProposeEventActivity extends GsgBaseActivity {
     private GridView memberShowGridView;
     private Button sendInvitationButton;
     private Button cancelButton;
+    //sichao
+    private GridView showMemberPortraitView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_propose_event);
 
-        eventId = (String) savedInstanceState.get("eventId");
+        //eventId = (String) savedInstanceState.get("eventId");
 
         initViews();
         initListener();
@@ -61,6 +63,8 @@ public class ProposeEventActivity extends GsgBaseActivity {
         this.addMemberButton =(Button) findViewById(R.id.button_propose_event_add_member);
         this.sendInvitationButton = (Button) findViewById(R.id.button_propose_event_send_invitation);
         this.cancelButton = (Button) findViewById(R.id.button_propose_event_cancel);
+        //sichao
+        this.showMemberPortraitView = (GridView) findViewById(R.id.gridview_show_members);
     }
 
     protected void initListener() {
@@ -196,5 +200,7 @@ public class ProposeEventActivity extends GsgBaseActivity {
             }
         });
     }
+
+    //sichao
 
 }
