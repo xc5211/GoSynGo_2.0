@@ -163,8 +163,7 @@ public class DashboardCalendarFragment extends Fragment {
         });
 
         //sichao
-
-        initEventList();
+        //initEventList();
         initUndecidedEventList();
         return view;
     }
@@ -225,11 +224,12 @@ public class DashboardCalendarFragment extends Fragment {
 
     private void initUndecidedEventList() {
         undecidedEventAdapter = new UndecidedEventAdapter(view.getContext(),
-                R.layout.undecided_event_row, undecidedEventList, ((GsgApplication)getActivity().getApplication()).getAppAction());
+                R.layout.undecided_event_row, ((GsgApplication)getActivity().getApplication()).getAppAction().getUndecidedEventList(), ((GsgApplication)getActivity().getApplication()).getAppAction());
         undecidedEventListView = (ListView) view.findViewById(R.id.listview_calendar_event);
         undecidedEventListView.setAdapter(undecidedEventAdapter);
     }
 
+    //sichao for test
     private void initEventList() {
         for(int i = 0; i < LIST_LENGTH; i++) {
             Event event = new Event();
