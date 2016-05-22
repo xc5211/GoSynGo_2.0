@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,12 +19,17 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 import edu.scu.gsgapp.GsgApplication;
 import edu.scu.gsgapp.R;
 import edu.scu.gsgapp.adaptor.CalendarAdapter;
 import edu.scu.gsgapp.adaptor.Utility;
+import edu.scu.gsgapp.adaptor.UndecidedEventAdapter;
+import edu.scu.model.Event;
+import edu.scu.model.EventLeaderDetail;
+import edu.scu.model.Person;
 
 /**
  * Created by chuanxu on 5/14/16.
@@ -44,6 +50,12 @@ public class DashboardCalendarFragment extends Fragment {
     LinearLayout rLayout;
     ArrayList<String> date;
     ArrayList<String> desc;
+
+    //sichao for grid view
+    private ListView undecidedEventListView;
+    private UndecidedEventAdapter undecidedEventAdapter;
+    private List<Event> undecidedEventList = new ArrayList<Event>();
+    public final static int LIST_LENGTH = 10;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -150,6 +162,10 @@ public class DashboardCalendarFragment extends Fragment {
 
         });
 
+        //sichao
+
+        initEventList();
+        initUndecidedEventList();
         return view;
     }
 
@@ -206,5 +222,25 @@ public class DashboardCalendarFragment extends Fragment {
             adapter.notifyDataSetChanged();
         }
     };
+
+    private void initUndecidedEventList() {
+        undecidedEventAdapter = new UndecidedEventAdapter(view.getContext(),
+                R.layout.undecided_event_row, undecidedEventList, ((GsgApplication)getActivity().getApplication()).getAppAction());
+        undecidedEventListView = (ListView) view.findViewById(R.id.listview_calendar_event);
+        undecidedEventListView.setAdapter(undecidedEventAdapter);
+    }
+
+    private void initEventList() {
+        for(int i = 0; i < LIST_LENGTH; i++) {
+            Event event = new Event();
+            EventLeaderDetail eventLeaderDetail = new EventLeaderDetail();
+            Person leader = new Person();
+            leader.setFirstName("sichao");
+            eventLeaderDetail.setLeader(leader);
+            event.setEventLeaderDetail(eventLeaderDetail);
+            event.setTitle("hot show baby!");
+            undecidedEventList.add(event);
+        }
+    }
 
 }

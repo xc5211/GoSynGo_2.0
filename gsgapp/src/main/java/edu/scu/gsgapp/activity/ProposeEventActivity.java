@@ -43,6 +43,7 @@ public class ProposeEventActivity extends GsgBaseActivity {
         setContentView(R.layout.activity_propose_event);
 
         //eventId = (String) savedInstanceState.get("eventId");
+        eventId = "61B5F3F8-6A3A-577F-FF6D-AA41F09CE100";
 
         initViews();
         initListener();
@@ -132,11 +133,13 @@ public class ProposeEventActivity extends GsgBaseActivity {
                     @Override
                     public void onSuccess(Event data) {
                         // notify dataset change to adapter
+                        progressDialog.cancel();
                     }
 
                     @Override
                     public void onFailure(String message) {
                         Toast.makeText(context, "This member does not exist.", Toast.LENGTH_SHORT).show();
+                        progressDialog.cancel();
                     }
                 });
 
@@ -176,6 +179,8 @@ public class ProposeEventActivity extends GsgBaseActivity {
             }
         });
 
+
+
     }
 
 
@@ -202,5 +207,8 @@ public class ProposeEventActivity extends GsgBaseActivity {
     }
 
     //sichao
+    public void updateGridView() {
+
+    }
 
 }

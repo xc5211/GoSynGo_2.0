@@ -1,9 +1,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/background"
     android:orientation="vertical"
-    android:id="@+id/fragment_dashboard_calendar">
+    android:id="@+id/fragment_dashboard_calendar"
+    tools:showIn="@layout/content_dashboard">
 
     <LinearLayout
         android:id="@+id/header"
@@ -81,13 +83,19 @@
             android:visibility="gone"
             android:text=""/> -->
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="5dp" />
+
         <ListView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="false"
-            android:id="@+id/listview_calendar_event">
+            android:id="@+id/listview_calendar_event"
+            android:dividerHeight="5dp">
 
         </ListView>
+
     </LinearLayout>
 
 </LinearLayout>
