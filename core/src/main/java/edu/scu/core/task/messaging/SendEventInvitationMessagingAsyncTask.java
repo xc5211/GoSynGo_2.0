@@ -33,7 +33,8 @@ public class SendEventInvitationMessagingAsyncTask extends BaseAsyncTask {
 
     @Override
     protected ApiResponse doInBackground(Object... params) {
-        return api.subscribeEventChannelAsLeader(eventId, leaderId, channelMsgResponderForLeader, subscriptionResponder);
+        //return api.subscribeEventChannel(eventId, leaderId, channelMsgResponderForLeader, subscriptionResponder);
+        return null;
     }
 
     @Override

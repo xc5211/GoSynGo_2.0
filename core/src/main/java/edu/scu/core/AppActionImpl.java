@@ -1,19 +1,20 @@
 package edu.scu.core;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.backendless.Subscription;
 import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessException;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.messaging.Message;
 import com.backendless.persistence.local.UserIdStorageFactory;
 import com.backendless.persistence.local.UserTokenStorageFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -21,11 +22,12 @@ import java.util.TimerTask;
 
 import edu.scu.api.Api;
 import edu.scu.api.ApiImpl;
+import edu.scu.core.callback.EventChannelMessageLeaderResponder;
+import edu.scu.core.callback.EventChannelMessageMemberResponder;
 import edu.scu.core.task.AcceptEventAsyncTask;
 import edu.scu.core.task.AddEventInformationAsyncTask;
 import edu.scu.core.task.AddEventMemberAsyncTask;
 import edu.scu.core.task.CancelEventAsyncTask;
-import edu.scu.core.task.DeclineEventAsyncTask;
 import edu.scu.core.task.InitiateEventAsyncTask;
 import edu.scu.core.task.LoginAsyncTask;
 import edu.scu.core.task.LogoutAsyncTask;
@@ -38,6 +40,7 @@ import edu.scu.core.task.SelectEventTimestampsAsMemberAsyncTask;
 import edu.scu.core.task.SendEventInvitationAsyncTask;
 import edu.scu.core.task.SetMinsToArriveAsMemberAsyncTask;
 import edu.scu.core.task.SyncHostInformationAsyncTask;
+import edu.scu.core.task.messaging.ChannelSubscription;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
@@ -57,12 +60,12 @@ public class AppActionImpl implements AppAction {
 
     private static String hostUserId;
     private static Person hostPerson;
+    private static List<Event> undecidedEventList = new ArrayList<>();
+    private static Map<String, ChannelSubscription> channelMap = new HashMap();
 
-    private Context context;
     private Api api;
 
-    public AppActionImpl (Context context) {
-        this.context = context;
+    public AppActionImpl () {
         this.api = new ApiImpl();
     }
 
@@ -77,6 +80,16 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
+    public Map<String, ChannelSubscription> getChannelMap() {
+        return channelMap;
+    }
+
+    @Override
+    public List<Event> getUndecidedEventList() {
+        return undecidedEventList;
+    }
+
+    @Override
     public void setHostUserId(String hostUserId) {
         AppActionImpl.hostUserId = hostUserId;
     }
@@ -85,6 +98,18 @@ public class AppActionImpl implements AppAction {
     public void setHostPerson(Person hostPerson) {
         AppActionImpl.hostPerson = hostPerson;
     }
+
+    @Override
+    public void setChannelMap(Map<String, ChannelSubscription> channelMap) {
+        AppActionImpl.channelMap = channelMap;
+    }
+
+    @Override
+    public void addToChannelMap(String channelName, AsyncCallback<List<Message>> channelMsgResponder, Subscription subscription) {
+        ChannelSubscription channelSubscription = new ChannelSubscription(channelMsgResponder, subscription);
+        channelMap.put(channelName, channelSubscription);
+    }
+
 
     @Override
     public void register(final String userEmail, final String password, final String firstName, final String lastName, final ActionCallbackListener<Person> listener) {
@@ -177,8 +202,34 @@ public class AppActionImpl implements AppAction {
             }
         });
 
-        LoginAsyncTask loginAsyncTask = new LoginAsyncTask(api, listener, handler, this, userEmail, password, stayLoggedIn);
+        LoginAsyncTask loginAsyncTask = new LoginAsyncTask(api, listener, handler, userEmail, password, stayLoggedIn);
         loginAsyncTask.execute();
+
+        // Subscribe to default channel
+//        defaultChannelMsgResponder = new AsyncCallback<List<Message>>() {
+//
+//            @Override
+//            public void handleResponse(List<Message> messages) {
+//
+//                Event event = null;
+//                for (Message message : messages) {
+//                    if (!message.getHeaders().get(hostPerson.getObjectId()).equals("true")) {
+//                        continue;
+//                    }
+//
+//                    event = (Event) message.getData();
+//                    undecidedEventList.add(event);
+//                }
+//            }
+//
+//            @Override
+//            public void handleFault(BackendlessFault backendlessFault) {
+//                Toast.makeText(context, "Subscribe to default channel fail", Toast.LENGTH_SHORT).show();
+//            }
+//        };
+
+//        defaultChannelMsgResponder = new DefaultChannelMessageResponder(null, undecidedEventList);
+//        api.subscribeDefaultChannel(null, defaultChannelMsgResponder, new SubscriptionResponder());
     }
 
     @Override
@@ -320,7 +371,6 @@ public class AppActionImpl implements AppAction {
         addEventInformationAsyncTask.execute();
     }
 
-    // TODO[test-messaging]
     @Override
     public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener) {
 
@@ -345,47 +395,27 @@ public class AppActionImpl implements AppAction {
         sendEventInvitationAsyncTask.execute();
 
         // Handle messaging
-        AsyncCallback<List<Message>> channelMsgResponderForLeader = new AsyncCallback<List<Message>>() {
-            @Override
-            public void handleResponse(List<Message> messages) {
-
-                String memberId;
-                Map<String, String> msgHeader;
-                Object msg;
-                for (Message message : messages) {
-                    memberId = message.getPublisherId();
-                    msgHeader = message.getHeaders();
-                    msg = message.getData();
-                    // TODO: update model
-
-                }
-            }
-
-            @Override
-            public void handleFault(BackendlessFault backendlessFault) {
-                // TODO:
-                Log.i("cxu", backendlessFault.getMessage());
-            }
-        };
-
+        final EventChannelMessageLeaderResponder channelMsgLeaderResponder = new EventChannelMessageLeaderResponder(hostPerson);
         AsyncCallback<Subscription> subscriptionResponder = new AsyncCallback<Subscription>() {
             @Override
-            public void handleResponse(Subscription subscription) {
-                Log.i("cxu", subscription.getChannelName());
+            public void handleResponse(Subscription response) {
+                addToChannelMap(targetEvent.getObjectId(), channelMsgLeaderResponder, response);
             }
-
             @Override
-            public void handleFault(BackendlessFault backendlessFault) {
-                Log.i("cxu", backendlessFault.getMessage());
+            public void handleFault(BackendlessFault fault) {
             }
         };
 
-        api.registerEventChannelMessaging(eventId);
-        api.subscribeEventChannelAsLeader(eventId, hostPerson.getObjectId(), channelMsgResponderForLeader, subscriptionResponder);
-        api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, hostPerson, EventManagementState.SEND_INVITATION.getStatus());
+        try {
+            api.registerEventChannelMessaging(eventId);
+            api.subscribeEventChannel(eventId, hostPerson.getObjectId(), channelMsgLeaderResponder, subscriptionResponder);
+            api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, hostPerson, EventManagementState.SEND_INVITATION.getStatus());
+        } catch (BackendlessException e) {
+            e.printStackTrace();
+        }
 
         // TODO[later]: refactor using BaseMessagingAsyncTask below?
-//        SendEventInvitationMessagingAsyncTask sendEventInvitationMessagingAsyncTask = new SendEventInvitationMessagingAsyncTask(api, null, null, eventId, hostPerson.getObjectId(), channelMsgResponderForLeader, subscriptionResponder);
+//        SendEventInvitationMessagingAsyncTask sendEventInvitationMessagingAsyncTask = new SendEventInvitationMessagingAsyncTask(api, null, null, eventId, hostPerson.getObjectId(), channelMsgResponderForLeader, new SubscriptionResponder());
 //        sendEventInvitationMessagingAsyncTask.execute();
     }
 
@@ -541,56 +571,60 @@ public class AppActionImpl implements AppAction {
         selectEventTimestampsAsMemberAsyncTask.execute();
     }
 
-    // TODO[refactor]: already received event object from broadcast receiver
     // TODO[test]
     @Override
-    public void acceptEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
+    public void acceptEvent(final Event undecidedEvent, final String leaderId, final ActionCallbackListener<Boolean> listener) {
 
-        AsyncCallback<List<Message>> channelMsgResponderForMember = new AsyncCallback<List<Message>>() {
+        final String memberId = hostPerson.getObjectId();
+        final String eventId = undecidedEvent.getObjectId();
 
-            @Override
-            public void handleResponse(List<Message> messages) {
-                // TODO[later]: no need to support member monitor channel yet
-//                String memberId;
-//                Map<String, String> msgHeader;
-//                EventMemberDetail eventMemberDetail;
+//        AsyncCallback<List<Message>> channelMsgResponderForMember = new AsyncCallback<List<Message>>() {
 //
-//                for (Message message : messages) {
-//                    memberId = message.getPublisherId();
-//                    msgHeader = message.getHeaders();
-//                    eventMemberDetail = hostPerson.getEventMemberMemberDetail(eventId, memberId);
+//            @Override
+//            public void handleResponse(List<Message> messages) {
+//                // TODO[later]: no need to support member monitor channel yet
+////                String memberId;
+////                Map<String, String> msgHeader;
+////                EventMemberDetail eventMemberDetail;
+////
+////                for (Message message : messages) {
+////                    memberId = message.getPublisherId();
+////                    msgHeader = message.getHeaders();
+////                    eventMemberDetail = hostPerson.getEventMemberMemberDetail(eventId, memberId);
+////
+////                    if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_STATUS.getKeyName()).equals("true")) {
+////                        int memberStatus = (int) message.getData();
+////                        eventMemberDetail.setStatusMember(memberStatus);
+////                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_PROPOSED_TIME.getKeyName()).equals("true")) {
+////                        List<MemberProposedTimestamp> memberProposedTimestamps = (List<MemberProposedTimestamp>) message.getData();
+////                        eventMemberDetail.setProposedTimestamps(memberProposedTimestamps);
+////                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_SELECTED_TIME.getKeyName()).equals("true")) {
+////                        List<MemberSelectedTimestamp> memberSelectedTimestamps = (List<MemberSelectedTimestamp>) message.getData();
+////                        eventMemberDetail.setSelectedTimestamps(memberSelectedTimestamps);
+////                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_MINS_TO_ARRIVE.getKeyName()).equals("true")) {
+////                        int estimateInMin = (int) message.getData();
+////                        eventMemberDetail.setMinsToArrive(estimateInMin);
+////                    } else {
+////                        assert false;
+////                    }
+////                }
 //
-//                    if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_STATUS.getKeyName()).equals("true")) {
-//                        int memberStatus = (int) message.getData();
-//                        eventMemberDetail.setStatusMember(memberStatus);
-//                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_PROPOSED_TIME.getKeyName()).equals("true")) {
-//                        List<MemberProposedTimestamp> memberProposedTimestamps = (List<MemberProposedTimestamp>) message.getData();
-//                        eventMemberDetail.setProposedTimestamps(memberProposedTimestamps);
-//                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_SELECTED_TIME.getKeyName()).equals("true")) {
-//                        List<MemberSelectedTimestamp> memberSelectedTimestamps = (List<MemberSelectedTimestamp>) message.getData();
-//                        eventMemberDetail.setSelectedTimestamps(memberSelectedTimestamps);
-//                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_MINS_TO_ARRIVE.getKeyName()).equals("true")) {
-//                        int estimateInMin = (int) message.getData();
-//                        eventMemberDetail.setMinsToArrive(estimateInMin);
-//                    } else {
-//                        assert false;
-//                    }
-//                }
-
-            }
-
-            @Override
-            public void handleFault(BackendlessFault backendlessFault) {
-            }
-        };
+//            }
+//
+//            @Override
+//            public void handleFault(BackendlessFault backendlessFault) {
+//            }
+//        };
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
-                Event updatedEvent = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
-                boolean isSuccess = hostPerson.getEventsAsMember().add(updatedEvent);
+                Person updatedPerson = (Person) bundle.getSerializable(Person.SERIALIZE_KEY);
+                Event acceptedEvent = updatedPerson.getEventAsMember(eventId);
+                boolean isSuccess = hostPerson.getEventsAsMember().add(acceptedEvent);
                 if (isSuccess) {
+                    undecidedEventList.remove(undecidedEvent);
                     listener.onSuccess(true);
                 } else {
                     listener.onFailure(String.valueOf(R.string.local_update_error));
@@ -599,44 +633,64 @@ public class AppActionImpl implements AppAction {
             }
         });
 
-        AcceptEventAsyncTask acceptTask = new AcceptEventAsyncTask(api, listener, channelMsgResponderForMember, handler, eventId, hostPerson.getObjectId());
+        Person baseMember = AppActionImplHelper.getBasePerson(hostPerson);
+        AcceptEventAsyncTask acceptTask = new AcceptEventAsyncTask(api, listener, handler, baseMember, undecidedEvent, memberId);
         acceptTask.execute();
+
+        // Handle messaging
+        final EventChannelMessageMemberResponder channelMsgMemberResponder = new EventChannelMessageMemberResponder();
+        AsyncCallback<Subscription> subscriptionResponder = new AsyncCallback<Subscription>() {
+            @Override
+            public void handleResponse(Subscription response) {
+                addToChannelMap(eventId, channelMsgMemberResponder, response);
+            }
+            @Override
+            public void handleFault(BackendlessFault fault) {
+            }
+        };
+
+        try {
+            api.registerEventChannelMessaging(eventId);
+            api.subscribeEventChannel(eventId, memberId, channelMsgMemberResponder, subscriptionResponder);
+            api.publishEventChannelMemberStatus(eventId, memberId, leaderId, StatusMember.Accept.getStatus());
+        } catch (BackendlessException e) {
+            e.printStackTrace();
+        }
 
         // TODO: TIMER!!!
         //timer.cancel();
     }
 
-    // TODO[refactor]: already received event object from broadcast receiver
     // TODO[test]
     @Override
-    public void declineEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
+    public void declineEvent(final Event undecidedEvent, final String leaderId, final ActionCallbackListener<Boolean> listener) {
 
-        EventMemberDetail targetEventMemberDetail = null;
-        for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-            if (eventAsMember.getObjectId().equals(eventId)) {
-                targetEventMemberDetail = eventAsMember.getEventMemberDetail().get(0);
-                break;
-            }
-        }
-        targetEventMemberDetail.setStatusMember(StatusMember.Declined.getStatus());
+        final String memberId = hostPerson.getObjectId();
+        final String eventId = undecidedEvent.getObjectId();
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
-                EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) bundle.getSerializable(EventMemberDetail.SERIALIZE_KEY);
-                for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-                    if (eventAsMember.getObjectId().equals(eventId)) {
-                        eventAsMember.updateEventMemberDetail(updatedEventMemberDetail);
-                        return true;
-                    }
-                }
+//                EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) bundle.getSerializable(EventMemberDetail.SERIALIZE_KEY);
+
+                undecidedEventList.remove(undecidedEvent);
                 return false;
             }
         });
 
-        DeclineEventAsyncTask declineEvent = new DeclineEventAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId(), targetEventMemberDetail);
-        declineEvent.execute();
+        // TODO: notify server event is declined in DeclineEventAsyncTask
+//        DeclineEventAsyncTask declineEvent = new DeclineEventAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId(), targetEventMemberDetail);
+//        declineEvent.execute();
+
+        try {
+            api.publishEventChannelMemberStatus(eventId, memberId, leaderId, StatusMember.Declined.getStatus());
+        } catch (BackendlessException e) {
+            e.printStackTrace();
+        }
+
+        // TODO: TIMER!!!
+        //timer.cancel();
     }
 
     // TODO: need this any more? We have SetMinsToArriveAsMember(..)
@@ -698,7 +752,7 @@ public class AppActionImpl implements AppAction {
             @Override
             public void run() {
                 // TODO: Decline and don't subscribe to event channel
-                appAction.declineEvent(eventId, null);
+                appAction.declineEvent(null, hostPerson.getObjectId(), null);
             }
         };
 

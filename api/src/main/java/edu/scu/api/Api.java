@@ -35,16 +35,8 @@ public interface Api {
     public ApiResponse<String> login(String userEmail, String password, boolean stayLoggedIn);
     //Boolean:True/False
     public ApiResponse<Void> logout();
-    //Boolean:True/False
-    public ApiResponse<Boolean> isGoogleCalendarImported(String personId);
-    //
+
     public ApiResponse<Void> importGoogleCalendar(String personId);
-
-    public ApiResponse<List<Date>> getScheduledDates(String personId);
-
-    public ApiResponse<List<Event>> getEventsAsLeader(String personId);
-
-    public ApiResponse<List<Event>> getEventsAsMember(String personId);
 
     /**
      * As leader
@@ -61,10 +53,6 @@ public interface Api {
 
     public ApiResponse<Event> cancelEvent(Event event);
 
-    public ApiResponse<Map<Person, Integer>> getAllEventMembersStatusAndEstimate(String eventId);
-
-    public ApiResponse<List<Person>> getAllEventMembers(String eventId);
-
     public ApiResponse<EventLeaderDetail> proposeEventTimestampsAsLeader(EventLeaderDetail eventLeaderDetail);
 
     /**
@@ -74,24 +62,13 @@ public interface Api {
 
     public ApiResponse<EventMemberDetail> selectEventTimestampsAsMember(EventMemberDetail eventMemberDetail);
 
-    public ApiResponse<Event> acceptEvent(String eventId, String memberId);
+    public ApiResponse<Person> acceptEvent(Person member, Event undecidedEvent, String memberId);
 
     public ApiResponse<EventMemberDetail> declineEvent(EventMemberDetail eventMemberDetail);
 
     public ApiResponse<EventMemberDetail> checkInEvent(EventMemberDetail eventMemberDetail);
 
     public ApiResponse<EventMemberDetail> setMinsToArriveAsMember(EventMemberDetail eventMemberDetail);
-
-    /**
-     * Event - Shared to both leader and member
-     */
-    public ApiResponse<Integer> getEventStatus(String eventId);
-
-    public ApiResponse<Person> getEventLeader(String eventId);
-
-    public ApiResponse<String> getEventLocation(String eventId);
-
-    public ApiResponse<Integer> getEventDurationInMin(String eventId);
 
     /**
      * Device
@@ -110,23 +87,21 @@ public interface Api {
      */
     public void registerEventChannelMessaging(String channelName);
 
-    public void subscribeDefaultChannel(String channelName, AsyncCallback<List<Message>> defaultChannelMsgResponder);
+    public void subscribeDefaultChannel(String personId, AsyncCallback<List<Message>> defaultChannelMsgResponder, AsyncCallback<Subscription> methodCallback);
 
-    public ApiResponse<Void> subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> memberMsgResponderForLeader, AsyncCallback<Subscription> subscriptionResponder);
+    public void subscribeEventChannel(String channelName, String personId, AsyncCallback<List<Message>> channelMsgResponder, AsyncCallback<Subscription> subscriptionResponder);
 
-    public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> channelMsgResponderForMember);
+    public void publishEventChannelMessage(String channelName, String publisherId, String receiverId, Message message);
 
-    public void publishEventChannelMessageAsLeader(String channelName, String publisherId, List<String> receiverIds);
+    public void publishEventChannelMessage(String channelName, String publisherId, List<String> receiverIds, Message message);
 
-    public void publishEventChannelMessageAsMember(String channelName, String publisherId, String receiverId);
+    public void publishEventChannelMemberStatus(String channelName, String publisherId, String leaderId, int memberStatus);
 
-    public void publishEventChannelMemberStatus(String channelName, String publisherId, String receiverId, int memberStatus);
+    public void publishEventChannelMemberSelectedTimestamps(String channelName, String publisherId, String leaderId, List<MemberSelectedTimestamp> memberSelectedTimestamps);
 
-    public void publishEventChannelMemberSelectedTimestamps(String channelName, String publisherId, String receiverId, List<MemberSelectedTimestamp> memberSelectedTimestamps);
+    public void publishEventChannelMemberProposedTimestamps(String channelName, String publisherId, String leaderId, List<MemberProposedTimestamp> memberProposedTimestamps);
 
-    public void publishEventChannelMemberProposedTimestamps(String channelName, String publisherId, String receiverId, List<MemberProposedTimestamp> memberProposedTimestamps);
-
-    public void publishEventChannelMemberEstimateInMin(String channelName, String publisherId, String receiverId, int estimateInMin);
+    public void publishEventChannelMemberEstimateInMin(String channelName, String publisherId, String leaderId, int estimateInMin);
 
     public void broadcastEventChannel(String channelName, String eventId, Person eventLeader, String eventManagementState);
 

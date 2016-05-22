@@ -13,6 +13,7 @@ import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.model.Event;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.Person;
 import edu.scu.model.enumeration.StatusMember;
 
 /**
@@ -20,40 +21,39 @@ import edu.scu.model.enumeration.StatusMember;
  */
 public class AcceptEventAsyncTask extends BaseAsyncTask {
 
-    private String eventId;
+    private Person baseMember;
+    private Event undecidedEvent;
     private String memberId;
-    private AsyncCallback<List<Message>> channelMsgResponderForMember;
 
-    public AcceptEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, AsyncCallback<List<Message>> channelMsgResponderForMember, Handler handler, String eventId, String memberId) {
+    public AcceptEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, Handler handler, Person baseMember, Event undecidedEvent, String memberId) {
         super(api, listener, handler);
-        this.eventId = eventId;
+        this.baseMember = baseMember;
+        this.undecidedEvent = undecidedEvent;
         this.memberId = memberId;
-        this.channelMsgResponderForMember = channelMsgResponderForMember;
     }
 
     @Override
-    protected ApiResponse<Event> doInBackground(Object... params) {
-        return api.acceptEvent(eventId, memberId);
+    protected ApiResponse<Person> doInBackground(Object... params) {
+        return api.acceptEvent(baseMember, undecidedEvent, memberId);
     }
 
     @Override
     protected void onPostExecute(ApiResponse response) {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
-                Event updatedEvent = (Event) response.getObj();
+                Person updatedPerson = (Person) response.getObj();
 
-                api.subscribeEventChannelAsMember(eventId, memberId, channelMsgResponderForMember);
-                String leaderId = updatedEvent.getEventLeaderDetail().getLeader().getObjectId();
-                for (EventMemberDetail eventMemberDetail : updatedEvent.getEventMemberDetail()) {
-                    if (eventMemberDetail.getMember().getObjectId().equals(memberId)) {
-                        api.publishEventChannelMemberStatus(eventId, memberId, leaderId, StatusMember.Accept.getStatus());
-                        break;
-                    }
-                }
+//                String leaderId = updatedEvent.getEventLeaderDetail().getLeader().getObjectId();
+//                for (EventMemberDetail eventMemberDetail : updatedEvent.getEventMemberDetail()) {
+//                    if (eventMemberDetail.getMember().getObjectId().equals(memberId)) {
+//                        api.publishEventChannelMemberStatus(undecidedEvent.getObjectId(), memberId, leaderId, StatusMember.Accept.getStatus());
+//                        break;
+//                    }
+//                }
 
                 android.os.Message message = new android.os.Message();
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(Event.SERIALIZE_KEY, updatedEvent);
+                bundle.putSerializable(Person.SERIALIZE_KEY, updatedPerson);
                 message.setData(bundle);
                 handler.sendMessage(message);
             } else {

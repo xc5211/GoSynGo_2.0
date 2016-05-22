@@ -7,7 +7,6 @@ import android.os.Message;
 import edu.scu.api.Api;
 import edu.scu.api.ApiResponse;
 import edu.scu.core.ActionCallbackListener;
-import edu.scu.core.AppAction;
 import edu.scu.util.lib.GoogleProjectSettings;
 
 /**
@@ -15,14 +14,12 @@ import edu.scu.util.lib.GoogleProjectSettings;
  */
 public class LoginAsyncTask extends BaseAsyncTask {
 
-    private AppAction appAction;
     private String userEmail;
     private String password;
     private boolean stayLoggedIn;
 
-    public LoginAsyncTask(Api api, ActionCallbackListener listener, Handler handler, AppAction appAction, String userEmail, String password, boolean stayLoggedIn) {
+    public LoginAsyncTask(Api api, ActionCallbackListener listener, Handler handler, String userEmail, String password, boolean stayLoggedIn) {
         super(api, listener, handler);
-        this.appAction = appAction;
         this.userEmail = userEmail;
         this.password = password;
         this.stayLoggedIn = stayLoggedIn;
@@ -39,6 +36,7 @@ public class LoginAsyncTask extends BaseAsyncTask {
             if (response.isSuccess()) {
                 String userId = (String) response.getObj();
 
+                // TODO: move next line to register async task
                 api.registerEventChannelMessaging(GoogleProjectSettings.DEFAULT_CHANNEL);
 
                 Message message = new Message();

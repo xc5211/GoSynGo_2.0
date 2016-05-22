@@ -98,26 +98,23 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
         this.hostPerson = appAction.getHostPerson();
         this.hostPersonId = hostPerson.getObjectId();
 
-        boolean receiveMessage = false;
-        String eventManagementState = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_MANAGEMENT_STATE.getKeyName());
-        if (eventManagementState == null) {
-            receiveMessage = handleServerTriggeredNotification(intent);
-        } else {
-            receiveMessage = handleLeaderTriggeredNotification(intent, eventManagementState);
+        // Reject if not for host
+        boolean isPushForHostPerson = intent.getStringExtra(hostPersonId).equals("true");
+        if (!isPushForHostPerson) {
+            return false;
         }
 
-        if (!receiveMessage) {
-            // TODO: Reject message by returning false?
-            return false;
+        // Handle server or leader triggered event
+        String eventManagementState = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_MANAGEMENT_STATE.getKeyName());
+        if (eventManagementState == null) {
+            handleServerTriggeredNotification(intent);
+        } else {
+            handleLeaderTriggeredNotification(intent, eventManagementState);
         }
         return super.onMessage(context, intent);
     }
 
-    private boolean handleLeaderTriggeredNotification(Intent intent, String eventManagementState) {
-        boolean isPushToHostPerson = intent.getStringExtra(hostPersonId).equals("true");
-        if (!isPushToHostPerson) {
-            return false;
-        }
+    private void handleLeaderTriggeredNotification(Intent intent, String eventManagementState) {
 
         String leaderId = intent.getStringExtra(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName());
         boolean isHostPersonLeader = hostPersonId.equals(leaderId);
@@ -126,7 +123,6 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
         } else {
             handleLeaderTriggeredNotificationAsMember(intent, eventManagementState);
         }
-        return true;
     }
 
     private void handleLeaderTriggeredNotificationAsLeader(Intent intent, String eventManagementState) {
@@ -142,7 +138,6 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
         } else {
             assert false;
         }
-        context.startActivity(nextIntent);
     }
 
     private void handleLeaderTriggeredNotificationAsMember(Intent intent, String eventManagementState) {
@@ -150,12 +145,15 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
         String eventId = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName());
         Intent nextIntent = null;
         if (eventManagementState.equals(EventManagementState.SEND_INVITATION.getStatus())) {
+
             String eventTitle = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_TITLE.getKeyName());
             String eventNote = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_NOTE.getKeyName());
             String eventLocation = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_LOCATION.getKeyName());
             String eventLeader = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_LEADER.getKeyName());
 
-            appAction.startMemberInvitationTimer(appAction, eventId);
+            // TODO: timer
+            //appAction.startMemberInvitationTimer(appAction, eventId);
+
             nextIntent = new Intent(context, DashboardActivity.class);
             nextIntent.putExtra(BroadcastEventChannelArgKeyName.EVENT_TITLE.getKeyName(), eventTitle);
             nextIntent.putExtra(BroadcastEventChannelArgKeyName.EVENT_NOTE.getKeyName(), eventNote);
@@ -176,7 +174,6 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
         } else {
             assert false;
         }
-        context.startActivity(nextIntent);
     }
 
     private boolean handleServerTriggeredNotification(Intent intent) {
@@ -197,7 +194,6 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
         } else {
             assert false;
         }
-        context.startActivity(nextIntent);
         return true;
     }
 

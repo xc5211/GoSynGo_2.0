@@ -10,6 +10,7 @@ import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessException;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.messaging.Message;
+import com.backendless.messaging.MessageStatus;
 import com.backendless.messaging.PublishOptions;
 import com.backendless.messaging.SubscriptionOptions;
 import com.backendless.persistence.BackendlessDataQuery;
@@ -82,7 +83,7 @@ public class ApiImpl implements Api {
     @Override
     public ApiResponse<String> login(String userEmail, String password, boolean stayLoggedIn) {
         // Step 1: start login process
-        BackendlessUser user = null;
+        BackendlessUser user;
         try {
             user = Backendless.UserService.login(userEmail, password, stayLoggedIn);
         } catch( BackendlessException exception ) {
@@ -114,93 +115,10 @@ public class ApiImpl implements Api {
         return new ApiResponse<>(SUCCESS_EVENT, "You have successfully logged out");
     }
 
-    @Override
-    public ApiResponse<Boolean> isGoogleCalendarImported(String personId) {
-        // Get person
-        Person person = null;
-        try{
-            person = Backendless.Data.of(Person.class).findById(personId);
-        }
-        catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code:" + exception.getCode());
-        }
-        return new ApiResponse<>(SUCCESS_EVENT, "", person.getIsGoogleCalendarImported());
-    }
-
     // TODO[later]
     @Override
     public ApiResponse<Void> importGoogleCalendar(String personId) {
         return null;
-    }
-
-    @Override
-    public ApiResponse<List<Date>> getScheduledDates(String personId) {
-
-        // Get events as member
-        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventsAsMember(personId));
-        BackendlessCollection<Event> result = null;
-        try {
-            result = Backendless.Data.of(Event.class).find(dataQuery);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
-        List<Event> scheduledEventsAsMember = result.getData();
-
-        // Get events as leader
-        dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventsAsLeader(personId));
-        try {
-            result = Backendless.Data.of(Event.class).find(dataQuery);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
-        List<Event> scheduledEventsAsLeader = result.getData();
-
-        List<Date> scheduledDates = new ArrayList<>();
-        for (Event eventAsMember : scheduledEventsAsMember) {
-            scheduledDates.add(eventAsMember.getTimestamp());
-        }
-        for (Event eventsAsLeader : scheduledEventsAsLeader) {
-            scheduledDates.add(eventsAsLeader.getTimestamp());
-        }
-        return new ApiResponse<List<Date>>(SUCCESS_EVENT, "Get scheduled dates success", scheduledDates);
-    }
-
-    @Override
-    public ApiResponse<List<Event>> getEventsAsLeader(String personId) {
-
-        // TODO[later]: Remove next line after testing
-        personId = idPersonChuan;
-        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventsAsLeader(personId));
-        BackendlessCollection<Event> result = null;
-        try {
-            result = Backendless.Data.of(Event.class).find(dataQuery);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
-
-        List<Event> eventsAsLeader = result.getData();
-        return new ApiResponse<List<Event>>(SUCCESS_EVENT, "", eventsAsLeader);
-    }
-
-    @Override
-    public ApiResponse<List<Event>> getEventsAsMember(String personId) {
-
-        // TODO[later]: Remove next line after testing
-        personId = idPersonSichao;
-        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventsAsMember(personId));
-        BackendlessCollection<Event> result = null;
-        try {
-            result = Backendless.Data.of(Event.class).find(dataQuery);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
-
-        List<Event> eventsAsMember = result.getData();
-        return new ApiResponse<List<Event>>(SUCCESS_EVENT, "", eventsAsMember);
     }
 
     @Override
@@ -297,44 +215,6 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Map<Person, Integer>> getAllEventMembersStatusAndEstimate(String eventId) {
-
-        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMemberDetails(eventId));
-        BackendlessCollection<EventMemberDetail> result = null;
-        try {
-            result = Backendless.Data.of(EventMemberDetail.class).find(dataQuery);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
-
-        List<EventMemberDetail> eventMemberDetails = result.getData();
-        Map<Person, Integer> statusMap = new HashMap<>();
-        for (EventMemberDetail memberDetail : eventMemberDetails) {
-            statusMap.put(memberDetail.getMember(), memberDetail.getMinsToArrive());
-        }
-        return new ApiResponse<>(SUCCESS_EVENT, "", statusMap);
-    }
-
-    @Override
-    public ApiResponse<List<Person>> getAllEventMembers(String eventId) {
-
-        // TODO[later]: Remove next line after testing
-        eventId = "0ED31A48-13E1-2EDC-FFF8-F2EF8764AC00";
-        BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        dataQuery.setWhereClause(BackendlessQueryHelper.queryEventMembers(eventId));
-        BackendlessCollection<Person> result = null;
-        try {
-            result = Backendless.Data.of(Person.class).find(dataQuery);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
-
-        List<Person> eventsAsMember = result.getData();
-        return new ApiResponse<List<Person>>(SUCCESS_EVENT, "", eventsAsMember);
-    }
-
-    @Override
     public ApiResponse<EventLeaderDetail> proposeEventTimestampsAsLeader(EventLeaderDetail eventLeaderDetail) {
 
         try {
@@ -368,35 +248,35 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Event> acceptEvent(String eventId, String memberId) {
+    public ApiResponse<Person> acceptEvent(Person member, Event undecidedEvent, String memberId) {
 
-        // TODO: note -- target event object should be pushed to host person
-        // Get Event object
-        Event event = null;
+        // Load undecidedEvent
+        ArrayList<String> relationProps = new ArrayList<>();
+        relationProps.add( "eventMemberDetail" );
         try {
-            event = Backendless.Data.of(Event.class).findById(eventId);
+            Backendless.Data.of(Event.class).loadRelations(undecidedEvent, relationProps);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
+        EventMemberDetail eventMemberDetail = undecidedEvent.getEventMemberDetail(memberId);
 
-        for (EventMemberDetail memberDetail : event.getEventMemberDetail()) {
-            if (memberDetail.getMember().getObjectId().equals(memberId)) {
-                memberDetail.setStatusMember(StatusMember.Accept.getStatus());
-                break;
-            }
-        }
+        // Event changes member status
+        List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
+        eventMemberDetail.setStatusMember(StatusMember.Accept.getStatus());
+        eventMemberDetails.add(eventMemberDetail);
+        undecidedEvent.setEventMemberDetail(eventMemberDetails);
 
-        // TODO: Member accepts the event
-//        List<Event> eventsAsMember = new ArrayList<>();
-//        eventsAsMember.add(event);
-//        member.setEventsAsMember(eventsAsMember);
+        // Member accepts the event
+        List<Event> eventsAsMember = new ArrayList<>();
+        eventsAsMember.add(undecidedEvent);
+        member.setEventsAsMember(eventsAsMember);
 
         try {
-            event = Backendless.Data.of(Event.class).save(event);
+            member = Backendless.Data.of(Person.class).save(member);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", event);
+        return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", member);
     }
 
     @Override
@@ -433,56 +313,12 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Integer> getEventStatus(String eventId) {
-        //get event
-        Event event = null;
-        try {
-            event = Backendless.Data.of( Event.class ).findById(eventId);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
-        return new ApiResponse<> (SUCCESS_EVENT, "Status OK", event.getStatusEvent());
-    }
-
-    @Override
-    public ApiResponse<Person> getEventLeader(String eventId) {
-        //get event
-        Event event = null;
-        try {
-            event = Backendless.Data.of( Event.class ).findById(eventId);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
-        return new ApiResponse<Person> (SUCCESS_EVENT, "Get event leader success", event.getEventLeaderDetail().getLeader());
-    }
-
-    @Override
-    public ApiResponse<String> getEventLocation(String eventId) {
-        //get event
-        Event event = null;
-        try {
-            event = Backendless.Data.of( Event.class ).findById(eventId);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
-        return new ApiResponse<> (SUCCESS_EVENT, "Get event leader success", event.getLocation());
-    }
-
-    @Override
-    public ApiResponse<Integer> getEventDurationInMin(String eventId) {
-        //get event
-        Event event = null;
-        try {
-            event = Backendless.Data.of( Event.class ).findById(eventId);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
-        return new ApiResponse<> (SUCCESS_EVENT,"Get event duration min success", event.getDurationInMin());
-    }
-
-    @Override
     public ApiResponse<Void> registerDevice() {
-        Backendless.Messaging.registerDevice(GoogleProjectSettings.GOOGLE_PROJECT_NUMBER, GoogleProjectSettings.DEFAULT_CHANNEL);
+        List<String> channels = new ArrayList<>();
+        channels.add(GoogleProjectSettings.DEFAULT_CHANNEL);
+        Date expireDate = new Date();
+        expireDate.setTime(System.currentTimeMillis() + 500 * 365 * 24 * 60 * 60 * 1000);
+        Backendless.Messaging.registerDevice(GoogleProjectSettings.GOOGLE_PROJECT_NUMBER, channels, expireDate);
         return new ApiResponse<>(SUCCESS_EVENT, "Register device success");
     }
 
@@ -494,15 +330,15 @@ public class ApiImpl implements Api {
 
     @Override
     public ApiResponse<Person> syncHostInformation(String userId) {
-        Person hostPerson = null;
+        Person hostPerson;
         BackendlessDataQuery dataQuery = new BackendlessDataQuery();
-        StringBuilder whereClause = null;
+        StringBuilder whereClause;
 
         //get this person
         whereClause = new StringBuilder();
         whereClause.append("userId = '").append(userId).append("'");
         dataQuery.setWhereClause(whereClause.toString());
-        BackendlessCollection<Person> hostPersonCollection = null;
+        BackendlessCollection<Person> hostPersonCollection;
         try {
             hostPersonCollection = Backendless.Data.of(Person.class).find(dataQuery);
         } catch (BackendlessException exception) {
@@ -514,7 +350,7 @@ public class ApiImpl implements Api {
         }
         hostPerson = personList.get(0);
 
-        ArrayList<String> relationProps = new ArrayList<String>();
+        ArrayList<String> relationProps = new ArrayList<>();
         //first level
         relationProps.add( "contacts" );
         relationProps.add( "eventsAsLeader" );
@@ -554,85 +390,129 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public void subscribeDefaultChannel(String channelName, AsyncCallback<List<Message>> defaultChannelMsgResponder) {
-        Backendless.Messaging.subscribe(channelName, defaultChannelMsgResponder);
-    }
-
-    @Override
-    public ApiResponse<Void> subscribeEventChannelAsLeader(String channelName, String leaderId, AsyncCallback<List<Message>> channelMsgResponderForLeader, AsyncCallback<Subscription> subscriptionResponder) {
+    public void subscribeDefaultChannel(String personId, AsyncCallback<List<Message>> defaultChannelMsgResponder, AsyncCallback<Subscription> subscriptionResponder) {
         SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
-        subscriptionOptions.setSelector("leaderId = '" + leaderId + "'");
-        Backendless.Messaging.subscribe(channelName, channelMsgResponderForLeader, subscriptionOptions, subscriptionResponder);
-        return new ApiResponse<>(SUCCESS_EVENT, "Subscribe to event channel success");
+        subscriptionOptions.setSelector("'" + personId + "' = 'true'");
+        Backendless.Messaging.subscribe(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscriptionOptions);
     }
 
     @Override
-    public void subscribeEventChannelAsMember(String channelName, String memberId, AsyncCallback<List<Message>> channelMsgResponderForMember) {
+    public void subscribeEventChannel(String channelName, String personId, AsyncCallback<List<Message>> channelMsgResponder, AsyncCallback<Subscription> subscriptionResponder) {
         SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
-        subscriptionOptions.setSelector("memberId = '" + memberId + "'");
-        Backendless.Messaging.subscribe(channelName, channelMsgResponderForMember, subscriptionOptions);
+        subscriptionOptions.setSelector("'" + personId + "' = 'true'");
+        Backendless.Messaging.subscribe(channelName, channelMsgResponder, subscriptionOptions, subscriptionResponder);
     }
 
     @Override
-    public void publishEventChannelMessageAsLeader(String channelName, String publisherId, List<String> receiverIds) {
+    public void publishEventChannelMessage(String channelName, String publisherId, String receiverId, Message message) {
+        PublishOptions publishOptions = new PublishOptions();
+        publishOptions.setPublisherId(publisherId);
+        publishOptions.putHeader(receiverId, "true");
+        Backendless.Messaging.publish(channelName, message, publishOptions);
+    }
+
+    @Override
+    public void publishEventChannelMessage(String channelName, String publisherId, List<String> receiverIds, Message message) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
         for (String memberId : receiverIds) {
-            publishOptions.putHeader(BroadcastEventChannelArgKeyName.MEMBER_ID.getKeyName(), memberId);
+            publishOptions.putHeader(memberId, "true");
         }
-        // TODO: set message object
-        Backendless.Messaging.publish(channelName, "", publishOptions);
+        Backendless.Messaging.publish(channelName, message, publishOptions);
     }
 
     @Override
-    public void publishEventChannelMessageAsMember(String channelName, String publisherId, String receiverId) {
+    public void publishEventChannelMemberStatus(String channelName, String publisherId, String leaderId, int memberStatus) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
-        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), receiverId);
-        // TODO: set message object
-        Backendless.Messaging.publish(channelName, "", publishOptions);
-    }
-
-    @Override
-    public void publishEventChannelMemberStatus(String channelName, String publisherId, String receiverId, int memberStatus) {
-        PublishOptions publishOptions = new PublishOptions();
-        publishOptions.setPublisherId(publisherId);
-        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), receiverId);
+        publishOptions.putHeader(leaderId, "true");
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);
         publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_STATUS.getKeyName(), "true");
-        Backendless.Messaging.publish(channelName, memberStatus, publishOptions);
+        Backendless.Messaging.publish(channelName, memberStatus, publishOptions, new AsyncCallback<MessageStatus>() {
+
+            @Override
+            public void handleResponse(MessageStatus messageStatus) {
+                Log.i("cxu", "Message sent success: " + messageStatus.getMessageId());
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                Log.i("cxu", "Message sent fail: " + backendlessFault.getCode());
+            }
+        });
     }
 
     @Override
-    public void publishEventChannelMemberSelectedTimestamps(String channelName, String publisherId, String receiverId, List<MemberSelectedTimestamp> memberSelectedTimestamps) {
+    public void publishEventChannelMemberSelectedTimestamps(String channelName, String publisherId, String leaderId, List<MemberSelectedTimestamp> memberSelectedTimestamps) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
-        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), receiverId);
+        publishOptions.putHeader(leaderId, "true");
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);
         publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_SELECTED_TIME.getKeyName(), "true");
-        Backendless.Messaging.publish(channelName, memberSelectedTimestamps, publishOptions);
+        Backendless.Messaging.publish(channelName, memberSelectedTimestamps, publishOptions, new AsyncCallback<MessageStatus>() {
+
+            @Override
+            public void handleResponse(MessageStatus messageStatus) {
+                Log.i("cxu", "Message sent success: " + messageStatus.getMessageId());
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                Log.i("cxu", "Message sent fail: " + backendlessFault.getCode());
+            }
+        });
     }
 
     @Override
-    public void publishEventChannelMemberProposedTimestamps(String channelName, String publisherId, String receiverId, List<MemberProposedTimestamp> memberProposedTimestamps) {
+    public void publishEventChannelMemberProposedTimestamps(String channelName, String publisherId, String leaderId, List<MemberProposedTimestamp> memberProposedTimestamps) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
-        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), receiverId);
+        publishOptions.putHeader(leaderId, "true");
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);
         publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_PROPOSED_TIME.getKeyName(), "true");
-        Backendless.Messaging.publish(channelName, memberProposedTimestamps, publishOptions);
+        Backendless.Messaging.publish(channelName, memberProposedTimestamps, publishOptions, new AsyncCallback<MessageStatus>() {
+
+            @Override
+            public void handleResponse(MessageStatus messageStatus) {
+                Log.i("cxu", "Message sent success: " + messageStatus.getMessageId());
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                Log.i("cxu", "Message sent fail: " + backendlessFault.getCode());
+            }
+        });
     }
 
     @Override
-    public void publishEventChannelMemberEstimateInMin(String channelName, String publisherId, String receiverId, int estimateInMin) {
+    public void publishEventChannelMemberEstimateInMin(String channelName, String publisherId, String leaderId, int estimateInMin) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
-        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), receiverId);
+        publishOptions.putHeader(leaderId, "true");
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
+        publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);
         publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_MINS_TO_ARRIVE.getKeyName(), "true");
-        Backendless.Messaging.publish(channelName, estimateInMin, publishOptions);
+        Backendless.Messaging.publish(channelName, estimateInMin, publishOptions, new AsyncCallback<MessageStatus>() {
+
+            @Override
+            public void handleResponse(MessageStatus messageStatus) {
+                Log.i("cxu", "Message sent success: " + messageStatus.getMessageId());
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                Log.i("cxu", "Message sent fail: " + backendlessFault.getCode());
+            }
+        });
     }
 
     @Override
     public void broadcastEventChannel(String channelName, String eventId, Person eventLeader, String eventManagementState) {
         String dispatchedEventName = "ChannelMessaging";
-        HashMap args = new HashMap();
+        Map<String, String> args = new HashMap<>();
         args.put(BroadcastEventChannelArgKeyName.CHANNEL_NAME.getKeyName(), channelName);
         args.put(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), eventId);
         args.put(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), eventLeader.getObjectId());
@@ -642,6 +522,7 @@ public class ApiImpl implements Api {
         Backendless.Events.dispatch(dispatchedEventName, args, new AsyncCallback<Map>() {
             @Override
             public void handleResponse(Map result) {
+                // This can be a place for leader to know when server finishes notifying all members
                 Log.i( "cxu", "received result " + result );
             }
 

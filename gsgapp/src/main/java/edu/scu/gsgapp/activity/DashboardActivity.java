@@ -10,13 +10,24 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.backendless.Backendless;
+import com.backendless.Subscription;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessException;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.messaging.SubscriptionOptions;
+
 import edu.scu.core.ActionCallbackListener;
+import edu.scu.core.callback.DefaultChannelMessageResponder;
 import edu.scu.gsgapp.R;
+import edu.scu.util.lib.GoogleProjectSettings;
 
 /**
  * Created by chuanxu on 4/16/16.
  */
 public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLayout.OnRefreshListener{
+
+    private static boolean isSyncFinish = false;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private Toolbar toolbar;
@@ -34,6 +45,67 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         initFragment();
 
         getData();
+        startDefaultChannelSubscriptionAsycTask();
+    }
+
+    private void startDefaultChannelSubscriptionAsycTask() {
+//        new AsyncTask<Void, Void, Void>() {
+//            @Override
+//            protected Void doInBackground(Void... params) {
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                boolean hasSubscribed = false;
+
+                while (!hasSubscribed) {
+                    try {
+                        Thread.sleep(100);
+
+                        if (isSyncFinish) {
+                            isSyncFinish = false;
+                            hasSubscribed = true;
+                            String hostPersonObjectId = appAction.getHostPerson().getObjectId();
+
+                            final DefaultChannelMessageResponder defaultChannelMsgResponder = new DefaultChannelMessageResponder(hostPersonObjectId, appAction.getUndecidedEventList());
+
+                            SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
+                            String selector = "'" + hostPersonObjectId + "' = 'true'";
+                            subscriptionOptions.setSelector(selector);
+
+                            Backendless.Messaging.subscribe(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscriptionOptions, new AsyncCallback<Subscription>() {
+
+                                @Override
+                                public void handleResponse(Subscription subscription) {
+                                    appAction.addToChannelMap(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscription);
+                                    Toast.makeText(context, "Subscribe to default channel success", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void handleFault(BackendlessFault backendlessFault) {
+                                    Toast.makeText(context, "Subscribe to default channel fail: " + backendlessFault.getCode(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            break;
+                        }
+                    } catch (BackendlessException | InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (hasSubscribed) {
+                            break;
+                        }
+                    }
+
+                }
+
+                Thread.yield();
+            }
+        }).start();
+//                return null;
+//            }
+//        }.execute();
     }
 
     @Override
@@ -45,16 +117,8 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
     }
 
     private void initFragment() {
-        // prepare the argument
-        Bundle bundle = new Bundle();
-        // TODO: pass host person object to fragment
-        //bundle.putSerializable(Person.SERIALIZE_KEY, appAction.getHostPerson());
         DashboardCalendarFragment dashboardCalendarFragment = new DashboardCalendarFragment();
-        dashboardCalendarFragment.setArguments(bundle);
-
-        getFragmentManager().beginTransaction()
-                .replace(R.id.dashboard_container, dashboardCalendarFragment)
-                .commit();
+        getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardCalendarFragment).commit();
     }
 
     private void initWidgetable() {
@@ -118,41 +182,19 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
     }
 
     private void switchFragment(String fragmentName) {
-        Bundle bundle = new Bundle();
 
         switch (fragmentName) {
             case "calendar":
-                // prepare the argument
-                // TODO: pass args to pass
-                //bundle.putSerializable(Person.SERIALIZE_KEY, appAction.getHostPerson());
                 DashboardCalendarFragment dashboardCalendarFragment = new DashboardCalendarFragment();
-                dashboardCalendarFragment.setArguments(bundle);
-
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.dashboard_container, dashboardCalendarFragment)
-                        .commit();
+                getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardCalendarFragment).commit();
                 break;
             case "events":
-                // prepare the argument
-                // TODO: pass args to pass
-                //bundle.putSerializable(Person.SERIALIZE_KEY, appAction.getHostPerson());
                 DashboardEventFragment dashboardEventFragment = new DashboardEventFragment();
-                dashboardEventFragment.setArguments(bundle);
-
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.dashboard_container, dashboardEventFragment)
-                        .commit();
+                getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardEventFragment).commit();
                 break;
             case "me":
-                // prepare the argument
-                // TODO: pass args to pass
-                //bundle.putSerializable(Person.SERIALIZE_KEY, appAction.getHostPerson());
                 DashboardMeFragment dashboardMeFragment = new DashboardMeFragment();
-                dashboardMeFragment.setArguments(bundle);
-
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.dashboard_container, dashboardMeFragment)
-                        .commit();
+                getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardMeFragment).commit();
                 break;
             default:
                 assert false;
@@ -191,6 +233,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
             public void onSuccess(Void data) {
                 progressDialog.cancel();
                 Toast.makeText(context, "Sync with server success", Toast.LENGTH_SHORT).show();
+                isSyncFinish = true;
             }
 
             @Override
