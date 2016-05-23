@@ -16,11 +16,9 @@ import edu.scu.model.Event;
  */
 public class DefaultChannelMessageResponder implements AsyncCallback<List<Message>> {
 
-    private String personId;
     private List<Event> undecidedEventList;
 
-    public DefaultChannelMessageResponder(String personId, List<Event> undecidedEventList) {
-        this.personId = personId;
+    public DefaultChannelMessageResponder(List<Event> undecidedEventList) {
         this.undecidedEventList = undecidedEventList;
     }
 
@@ -28,10 +26,6 @@ public class DefaultChannelMessageResponder implements AsyncCallback<List<Messag
     public void handleResponse(List<Message> messages) {
 
         for (Message message : messages) {
-            if (!message.getHeaders().get(personId).equals("true")) {
-                continue;
-            }
-
             Map<String, Object> eventDataMap = ((Map<String, Object>) message.getData());
 
             Event undecidedEvent = new Event();

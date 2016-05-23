@@ -103,7 +103,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         subscriptionOptions.setSelector(selector);
 
         // Resubscribe default channel
-        DefaultChannelMessageResponder defaultChannelMsgResponder = new DefaultChannelMessageResponder(hostPersonObjectId, appAction.getUndecidedEventList());
+        DefaultChannelMessageResponder defaultChannelMsgResponder = new DefaultChannelMessageResponder(appAction.getUndecidedEventList());
         resubscribeChannel(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscriptionOptions);
 
         // Resubscribe all event channels as leader
