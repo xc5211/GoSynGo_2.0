@@ -15,11 +15,17 @@ import com.backendless.Subscription;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessException;
 import com.backendless.exceptions.BackendlessFault;
+import com.backendless.messaging.Message;
 import com.backendless.messaging.SubscriptionOptions;
+
+import java.util.List;
 
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.core.callback.DefaultChannelMessageResponder;
+import edu.scu.core.callback.EventChannelMessageLeaderResponder;
+import edu.scu.core.callback.EventChannelMessageMemberResponder;
 import edu.scu.gsgapp.R;
+import edu.scu.model.Event;
 import edu.scu.util.lib.GoogleProjectSettings;
 
 /**
@@ -69,25 +75,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
                             hasSubscribed = true;
                             String hostPersonObjectId = appAction.getHostPerson().getObjectId();
 
-                            final DefaultChannelMessageResponder defaultChannelMsgResponder = new DefaultChannelMessageResponder(hostPersonObjectId, appAction.getUndecidedEventList());
-
-                            SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
-                            String selector = "'" + hostPersonObjectId + "' = 'true'";
-                            subscriptionOptions.setSelector(selector);
-
-                            Backendless.Messaging.subscribe(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscriptionOptions, new AsyncCallback<Subscription>() {
-
-                                @Override
-                                public void handleResponse(Subscription subscription) {
-                                    appAction.addToChannelMap(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscription);
-                                    Toast.makeText(context, "Subscribe to default channel success", Toast.LENGTH_SHORT).show();
-                                }
-
-                                @Override
-                                public void handleFault(BackendlessFault backendlessFault) {
-                                    Toast.makeText(context, "Subscribe to default channel fail: " + backendlessFault.getCode(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            resubscribeAllChannels(hostPersonObjectId);
                             break;
                         }
                     } catch (BackendlessException | InterruptedException e) {
@@ -106,6 +94,45 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
 //                return null;
 //            }
 //        }.execute();
+    }
+
+    private void resubscribeAllChannels(String hostPersonObjectId) {
+
+        SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
+        String selector = "'" + hostPersonObjectId + "' = 'true'";
+        subscriptionOptions.setSelector(selector);
+
+        // Resubscribe default channel
+        DefaultChannelMessageResponder defaultChannelMsgResponder = new DefaultChannelMessageResponder(hostPersonObjectId, appAction.getUndecidedEventList());
+        resubscribeChannel(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscriptionOptions);
+
+        // Resubscribe all event channels as leader
+        for (Event event : hostPerson.getEventsAsLeader()) {
+            EventChannelMessageLeaderResponder channelMessageLeaderResponder = new EventChannelMessageLeaderResponder(appAction.getHostPerson());
+            resubscribeChannel(event.getObjectId(), channelMessageLeaderResponder, subscriptionOptions);
+        }
+
+        // Resubscribe all event channels as member
+        for (Event event : hostPerson.getEventsAsMember()) {
+            EventChannelMessageMemberResponder channelMessageMemberResponder = new EventChannelMessageMemberResponder();
+            resubscribeChannel(event.getObjectId(), channelMessageMemberResponder, subscriptionOptions);
+        }
+    }
+
+    private void resubscribeChannel(String channelName, final AsyncCallback<List<Message>> channelMessageResponder, SubscriptionOptions subscriptionOptions) {
+        Backendless.Messaging.subscribe(channelName, channelMessageResponder, subscriptionOptions, new AsyncCallback<Subscription>() {
+
+            @Override
+            public void handleResponse(Subscription subscription) {
+                appAction.addToChannelMap(GoogleProjectSettings.DEFAULT_CHANNEL, channelMessageResponder, subscription);
+                Toast.makeText(context, "Resubscribe to channel success: " + subscription.getSubscriptionId(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                Toast.makeText(context, "Resubscribe to channel fail: " + backendlessFault.getCode(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
