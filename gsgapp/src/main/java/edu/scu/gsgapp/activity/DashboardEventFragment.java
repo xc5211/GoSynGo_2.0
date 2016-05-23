@@ -42,8 +42,8 @@ public class DashboardEventFragment extends Fragment {
 
         ListView eventsReadyListView = (ListView) inflater.inflate(R.layout.fragment_event_listing, null).findViewById(R.id.list_view_fragment_event);
         ListView eventsNotReadyListView = (ListView) inflater.inflate(R.layout.fragment_event_listing, null).findViewById(R.id.list_view_fragment_event);
-        eventsReadyListView.setAdapter(new EventListViewAdapter(container.getContext(), R.layout.fragment_event_view_pager_custom_row, eventsReady));
-        eventsNotReadyListView.setAdapter(new EventListViewAdapter(container.getContext(), R.layout.fragment_event_view_pager_custom_row, eventsNotReady));
+        eventsReadyListView.setAdapter(new EventListViewAdapter(container.getContext(), R.layout.fragment_event_ready_view_pager_custom_row, eventsReady));
+        eventsNotReadyListView.setAdapter(new EventListViewAdapter(container.getContext(), R.layout.fragment_event_ready_view_pager_custom_row, eventsNotReady));
 
         ListView[] pagesView = new ListView[2];
         pagesView[0] = eventsReadyListView;

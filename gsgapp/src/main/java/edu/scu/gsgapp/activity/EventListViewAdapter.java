@@ -39,17 +39,32 @@ public class EventListViewAdapter extends ArrayAdapter<Event> {
     }
 
     private View setEventRow(LayoutInflater inflater, android.view.View row, int position, ViewGroup parent) {
-        row = inflater.inflate(R.layout.fragment_event_view_pager_custom_row, parent, false);
+//        row = inflater.inflate(R.layout.fragment_event_ready_view_pager_custom_row, parent, false);
 
-        TextView textViewTime = (TextView) row.findViewById(R.id.text_view_fragment_event_view_pager_custom_event_row_time);
-        textViewTime.setText(events.get(position).getTimestamp().toString());
+        if (position == 1) {
+            row = inflater.inflate(R.layout.fragment_event_ready_view_pager_custom_row, parent, false);
+            TextView textViewTime = (TextView) row.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_event_row_time);
+            textViewTime.setText(events.get(position).getTimestamp().toString());
 
-        TextView textViewTitle = (TextView) row.findViewById(R.id.text_view_fragment_event_view_pager_custom_row_event_title);
-        textViewTitle.setText(events.get(position).getTitle());
+            TextView textViewTitle = (TextView) row.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_title);
+            textViewTitle.setText(events.get(position).getTitle());
 
-        TextView textViewStatus = (TextView) row.findViewById(R.id.text_view_fragment_event_view_pager_custom_row_event_status);
-        String statusString = getStatusString(events.get(position));
-        textViewStatus.setText(statusString);
+            TextView textViewStatus = (TextView) row.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_status);
+            String statusString = getStatusString(events.get(position));
+            textViewStatus.setText(statusString);
+
+        } else if(position == 0){
+            row = inflater.inflate(R.layout.fragment_event_not_ready_view_pager_custom_row, parent, false);
+            TextView textViewTitle = (TextView) row.findViewById(R.id.text_view_fragment_event_not_ready_view_pager_custom_row_event_title);
+            textViewTitle.setText(events.get(position).getTitle());
+
+            TextView textViewStatus = (TextView) row.findViewById(R.id.text_view_fragment_event_not_ready_view_pager_custom_row_event_status);
+            String statusString = getStatusString(events.get(position));
+            textViewStatus.setText(statusString);
+        }else {
+            assert false;
+        }
+
         return row;
     }
 
