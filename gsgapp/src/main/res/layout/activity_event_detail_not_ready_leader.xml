@@ -4,6 +4,6 @@
     android:layout_height="match_parent">
 
 
-    <include layout="@layout/content_view_ready_event_details_as_member" />
+    <include layout="@layout/content_event_detail_not_ready_leader" />
 
 </LinearLayout>

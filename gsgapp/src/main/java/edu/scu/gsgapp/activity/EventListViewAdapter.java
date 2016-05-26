@@ -27,45 +27,46 @@ public class EventListViewAdapter extends ArrayAdapter<Event> {
     }
 
     @Override
-    public View getView(int position, android.view.View convertView, ViewGroup parent) {
+    public View getView(int position, View view, ViewGroup parent) {
 
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        android.view.View row = convertView;
 
-        if (convertView == null) {
-            row = setEventRow(inflater, row, position, parent);
+        if (view == null) {
+            view = setEventRow(inflater, view, position, parent);
         }
-        return row;
+        return view;
     }
 
-    private View setEventRow(LayoutInflater inflater, android.view.View row, int position, ViewGroup parent) {
-//        row = inflater.inflate(R.layout.fragment_event_ready_view_pager_custom_row, parent, false);
+    private View setEventRow(LayoutInflater inflater, View rowView, int position, final ViewGroup parent) {
+
+        final Event event = events.get(position);
 
         if (position == 1) {
-            row = inflater.inflate(R.layout.fragment_event_ready_view_pager_custom_row, parent, false);
-            TextView textViewTime = (TextView) row.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_event_row_time);
-            textViewTime.setText(events.get(position).getTimestamp().toString());
+            rowView = inflater.inflate(R.layout.fragment_event_ready_view_pager_custom_row, parent, false);
+            TextView textViewTime = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_event_row_time);
+            textViewTime.setText(event.getTimestamp().toString());
 
-            TextView textViewTitle = (TextView) row.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_title);
-            textViewTitle.setText(events.get(position).getTitle());
+            TextView textViewTitle = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_title);
+            textViewTitle.setText(event.getTitle());
 
-            TextView textViewStatus = (TextView) row.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_status);
-            String statusString = getStatusString(events.get(position));
+            TextView textViewStatus = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_status);
+            String statusString = getStatusString(event);
             textViewStatus.setText(statusString);
 
-        } else if(position == 0){
-            row = inflater.inflate(R.layout.fragment_event_not_ready_view_pager_custom_row, parent, false);
-            TextView textViewTitle = (TextView) row.findViewById(R.id.text_view_fragment_event_not_ready_view_pager_custom_row_event_title);
-            textViewTitle.setText(events.get(position).getTitle());
+        } else if (position == 0) {
 
-            TextView textViewStatus = (TextView) row.findViewById(R.id.text_view_fragment_event_not_ready_view_pager_custom_row_event_status);
-            String statusString = getStatusString(events.get(position));
+            rowView = inflater.inflate(R.layout.fragment_event_not_ready_view_pager_custom_row, parent, false);
+            TextView textViewTitle = (TextView) rowView.findViewById(R.id.text_view_fragment_event_not_ready_view_pager_custom_row_event_title);
+            textViewTitle.setText(event.getTitle());
+
+            TextView textViewStatus = (TextView) rowView.findViewById(R.id.text_view_fragment_event_not_ready_view_pager_custom_row_event_status);
+            String statusString = getStatusString(event);
             textViewStatus.setText(statusString);
-        }else {
+
+        } else {
             assert false;
         }
-
-        return row;
+        return rowView;
     }
 
     private String getStatusString(Event event) {
@@ -87,8 +88,4 @@ public class EventListViewAdapter extends ArrayAdapter<Event> {
         return statusString;
     }
 
-//    @Override
-//    public boolean isViewFromObject(Event view, Object object) {
-//        return false;
-//    }
 }

@@ -1,11 +1,13 @@
 package edu.scu.gsgapp.activity;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -42,8 +44,38 @@ public class DashboardEventFragment extends Fragment {
 
         ListView eventsReadyListView = (ListView) inflater.inflate(R.layout.fragment_event_listing, null).findViewById(R.id.list_view_fragment_event);
         ListView eventsNotReadyListView = (ListView) inflater.inflate(R.layout.fragment_event_listing, null).findViewById(R.id.list_view_fragment_event);
+
         eventsReadyListView.setAdapter(new EventListViewAdapter(container.getContext(), R.layout.fragment_event_ready_view_pager_custom_row, eventsReady));
+        eventsReadyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent intent = new Intent(parent.getContext(), EventDetailActivity.class);
+                //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bundle = new Bundle();
+                Event event = (Event) parent.getAdapter().getItem(position);
+                bundle.putString("eventId", event.getObjectId());
+                bundle.putString("eventState", "Ready");
+                intent.putExtras(bundle);
+                parent.getContext().startActivity(intent);
+            }
+        });
+
         eventsNotReadyListView.setAdapter(new EventListViewAdapter(container.getContext(), R.layout.fragment_event_not_ready_view_pager_custom_row, eventsNotReady));
+        eventsNotReadyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent intent = new Intent(parent.getContext(), EventDetailActivity.class);
+                // intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Bundle bundle = new Bundle();
+                Event event = (Event) parent.getAdapter().getItem(position);
+                bundle.putString("eventId", event.getObjectId());
+                bundle.putString("eventState", "NotReady");
+                intent.putExtras(bundle);
+                parent.getContext().startActivity(intent);
+            }
+        });
 
         ListView[] pagesView = new ListView[2];
         pagesView[0] = eventsReadyListView;
