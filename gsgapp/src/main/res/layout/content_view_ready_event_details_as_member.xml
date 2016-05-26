@@ -17,7 +17,7 @@
             android:id="@+id/edit_text_view_ready_event_detail_as_member_title"
             android:hint="Title:"
             android:text="Annual Meeting"
-            android:textSize="30dp"
+            android:textSize="30sp"
             android:textStyle="bold"
             android:layout_marginTop="10dp" />
     </LinearLayout>
@@ -107,7 +107,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:weight="1"
         android:id="@+id/text_view_ready_event_detail_as_member_participant">
 
 
@@ -116,7 +115,7 @@
             android:layout_height="wrap_content"
             android:text="Participants:"
             android:id="@+id/textView2"
-            android:textSize="30dp" />
+            android:textSize="30sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -168,7 +167,7 @@
             android:text="check In"
             android:id="@+id/button_propose_event_send_invitation"
             android:background="#FEE70B"
-            android:textSize="30dp" />
+            android:textSize="30sp" />
 
     </LinearLayout>
 

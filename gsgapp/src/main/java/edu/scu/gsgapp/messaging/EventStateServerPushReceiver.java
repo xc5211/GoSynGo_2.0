@@ -1,12 +1,17 @@
 package edu.scu.gsgapp.messaging;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 
+import com.backendless.messaging.PublishOptions;
 import com.backendless.push.BackendlessBroadcastReceiver;
 
 import edu.scu.core.AppAction;
 import edu.scu.gsgapp.GsgApplication;
+import edu.scu.gsgapp.R;
 import edu.scu.gsgapp.activity.DashboardActivity;
 import edu.scu.model.Person;
 import edu.scu.model.enumeration.BroadcastEventChannelArgKeyName;
@@ -83,6 +88,8 @@ import edu.scu.model.enumeration.EventManagementState;
  */
 public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
 
+    private static int notificationId;
+
     private Context context;
     private GsgApplication gsgApplication;
     private AppAction appAction;
@@ -92,26 +99,40 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
     @Override
     public boolean onMessage(Context context, Intent intent) {
 
-        this.context = context;
-        this.gsgApplication = (GsgApplication) context.getApplicationContext();
-        this.appAction = gsgApplication.getAppAction();
-        this.hostPerson = appAction.getHostPerson();
-        this.hostPersonId = hostPerson.getObjectId();
+//        // Handle server or leader triggered event
+//        String eventManagementState = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_MANAGEMENT_STATE.getKeyName());
+//        if (eventManagementState == null) {
+//            handleServerTriggeredNotification(intent);
+//        } else {
+//            handleLeaderTriggeredNotification(intent, eventManagementState);
+//        }
 
-        // Reject if not for host
-        boolean isPushForHostPerson = intent.getStringExtra(hostPersonId).equals("true");
-        if (!isPushForHostPerson) {
-            return false;
-        }
+        Intent notificationIntent = context.getPackageManager().getLaunchIntentForPackage(context.getApplicationInfo().packageName);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 
-        // Handle server or leader triggered event
-        String eventManagementState = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_MANAGEMENT_STATE.getKeyName());
-        if (eventManagementState == null) {
-            handleServerTriggeredNotification(intent);
-        } else {
-            handleLeaderTriggeredNotification(intent, eventManagementState);
-        }
-        return super.onMessage(context, intent);
+        int icon = context.getApplicationInfo().icon;
+        String title = context.getResources().getString(R.string.app_name);
+        String message = intent.getStringExtra(PublishOptions.ANDROID_CONTENT_TEXT_TAG);
+
+        final NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(icon)
+                        .setContentTitle(title)
+                        .setContentText(message)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                        .addAction(0, "View", contentIntent)
+                        .setAutoCancel(true)
+                        .setDefaults(new NotificationCompat().DEFAULT_VIBRATE)
+                        .setDefaults(new NotificationCompat().DEFAULT_SOUND);
+//                        .setSound(Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.notification1));
+
+        mBuilder.setContentIntent(contentIntent);
+
+        NotificationManager mNotifM = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotifM.notify(notificationId++, mBuilder.build());
+
+        return false;
+//        return super.onMessage(context, intent);
     }
 
     private void handleLeaderTriggeredNotification(Intent intent, String eventManagementState) {
