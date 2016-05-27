@@ -101,7 +101,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
     private void resubscribeAllChannels(String hostPersonObjectId) {
 
         SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
-        String selector = "'" + hostPersonObjectId + "' = 'true'";
+        String selector = "receiverId" + hostPersonObjectId.replace("-", "") + " = 'true'";
         subscriptionOptions.setSelector(selector);
 
         // Resubscribe default channel
