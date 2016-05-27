@@ -1,5 +1,6 @@
 package edu.scu.gsgapp.activity;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -202,20 +203,40 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         this.calendarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Fragment calendarFragment = getFragmentManager().findFragmentByTag("CALENDAR");
+                if (calendarFragment != null && calendarFragment.isVisible()) {
+                    return;
+                }
+
                 switchFragment("calendar");
             }
         });
 
         this.eventsButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+
+                Fragment eventsFragment = getFragmentManager().findFragmentByTag("EVENTS");
+                if (eventsFragment != null && eventsFragment.isVisible()) {
+                    return;
+                }
+
                 switchFragment("events");
             }
         });
 
         this.meButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+
+                Fragment meFragment = getFragmentManager().findFragmentByTag("ME");
+                if (meFragment != null && meFragment.isVisible()) {
+                    return;
+                }
+
                 switchFragment("me");
             }
         });
@@ -227,15 +248,15 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         switch (fragmentName) {
             case "calendar":
                 DashboardCalendarFragment dashboardCalendarFragment = new DashboardCalendarFragment();
-                getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardCalendarFragment).commit();
+                getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardCalendarFragment, "CALENDAR").commit();
                 break;
             case "events":
                 DashboardEventFragment dashboardEventFragment = new DashboardEventFragment();
-                getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardEventFragment).commit();
+                getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardEventFragment, "EVENTS").commit();
                 break;
             case "me":
                 DashboardMeFragment dashboardMeFragment = new DashboardMeFragment();
-                getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardMeFragment).commit();
+                getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardMeFragment, "ME").commit();
                 break;
             default:
                 assert false;
