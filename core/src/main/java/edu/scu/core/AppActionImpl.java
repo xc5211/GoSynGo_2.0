@@ -296,6 +296,9 @@ public class AppActionImpl implements AppAction {
         if (targetEvent.hasEventMember(memberEmail)) {
             listener.onFailure(memberEmail + " has been added to current event");
             return;
+        } else if (hostPerson.getEmail().equals(memberEmail)) {
+            listener.onFailure("You are already in this event");
+            return;
         }
         Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
 
