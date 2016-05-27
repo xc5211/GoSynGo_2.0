@@ -295,6 +295,7 @@ public class AppActionImpl implements AppAction {
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
         if (targetEvent.hasEventMember(memberEmail)) {
             listener.onFailure(memberEmail + " has been added to current event");
+            return;
         }
         Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
 
