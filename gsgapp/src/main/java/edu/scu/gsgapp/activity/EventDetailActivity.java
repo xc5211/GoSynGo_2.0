@@ -2,13 +2,35 @@ package edu.scu.gsgapp.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import edu.scu.gsgapp.R;
+import edu.scu.model.Event;
 
 /**
  * Created by chuanxu on 5/26/16.
  */
 public class EventDetailActivity extends GsgBaseActivity {
+
+    // Common
+    private Toolbar toolbar;
+    // Leader not ready
+    private EditText locationEditText;
+    private EditText noteEditText;
+    private Spinner durationSpinner;
+    private Spinner reminderSpinner;
+    private Button cancelButton;
+    // Member not ready
+
+    // Ready
+
+
+    private Event event;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -17,38 +39,99 @@ public class EventDetailActivity extends GsgBaseActivity {
         Intent intent = getIntent();
         String eventId = intent.getStringExtra("eventId");
         String eventState = intent.getStringExtra("eventState");
-        String hostRole = isEventLeader(eventId) ? "leader" : "member";
+
+        boolean isEventLeader = isEventLeader(eventId);
+        String hostRole = isEventLeader ? "leader" : "member";
+        event = isEventLeader ? appAction.getHostPerson().getEventAsLeader(eventId) : appAction.getHostPerson().getEventAsMember(eventId);
 
         String eventDetailProperty = hostRole + eventState;
         switch (eventDetailProperty) {
             case "leaderNotReady":
                 setContentView(R.layout.activity_event_detail_not_ready_leader);
-                initWidgetable();
-                initListener();
+                initWidgetable(eventDetailProperty);
+                initListener(eventDetailProperty);
                 break;
             case "memberNotReady":
                 setContentView(R.layout.activity_event_detail_not_ready_member);
-                initWidgetable();
-                initListener();
+                initWidgetable(eventDetailProperty);
+                initListener(eventDetailProperty);
                 break;
             default:    // "leaderReady" || "memberReady"
                 setContentView(R.layout.activity_event_detail_ready);
-                initWidgetable();
-                initListener();
+                initWidgetable(eventDetailProperty);
+                initListener(eventDetailProperty);
                 break;
         }
     }
 
     private boolean isEventLeader(String eventId) {
-        boolean isEventLeader = hostPerson.getEventAsLeader(eventId) != null;
+        boolean isEventLeader = appAction.getHostPerson().getEventAsLeader(eventId) != null;
         return isEventLeader;
     }
 
-    private void initWidgetable() {
+    private void initWidgetable(String eventDetailProperty) {
 
+        initWidgetableCommon();
+
+        switch (eventDetailProperty) {
+            case "leaderNotReady":
+
+                ((TextView) findViewById(R.id.toolbar_event_detail_not_ready_leader_title)).setText(event.getTitle());
+
+                this.locationEditText = (EditText) findViewById(R.id.edit_text_event_detail_not_ready_leader_location);
+                this.locationEditText.setText(event.getLocation());
+
+                this.noteEditText = (EditText) findViewById(R.id.edit_text_event_detail_not_ready_leader_note);
+                this.noteEditText.setText(event.getNote());
+
+                this.durationSpinner = (Spinner) findViewById(R.id.spinner_event_detail_not_ready_leader_duration);
+                Integer[] durations = { 15, 30, 45, 60 };
+                ArrayAdapter<Integer> durationSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, durations);
+                durationSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                this.durationSpinner.setAdapter(durationSpinnerArrayAdapter);
+
+                this.reminderSpinner = (Spinner) findViewById(R.id.spinner_event_detail_not_ready_leader_reminder);
+                Integer[] reminders = { 0, 15, 30, 45, 60 };
+                ArrayAdapter<Integer> remindSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, durations);
+                remindSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                this.reminderSpinner.setAdapter(remindSpinnerArrayAdapter);
+
+                this.cancelButton = (Button) findViewById(R.id.button_event_detail_not_ready_leader_cancel);
+                break;
+
+            case "memberNotReady":
+
+                break;
+
+            default:    // "leaderReady" || "memberReady"
+
+                break;
+        }
     }
 
-    private void initListener() {
+    private void initWidgetableCommon() {
+        this.toolbar = (Toolbar) findViewById(R.id.toolbar_event_detail_not_ready_leader);
+        //this.toolbar.setTitle(event.getTitle());
+    }
+
+    private void initListener(String eventDetailProperty) {
+
+        initListenerCommon();
+
+        switch (eventDetailProperty) {
+            case "leaderNotReady":
+
+                break;
+            case "memberNotReady":
+
+                break;
+            default:    // "leaderReady" || "memberReady"
+
+                break;
+        }
+    }
+
+    private void initListenerCommon() {
 
     }
 

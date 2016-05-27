@@ -1,105 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <LinearLayout
-        android:orientation="vertical"
+    <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1">
+        android:layout_height="?attr/actionBarSize"
+        android:id="@+id/toolbar_event_detail_not_ready_leader"
+        android:background="@color/title_background_color">
 
-        <EditText
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/edit_text_view_ready_event_detail_as_member_title"
-            android:hint="Title:"
+            android:textSize="20sp"
             android:text="Annual Meeting"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:layout_marginTop="10dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1" >
-
-        <ImageView
-            android:layout_width="31dp"
-            android:layout_height="31dp"
-            android:id="@+id/imageView6"
-            android:src="@android:drawable/ic_lock_idle_alarm" />
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/edit_text_view_ready_event_detail_as_member_time"
-            android:layout_weight="1"
-            android:hint="Note"
-            android:text="Time: 13pm, June 1st, 2016" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:weightSum="1">
-
-        <ImageView
-            android:layout_width="31dp"
-            android:layout_height="33dp"
-            android:id="@+id/imageView2"
-            android:src="@drawable/temp_map_icon" />
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/edit_text_view_ready_event_detail_as_member_location"
-            android:layout_gravity="center_horizontal"
-            android:hint="Location:"
-            android:text="300H, Lucas Hall, 455 El Camino Real"
-            android:layout_weight="0.73" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1">
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/edit_text_view_ready_event_detail_as_member_note"
-            android:layout_weight="1"
-            android:hint="Note"
-            android:text="Note:     Please bring your own laptop" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1">
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/edit_text_view_ready_event_detail_as_member_duration"
-            android:layout_weight="0.06"
-            android:hint="duration in min"
-            android:text="Durantion:         30min" />
-
-    </LinearLayout>
+            android:id="@+id/toolbar_event_detail_not_ready_leader_title"
+            android:textColor="@color/title_text_color"
+            android:layout_gravity="center" />
+    </android.support.v7.widget.Toolbar>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -107,15 +27,115 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:id="@+id/text_view_ready_event_detail_as_member_participant">
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp">
 
-
-        <TextView
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Participants:"
-            android:id="@+id/textView2"
-            android:textSize="30sp" />
+            android:id="@+id/imageView2"
+            android:src="@drawable/temp_map_icon"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_text_event_detail_not_ready_leader_location"
+            android:layout_gravity="center_vertical"
+            android:hint="Location:"
+            android:text="300H, Lucas Hall, 455 El Camino Real"
+            android:layout_weight="4"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical"
+        android:layout_weight="1"
+        android:layout_marginEnd="7dp"
+        android:layout_marginRight="7dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Note: "
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="7dp"
+            android:layout_marginStart="7dp"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_text_event_detail_not_ready_leader_note"
+            android:layout_weight="4"
+            android:textSize="14sp"
+            android:text="Please bring your own laptop" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Duration: "
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="7dp"
+            android:layout_marginStart="7dp"/>
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/spinner_event_detail_not_ready_leader_duration"
+            android:layout_weight="1"
+            android:gravity="left|center_vertical">
+        </Spinner>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Remind ahead:"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical" />
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/spinner_event_detail_not_ready_leader_reminder"
+            android:layout_weight="1"
+            android:gravity="left|center_vertical">
+        </Spinner>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="8" >
+
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/event_detail_not_ready_leader_day_calendar_container"
+            android:name="edu.scu.gsgapp.activity.DashboardCalendarFragment"
+            tools:layout="@layout/content_propose_event">
+        </fragment>
     </LinearLayout>
 
     <LinearLayout
@@ -158,17 +178,16 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center_vertical|center_horizontal"
-        android:weightSum="1">
+        android:gravity="center_vertical|center_horizontal">
 
         <Button
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="check In"
-            android:id="@+id/button_propose_event_send_invitation"
-            android:background="#FEE70B"
-            android:textSize="30sp" />
-
+            android:text="Cancel Event"
+            android:id="@+id/button_event_detail_not_ready_leader_cancel"
+            android:background="#fe2f0b"
+            android:textSize="14sp"
+            android:gravity="center" />
     </LinearLayout>
 
 </LinearLayout>
