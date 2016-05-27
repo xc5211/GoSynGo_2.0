@@ -5,7 +5,7 @@ package edu.scu.model.enumeration;
  */
 public enum StatusMember {
 
-    Pending(0), Accept(1), Declined(2);
+    Pending(0), Accept(1), Declined(2), CheckedIn(3);
 
     private int status;
 

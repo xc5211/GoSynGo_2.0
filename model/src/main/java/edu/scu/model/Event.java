@@ -223,6 +223,10 @@ public class Event implements Serializable {
     }
 
     public boolean hasEventMember(String memberEmail) {
+        if (this.eventMemberDetail == null) {
+            return false;
+        }
+
         for (EventMemberDetail memberDetail : this.eventMemberDetail) {
             if (memberDetail.getMember().getEmail().equals(memberEmail.trim())) {
                 return true;
