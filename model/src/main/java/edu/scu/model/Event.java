@@ -222,4 +222,12 @@ public class Event implements Serializable {
         return null;
     }
 
+    public boolean hasEventMember(String memberEmail) {
+        for (EventMemberDetail memberDetail : this.eventMemberDetail) {
+            if (memberDetail.getMember().getEmail().equals(memberEmail.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
