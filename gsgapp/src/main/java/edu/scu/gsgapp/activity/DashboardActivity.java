@@ -26,6 +26,7 @@ import edu.scu.core.callback.EventChannelMessageLeaderResponder;
 import edu.scu.core.callback.EventChannelMessageMemberResponder;
 import edu.scu.gsgapp.R;
 import edu.scu.model.Event;
+import edu.scu.model.Person;
 import edu.scu.util.lib.GoogleProjectSettings;
 
 /**
@@ -163,8 +164,21 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
                 Intent intent = null;
                 switch(item.getItemId()) {
                     case R.id.menu_dashboard_toolbar_add_event:
-                        intent = new Intent(DashboardActivity.this, ProposeEventActivity.class);
-                        startActivity(intent);
+                        //intent = new Intent(DashboardActivity.this, ProposeEventActivity.class);
+                        //startActivity(intent);
+                        appAction.proposeEvent(new ActionCallbackListener<Event>() {
+                            @Override
+                            public void onSuccess(Event data) {
+                                Intent intent = new Intent(DashboardActivity.this, ProposeEventActivity.class);
+                                intent.putExtra("eventId", data.getObjectId());
+                                startActivity(intent);
+                            }
+
+                            @Override
+                            public void onFailure(String message) {
+                                Toast.makeText(context, "Failed: " + message,Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         break;
                     case R.id.menu_dashboard_toolbar_test:
                         intent = new Intent(DashboardActivity.this, TestEventActivity.class);

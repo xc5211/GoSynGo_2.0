@@ -10,8 +10,12 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.gsgapp.R;
+import edu.scu.gsgapp.adaptor.ProposeEventAddMemberAdapter;
 import edu.scu.model.Event;
 
 /**
@@ -34,18 +38,28 @@ public class ProposeEventActivity extends GsgBaseActivity {
     private GridView memberShowGridView;
     private Button sendInvitationButton;
     private Button cancelButton;
+
     //sichao
-    private GridView showMemberPortraitView;
+    GridView gridView;;
+    public static int numNames = 0;
+    ProposeEventAddMemberAdapter proposeEventAddMemberAdapter;
+    List<String> personNames= new ArrayList<String>();
+    public final static int LIST_LENGTH = 100;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_propose_event);
 
-        //eventId = (String) savedInstanceState.get("eventId");
-        eventId = "61B5F3F8-6A3A-577F-FF6D-AA41F09CE100";
+        Intent intent = getIntent();
+        eventId = intent.getStringExtra("eventId");
+
+        //sichao for test
+        //eventId = "13D3D5BD-EC4B-933B-FFC4-E4F39DF99500";
 
         initViews();
+        initGridView();
         initListener();
     }
 
@@ -64,8 +78,6 @@ public class ProposeEventActivity extends GsgBaseActivity {
         this.addMemberButton =(Button) findViewById(R.id.button_propose_event_add_member);
         this.sendInvitationButton = (Button) findViewById(R.id.button_propose_event_send_invitation);
         this.cancelButton = (Button) findViewById(R.id.button_propose_event_cancel);
-        //sichao
-        this.showMemberPortraitView = (GridView) findViewById(R.id.gridview_show_members);
     }
 
     protected void initListener() {
@@ -126,19 +138,22 @@ public class ProposeEventActivity extends GsgBaseActivity {
             @Override
             public void onClick(View v) {
                 //evnetId
-                String memberEmail = emailEdit.getText().toString();
+                String memberEmail = emailEdit.getText().toString().trim();
+
 
                 final ProgressDialog progressDialog = ProgressDialog.show( ProposeEventActivity.this, "", "Adding member...", true );
-                getAppAction().addEventMember(eventId, memberEmail, new ActionCallbackListener<Event>() {
+                appAction.addEventMember(eventId, memberEmail, new ActionCallbackListener<Event>() {
                     @Override
                     public void onSuccess(Event data) {
-                        // notify dataset change to adapter
+                        String name = data.getEventMemberDetail().get(0).getMember().getFirstName();
+                        proposeEventAddMemberAdapter.personNames.add(name);
+                        gridView.setAdapter(proposeEventAddMemberAdapter);
                         progressDialog.cancel();
                     }
 
                     @Override
                     public void onFailure(String message) {
-                        Toast.makeText(context, "This member does not exist.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Fail: " + message, Toast.LENGTH_SHORT).show();
                         progressDialog.cancel();
                     }
                 });
@@ -207,8 +222,27 @@ public class ProposeEventActivity extends GsgBaseActivity {
     }
 
     //sichao
-    public void updateGridView() {
-
+    private void initGridView() {
+        proposeEventAddMemberAdapter = new ProposeEventAddMemberAdapter(this, personNames);
+        gridView = (GridView) findViewById(R.id.gridview_show_members);
+        gridView.setAdapter(proposeEventAddMemberAdapter);
     }
+
+    /*private void addMember() {
+
+        int whichName = numNames % 3;
+        numNames++;
+        switch (whichName) {
+            case 0:
+                proposeEventAddMemberAdapter.personNames.add("Sichao");
+                break;
+            case 1:
+                proposeEventAddMemberAdapter.personNames.add("Chuan");
+                break;
+            case 2:
+                proposeEventAddMemberAdapter.personNames.add("Hairong");
+                break;
+        }
+    }*/
 
 }

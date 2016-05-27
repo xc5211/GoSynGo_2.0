@@ -75,7 +75,7 @@ public class UndecidedEventAdapter extends ArrayAdapter<Event> {
 
                     @Override
                     public void onFailure(String message) {
-
+                        Toast.makeText(context, "failed",Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -97,7 +97,7 @@ public class UndecidedEventAdapter extends ArrayAdapter<Event> {
 
                     @Override
                     public void onFailure(String message) {
-
+                        Toast.makeText(context, "failed",Toast.LENGTH_SHORT).show();
                     }
                 });
 
