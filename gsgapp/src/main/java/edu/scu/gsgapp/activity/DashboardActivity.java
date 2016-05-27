@@ -109,25 +109,25 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         resubscribeChannel(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscriptionOptions);
 
         // Resubscribe all event channels as leader
-        for (Event event : hostPerson.getEventsAsLeader()) {
+        for (Event event : appAction.getHostPerson().getEventsAsLeader()) {
             EventChannelMessageLeaderResponder channelMessageLeaderResponder = new EventChannelMessageLeaderResponder(appAction.getHostPerson());
             resubscribeChannel(event.getObjectId(), channelMessageLeaderResponder, subscriptionOptions);
         }
 
         // Resubscribe all event channels as member
-        for (Event event : hostPerson.getEventsAsMember()) {
+        for (Event event : appAction.getHostPerson().getEventsAsMember()) {
             EventChannelMessageMemberResponder channelMessageMemberResponder = new EventChannelMessageMemberResponder();
             resubscribeChannel(event.getObjectId(), channelMessageMemberResponder, subscriptionOptions);
         }
     }
 
-    private void resubscribeChannel(String channelName, final AsyncCallback<List<Message>> channelMessageResponder, SubscriptionOptions subscriptionOptions) {
+    private void resubscribeChannel(final String channelName, final AsyncCallback<List<Message>> channelMessageResponder, SubscriptionOptions subscriptionOptions) {
         Backendless.Messaging.subscribe(channelName, channelMessageResponder, subscriptionOptions, new AsyncCallback<Subscription>() {
 
             @Override
             public void handleResponse(Subscription subscription) {
-                appAction.addToChannelMap(GoogleProjectSettings.DEFAULT_CHANNEL, channelMessageResponder, subscription);
-                Toast.makeText(context, "Resubscribe to channel success: " + subscription.getSubscriptionId(), Toast.LENGTH_SHORT).show();
+                appAction.addToChannelMap(channelName, channelMessageResponder, subscription);
+                Toast.makeText(context, "Resubscribe to channel success: " + channelName, Toast.LENGTH_SHORT).show();
             }
 
             @Override

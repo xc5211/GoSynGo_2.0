@@ -27,7 +27,6 @@ public abstract class GsgBaseActivity extends AppCompatActivity {
     protected Context context;
     protected GsgApplication gsgApplication;
     protected AppAction appAction;
-    protected Person hostPerson;
     public String fileUri = "PersonMap";
 
     @Override
@@ -36,7 +35,6 @@ public abstract class GsgBaseActivity extends AppCompatActivity {
         context = getApplicationContext();
         gsgApplication = (GsgApplication) this.getApplication();
         appAction = gsgApplication.getAppAction();
-        hostPerson = appAction.getHostPerson();
     }
 
     protected AppAction getAppAction() {
