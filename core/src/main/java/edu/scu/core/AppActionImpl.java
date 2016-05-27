@@ -306,7 +306,11 @@ public class AppActionImpl implements AppAction {
                 Event updatedEvent = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
                 EventMemberDetail newEventMemberDetail = updatedEvent.getEventMemberDetail().get(0);
 
-                targetEvent.getEventMemberDetail().add(newEventMemberDetail);
+                if (targetEvent.getEventMemberDetail() == null) {
+                    targetEvent.setEventMemberDetail(updatedEvent.getEventMemberDetail());
+                } else {
+                    targetEvent.getEventMemberDetail().add(newEventMemberDetail);
+                }
                 listener.onSuccess(updatedEvent);
                 return true;
             }
