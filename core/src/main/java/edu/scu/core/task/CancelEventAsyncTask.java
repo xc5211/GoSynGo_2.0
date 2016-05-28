@@ -14,25 +14,23 @@ import edu.scu.model.Event;
  */
 public class CancelEventAsyncTask extends BaseAsyncTask {
 
-    private String eventId;
     private Event eventAsLeader;
 
-    public CancelEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, final Handler handler, final String eventId, final Event eventAsLeader) {
+    public CancelEventAsyncTask(final Api api, final ActionCallbackListener<Boolean> listener, final Handler handler, final Event eventAsLeader) {
         super(api, listener, handler);
-        this.eventId = eventId;
         this.eventAsLeader = eventAsLeader;
     }
 
     @Override
-    protected ApiResponse<Event> doInBackground(Object... params) {
-        return api.cancelEvent(eventAsLeader);
+    protected ApiResponse<Long> doInBackground(Object... params) {
+        return api.removeEvent(eventAsLeader);
     }
 
     @Override
     protected void onPostExecute(ApiResponse response) {
         if (listener != null && response != null) {
             if (response.isSuccess()) {
-                Event updatedEvent = (Event) response.getObj();
+                Long updatedEvent = (Long) response.getObj();
                 Message message = new Message();
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(Event.SERIALIZE_KEY, updatedEvent);

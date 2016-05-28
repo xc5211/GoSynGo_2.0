@@ -192,6 +192,8 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
         } else if (eventManagementState.equals(EventManagementState.CHECKIN_OR_ESTIMATE.getStatus())) {
             // TODO: handle member receives checkin notification
             nextIntent = new Intent(context, DashboardActivity.class);
+        } else if (eventManagementState.equals(EventManagementState.CANCEL_EVENT.getStatus())) {
+            // TODO: start an intentService to remove target event locally
         } else {
             assert false;
         }

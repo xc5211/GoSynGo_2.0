@@ -14,7 +14,9 @@ public enum EventManagementState {
     // case 3(delay): push all members through event channel to remind
     EVENT_REMINDER("3"),
     // case 4(delay): push all members through event channel to checkin or estimate
-    CHECKIN_OR_ESTIMATE("4");
+    CHECKIN_OR_ESTIMATE("4"),
+    // case 5: push all members through event channel to notify event's cancelled
+    CANCEL_EVENT("5");
 
 
     private String status;

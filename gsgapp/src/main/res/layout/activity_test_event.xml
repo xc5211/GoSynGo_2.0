@@ -45,4 +45,11 @@
         android:id="@+id/button_send_invitation"
         android:layout_gravity="center_horizontal" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel Event"
+        android:id="@+id/button_cancel_event"
+        android:layout_gravity="center_horizontal" />
+
 </LinearLayout>

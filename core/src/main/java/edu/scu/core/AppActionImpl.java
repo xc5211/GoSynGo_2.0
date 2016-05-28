@@ -456,32 +456,48 @@ public class AppActionImpl implements AppAction {
         initiateEvent.execute();
     }
 
-    // TODO[later/refactor]
-    // TODO[test]
+    // TODO[notification]
     @Override
     public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
 
-        Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
-        targetEventInProgress.setStatusEvent(StatusEvent.Cancelled.getStatus());
+        final Event targetEvent = hostPerson.getEventAsLeader(eventId);
 
-        Handler handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(android.os.Message msg) {
-                Bundle bundle = msg.getData();
-                Event updatedEvent = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
-                boolean isSuccess = hostPerson.getEventsAsLeader().remove(updatedEvent);
-                if (isSuccess) {
-                    listener.onSuccess(true);
-                } else {
-                    listener.onFailure(String.valueOf(R.string.local_update_error));
+        // Invitation has not been sent out
+        if (targetEvent.getStatusEvent().equals(StatusEvent.Tentative.getStatus())) {
+
+            Handler handler = new Handler(new Handler.Callback() {
+                @Override
+                public boolean handleMessage(android.os.Message msg) {
+                    Bundle bundle = msg.getData();
+                    Long result = (Long) bundle.getSerializable(Event.SERIALIZE_KEY);
+                    boolean isSuccess = hostPerson.getEventsAsLeader().remove(targetEvent);
+                    if (isSuccess) {
+                        listener.onSuccess(true);
+                    } else {
+                        listener.onFailure(String.valueOf(R.string.local_update_error));
+                    }
+                    return isSuccess;
                 }
-                return isSuccess;
-            }
-        });
+            });
 
-        CancelEventAsyncTask cancelEventAsyncTask = new CancelEventAsyncTask(api, listener, handler, eventId, targetEventInProgress);
-        cancelEventAsyncTask.execute();
+            // No need to handle any proposed or selected time in this async task as the invitation has not been sent out
+            CancelEventAsyncTask cancelEventAsyncTask = new CancelEventAsyncTask(api, listener, handler, targetEvent);
+            cancelEventAsyncTask.execute();
+
+        } else {
+            // Invitation has been sent out -> take care of cancellation on server side
+
+            try {
+                // TODO[later]: unregister from channel
+                // TODO[later]: notify member
+                // TODO[later]: member unregister from channel
+                api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, hostPerson, EventManagementState.CANCEL_EVENT.getStatus());
+            } catch (BackendlessException e) {
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
     @Override

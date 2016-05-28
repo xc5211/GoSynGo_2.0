@@ -555,8 +555,25 @@ public class ApiImpl implements Api {
 
     @Override
     public ApiResponse<Long> removeEvent(Event event) {
+
         Long result;
         try {
+
+            if (event.getEventMemberDetail() != null) {
+                for (EventMemberDetail memberDetail : event.getEventMemberDetail()) {
+                    result = Backendless.Data.of(EventMemberDetail.class).remove(memberDetail);
+                }
+            }
+
+            List<LeaderProposedTimestamp> leaderProposedTimestamps = event.getEventLeaderDetail().getProposedTimestamps();
+            if (leaderProposedTimestamps != null) {
+
+                for (LeaderProposedTimestamp leaderProposedTimestamp : leaderProposedTimestamps) {
+                    result = Backendless.Data.of(LeaderProposedTimestamp.class).remove(leaderProposedTimestamp);
+                }
+                result = Backendless.Data.of(EventLeaderDetail.class).remove(event.getEventLeaderDetail());
+            }
+
             result = Backendless.Data.of(Event.class).remove(event);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
