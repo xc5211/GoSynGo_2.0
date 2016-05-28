@@ -2,6 +2,7 @@ package edu.scu.gsgapp.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v17.leanback.widget.HorizontalGridView;
 import android.support.v7.widget.Toolbar;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -9,8 +10,13 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.scu.gsgapp.R;
+import edu.scu.gsgapp.adaptor.MemberHorizontalViewAdapter;
 import edu.scu.model.Event;
+import edu.scu.model.EventMemberDetail;
 
 /**
  * Created by chuanxu on 5/26/16.
@@ -25,6 +31,10 @@ public class EventDetailActivity extends GsgBaseActivity {
     private Spinner durationSpinner;
     private Spinner reminderSpinner;
     private Button cancelButton;
+
+    //sichao
+
+    private HorizontalGridView MemberHorizontalView;
     // Member not ready
 
     // Ready
@@ -62,6 +72,15 @@ public class EventDetailActivity extends GsgBaseActivity {
                 initListener(eventDetailProperty);
                 break;
         }
+
+        MemberHorizontalView = (HorizontalGridView) findViewById(R.id.MembererGridView);
+        List<String> memberList = new ArrayList<>();
+        for(EventMemberDetail eventMemberDetail : event.getEventMemberDetail()) {
+            memberList.add(eventMemberDetail.getMember().getFirstName());
+        }
+        MemberHorizontalViewAdapter adapter = new MemberHorizontalViewAdapter(this, memberList);
+
+        MemberHorizontalView.setAdapter(adapter);
     }
 
     private boolean isEventLeader(String eventId) {
