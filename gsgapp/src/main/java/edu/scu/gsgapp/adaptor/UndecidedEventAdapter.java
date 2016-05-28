@@ -1,35 +1,35 @@
 package edu.scu.gsgapp.adaptor;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import edu.scu.core.ActionCallbackListener;
-import edu.scu.core.AppAction;
-import edu.scu.gsgapp.R;
-import edu.scu.model.Event;
 
 import java.util.List;
+
+import edu.scu.core.AppAction;
+import edu.scu.gsgapp.R;
+import edu.scu.gsgapp.databinding.UndecidedEventRowBinding;
+import edu.scu.model.EventUndecided;
 
 /**
  * Created by Blood on 2016/5/22.
  */
-public class UndecidedEventAdapter extends ArrayAdapter<Event> {
+public class UndecidedEventAdapter extends RecyclerView.Adapter<UndecidedEventObjectHolder> {
 
     private Context context;
     private AppAction appAction;
-    private List<Event> undecidedEventList;
-    //private TextView eventTime;
-    private TextView eventTitle;
-    private TextView eventLeader;
+    private List<EventUndecided> undecidedEventList;
     private Button acceptButton;
     private Button declineButton;
 
+    public UndecidedEventAdapter(List<EventUndecided> undecidedEventList) {
+        this.undecidedEventList = undecidedEventList;
+    }
+
+    /*
     public UndecidedEventAdapter(Context context, int resource, List<Event> undecidedEventList, AppAction appAction) {
         super(context, resource, undecidedEventList);
         this.undecidedEventList = undecidedEventList;
@@ -47,16 +47,6 @@ public class UndecidedEventAdapter extends ArrayAdapter<Event> {
         if (convertView == null) {
             row = inflater.inflate(R.layout.undecided_event_row, parent, false);
         }
-
-
-        //eventTime = (TextView) row.findViewById(R.id.textView_event_time);
-        //eventTime.setText(undecidedEventList.get(position).getTimestamp().toString());
-
-        eventTitle = (TextView) row.findViewById(R.id.textView_event_title);
-        eventTitle.setText(undecidedEventList.get(position).getTitle());
-
-        eventLeader = (TextView) row.findViewById(R.id.textView_event_leader);
-        eventLeader.setText("Leader: "+ undecidedEventList.get(position).getEventLeaderDetail().getLeader().getFirstName());
 
         final int staticPosition = position;
         acceptButton = (Button) row.findViewById(R.id.button_accept);
@@ -104,6 +94,24 @@ public class UndecidedEventAdapter extends ArrayAdapter<Event> {
             }
         });
         return row;
+    }
+*/
+
+    @Override
+    public UndecidedEventObjectHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        UndecidedEventRowBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
+                R.layout.undecided_event_row, parent, false);
+        return new UndecidedEventObjectHolder(binding);
+    }
+
+    @Override
+    public void onBindViewHolder(UndecidedEventObjectHolder holder, int position) {
+        holder.bindConnection(this.undecidedEventList.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return this.undecidedEventList.size();
     }
 
 }

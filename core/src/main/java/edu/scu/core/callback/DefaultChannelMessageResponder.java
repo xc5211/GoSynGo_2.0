@@ -10,15 +10,16 @@ import java.util.List;
 import java.util.Map;
 
 import edu.scu.model.Event;
+import edu.scu.model.EventUndecided;
 
 /**
  * Created by chuanxu on 5/20/16.
  */
 public class DefaultChannelMessageResponder implements AsyncCallback<List<Message>> {
 
-    private List<Event> undecidedEventList;
+    private List<EventUndecided> undecidedEventList;
 
-    public DefaultChannelMessageResponder(List<Event> undecidedEventList) {
+    public DefaultChannelMessageResponder(List<EventUndecided> undecidedEventList) {
         this.undecidedEventList = undecidedEventList;
     }
 
@@ -38,7 +39,7 @@ public class DefaultChannelMessageResponder implements AsyncCallback<List<Messag
             undecidedEvent.setReminderInMin((Integer) eventDataMap.get("reminderInMin"));
             undecidedEvent.setObjectId((String) eventDataMap.get("objectId"));
             undecidedEvent.setOwnerId((String) eventDataMap.get("ownerId"));
-            undecidedEventList.add(undecidedEvent);
+            undecidedEventList.add(new EventUndecided((String) eventDataMap.get("title"), "leader name", (String) eventDataMap.get("objectId")));
         }
     }
 

@@ -12,6 +12,7 @@ import edu.scu.core.task.messaging.ChannelSubscription;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.EventUndecided;
 import edu.scu.model.Person;
 
 /**
@@ -25,7 +26,7 @@ public interface AppAction {
     public String getHostUserId();
     public Person getHostPerson();
     public Map<String, ChannelSubscription> getChannelMap();
-    public List<Event> getUndecidedEventList();
+    public List<EventUndecided> getUndecidedEventList();
     public void setHostUserId(String hostUserId);
     public void setHostPerson(Person person);
     public void setChannelMap(Map<String, ChannelSubscription> channelMap);

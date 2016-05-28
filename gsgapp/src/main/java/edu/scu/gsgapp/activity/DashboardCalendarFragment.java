@@ -4,6 +4,8 @@ import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +31,7 @@ import edu.scu.gsgapp.adaptor.Utility;
 import edu.scu.gsgapp.adaptor.UndecidedEventAdapter;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
+import edu.scu.model.EventUndecided;
 import edu.scu.model.Person;
 
 /**
@@ -60,7 +63,7 @@ public class DashboardCalendarFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.fragment_dashboard_calendar_monthly, container, false);
+        view = inflater.inflate(R.layout.fragment_dashboard_calendar, container, false);
 
         this.gsgApplication = (GsgApplication) getActivity().getApplication();
 
@@ -72,7 +75,12 @@ public class DashboardCalendarFragment extends Fragment {
         // TODO: setup calendarView & listView
 
 
+        RecyclerView undecidedEventRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_dashboard_calenar_undecided_event);
+        List<EventUndecided> undecidedEventList = gsgApplication.getAppAction().getUndecidedEventList();
 
+        UndecidedEventAdapter undecidedEventAdapter = new UndecidedEventAdapter(undecidedEventList);
+        undecidedEventRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        undecidedEventRecyclerView.setAdapter(undecidedEventAdapter);
 
 
 
@@ -117,47 +125,48 @@ public class DashboardCalendarFragment extends Fragment {
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                // removing the previous view if added
-                if (((LinearLayout) rLayout).getChildCount() > 0) {
-                    ((LinearLayout) rLayout).removeAllViews();
-                }
-                desc = new ArrayList<>();
-                date = new ArrayList<>();
-                ((CalendarAdapter) parent.getAdapter()).setSelected(v);
-                String selectedGridDate = CalendarAdapter.dayString.get(position);
-                String[] separatedTime = selectedGridDate.split("-");
-                String gridvalueString = separatedTime[2].replaceFirst("^0*", "");// taking last part of date. ie; 2 from 2012-12-02.
-                int gridvalue = Integer.parseInt(gridvalueString);
-                // navigate to next or previous month on clicking offdays.
-                if ((gridvalue > 10) && (position < 8)) {
-                    setPreviousMonth();
-                    refreshCalendar();
-                } else if ((gridvalue < 7) && (position > 28)) {
-                    setNextMonth();
-                    refreshCalendar();
-                }
-                ((CalendarAdapter) parent.getAdapter()).setSelected(v);
-
-                for (int i = 0; i < Utility.startDates.size(); i++) {
-                    if (Utility.startDates.get(i).equals(selectedGridDate)) {
-                        desc.add(Utility.nameOfEvent.get(i));
-                    }
-                }
-
-                if (desc.size() > 0) {
-                    for (int i = 0; i < desc.size(); i++) {
-                        TextView rowTextView = new TextView(view.getContext());
-
-                        // set some properties of rowTextView or something
-                        rowTextView.setText("Event:" + desc.get(i));
-                        rowTextView.setTextColor(Color.BLACK);
-
-                        // add the textview to the linearlayout
-                        rLayout.addView(rowTextView);
-                    }
-                }
-
-                desc = null;
+                // TODO[?]: Removed calendar grid view listener
+//                // removing the previous view if added
+//                if (((LinearLayout) rLayout).getChildCount() > 0) {
+//                    ((LinearLayout) rLayout).removeAllViews();
+//                }
+//                desc = new ArrayList<>();
+//                date = new ArrayList<>();
+//                ((CalendarAdapter) parent.getAdapter()).setSelected(v);
+//                String selectedGridDate = CalendarAdapter.dayString.get(position);
+//                String[] separatedTime = selectedGridDate.split("-");
+//                String gridvalueString = separatedTime[2].replaceFirst("^0*", "");// taking last part of date. ie; 2 from 2012-12-02.
+//                int gridvalue = Integer.parseInt(gridvalueString);
+//                // navigate to next or previous month on clicking offdays.
+//                if ((gridvalue > 10) && (position < 8)) {
+//                    setPreviousMonth();
+//                    refreshCalendar();
+//                } else if ((gridvalue < 7) && (position > 28)) {
+//                    setNextMonth();
+//                    refreshCalendar();
+//                }
+//                ((CalendarAdapter) parent.getAdapter()).setSelected(v);
+//
+//                for (int i = 0; i < Utility.startDates.size(); i++) {
+//                    if (Utility.startDates.get(i).equals(selectedGridDate)) {
+//                        desc.add(Utility.nameOfEvent.get(i));
+//                    }
+//                }
+//
+//                if (desc.size() > 0) {
+//                    for (int i = 0; i < desc.size(); i++) {
+//                        TextView rowTextView = new TextView(view.getContext());
+//
+//                        // set some properties of rowTextView or something
+//                        rowTextView.setText("Event:" + desc.get(i));
+//                        rowTextView.setTextColor(Color.BLACK);
+//
+//                        // add the textview to the linearlayout
+//                        rLayout.addView(rowTextView);
+//                    }
+//                }
+//
+//                desc = null;
             }
 
         });
@@ -223,10 +232,10 @@ public class DashboardCalendarFragment extends Fragment {
     };
 
     private void initUndecidedEventList() {
-        undecidedEventAdapter = new UndecidedEventAdapter(view.getContext(),
-                R.layout.undecided_event_row, ((GsgApplication)getActivity().getApplication()).getAppAction().getUndecidedEventList(), ((GsgApplication)getActivity().getApplication()).getAppAction());
-        undecidedEventListView = (ListView) view.findViewById(R.id.listview_calendar_event);
-        undecidedEventListView.setAdapter(undecidedEventAdapter);
+//        undecidedEventAdapter = new UndecidedEventAdapter(view.getContext(),
+//                R.layout.undecided_event_row, ((GsgApplication)getActivity().getApplication()).getAppAction().getUndecidedEventList(), ((GsgApplication)getActivity().getApplication()).getAppAction());
+//        undecidedEventListView = (ListView) view.findViewById(R.id.listview_calendar_event);
+//        undecidedEventListView.setAdapter(undecidedEventAdapter);
     }
 
     //sichao for test

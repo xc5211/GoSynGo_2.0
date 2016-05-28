@@ -29,7 +29,7 @@
         android:layout_weight="5"
         android:id="@+id/dashboard_container"
         android:name="edu.scu.gsgapp.activity.DashboardCalendarFragment"
-        tools:layout="@layout/fragment_dashboard_calendar_monthly">
+        tools:layout="@layout/fragment_dashboard_calendar">
     </fragment>
 
     <android.support.v7.widget.Toolbar

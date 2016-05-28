@@ -44,6 +44,7 @@ import edu.scu.core.task.messaging.ChannelSubscription;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.EventUndecided;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
@@ -60,7 +61,7 @@ public class AppActionImpl implements AppAction {
 
     private static String hostUserId;
     private static Person hostPerson;
-    private static List<Event> undecidedEventList = new ArrayList<>();
+    private static List<EventUndecided> undecidedEventList = new ArrayList<>();
     private static Map<String, ChannelSubscription> channelMap = new HashMap();
 
     private Api api;
@@ -85,7 +86,7 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public List<Event> getUndecidedEventList() {
+    public List<EventUndecided> getUndecidedEventList() {
         return undecidedEventList;
     }
 

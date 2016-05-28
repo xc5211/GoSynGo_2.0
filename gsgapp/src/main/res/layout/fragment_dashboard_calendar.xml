@@ -87,14 +87,19 @@
             android:layout_width="match_parent"
             android:layout_height="5dp" />
 
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="false"
-            android:id="@+id/listview_calendar_event"
+            android:id="@+id/recyclerview_dashboard_calenar_undecided_event"
             android:dividerHeight="5dp">
-
-        </ListView>
+        </android.support.v7.widget.RecyclerView>
+        <!--<fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/dashboard_calendar_undecided_event_container"
+            tools:layout="@layout/fragment_dashboard_calendar_undecided_event">
+        </fragment>-->
 
     </LinearLayout>
 
