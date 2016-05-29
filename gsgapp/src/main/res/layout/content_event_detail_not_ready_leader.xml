@@ -147,7 +147,7 @@
         <android.support.v17.leanback.widget.HorizontalGridView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/MembererGridView"/>
+            android:id="@+id/event_detail_not_ready_leader_event_member_grid_view"/>
 
 <!--
         <ImageView

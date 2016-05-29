@@ -25,6 +25,8 @@ public class EventDetailActivity extends GsgBaseActivity {
 
     // Common
     private Toolbar toolbar;
+    private HorizontalGridView memberHorizontalView;
+
     // Leader not ready
     private EditText locationEditText;
     private EditText noteEditText;
@@ -32,9 +34,6 @@ public class EventDetailActivity extends GsgBaseActivity {
     private Spinner reminderSpinner;
     private Button cancelButton;
 
-    //sichao
-
-    private HorizontalGridView MemberHorizontalView;
     // Member not ready
 
     // Ready
@@ -72,15 +71,6 @@ public class EventDetailActivity extends GsgBaseActivity {
                 initListener(eventDetailProperty);
                 break;
         }
-
-        MemberHorizontalView = (HorizontalGridView) findViewById(R.id.MembererGridView);
-        List<String> memberList = new ArrayList<>();
-        for(EventMemberDetail eventMemberDetail : event.getEventMemberDetail()) {
-            memberList.add(eventMemberDetail.getMember().getFirstName());
-        }
-        MemberHorizontalViewAdapter adapter = new MemberHorizontalViewAdapter(this, memberList);
-
-        MemberHorizontalView.setAdapter(adapter);
     }
 
     private boolean isEventLeader(String eventId) {
@@ -114,6 +104,14 @@ public class EventDetailActivity extends GsgBaseActivity {
                 ArrayAdapter<Integer> remindSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, durations);
                 remindSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 this.reminderSpinner.setAdapter(remindSpinnerArrayAdapter);
+
+                this.memberHorizontalView = (HorizontalGridView) findViewById(R.id.event_detail_not_ready_leader_event_member_grid_view);
+                List<String> memberList = new ArrayList<>();
+                for(EventMemberDetail eventMemberDetail : event.getEventMemberDetail()) {
+                    memberList.add(eventMemberDetail.getMember().getFirstName());
+                }
+                MemberHorizontalViewAdapter adapter = new MemberHorizontalViewAdapter(this, memberList);
+                this.memberHorizontalView.setAdapter(adapter);
 
                 this.cancelButton = (Button) findViewById(R.id.button_event_detail_not_ready_leader_cancel);
                 break;
