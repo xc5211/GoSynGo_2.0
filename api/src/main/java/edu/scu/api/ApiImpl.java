@@ -589,6 +589,17 @@ public class ApiImpl implements Api {
             if (event.getEventMemberDetail() != null) {
                 for (EventMemberDetail memberDetail : event.getEventMemberDetail()) {
                     result = Backendless.Data.of(EventMemberDetail.class).remove(memberDetail);
+
+                    if (memberDetail.getProposedTimestamps() != null) {
+                        for (MemberProposedTimestamp proposedTimestamp : memberDetail.getProposedTimestamps()) {
+                            result = Backendless.Data.of(MemberProposedTimestamp.class).remove(proposedTimestamp);
+                        }
+                    }
+                    if (memberDetail.getSelectedTimestamps() != null) {
+                        for (MemberSelectedTimestamp selectedTimestamp : memberDetail.getSelectedTimestamps()) {
+                            result = Backendless.Data.of(MemberSelectedTimestamp.class).remove(selectedTimestamp);
+                        }
+                    }
                 }
             }
 
@@ -601,6 +612,8 @@ public class ApiImpl implements Api {
                 result = Backendless.Data.of(EventLeaderDetail.class).remove(event.getEventLeaderDetail());
             }
 
+            EventLeaderDetail leaderDetail = event.getEventLeaderDetail();
+            result = Backendless.Data.of(EventLeaderDetail.class).remove(leaderDetail);
             result = Backendless.Data.of(Event.class).remove(event);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());

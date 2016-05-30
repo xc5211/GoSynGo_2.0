@@ -457,7 +457,7 @@ public class AppActionImpl implements AppAction {
         initiateEvent.execute();
     }
 
-    // TODO[notification]
+    // TODO[server side cancellation/notification]
     @Override
     public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener) {
 
@@ -599,7 +599,6 @@ public class AppActionImpl implements AppAction {
         selectEventTimestampsAsMemberAsyncTask.execute();
     }
 
-    // TODO[test]
     @Override
     public void acceptEvent(final String eventId, final String leaderId, final ActionCallbackListener<Boolean> listener) {
 
