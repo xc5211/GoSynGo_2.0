@@ -26,8 +26,10 @@ import edu.scu.core.callback.DefaultChannelMessageResponder;
 import edu.scu.core.callback.EventChannelMessageLeaderResponder;
 import edu.scu.core.callback.EventChannelMessageMemberResponder;
 import edu.scu.gsgapp.R;
+import edu.scu.gsgapp.fragment.DashboardCalendarFragment;
+import edu.scu.gsgapp.fragment.DashboardEventFragment;
+import edu.scu.gsgapp.fragment.DashboardMeFragment;
 import edu.scu.model.Event;
-import edu.scu.model.Person;
 import edu.scu.util.lib.GoogleProjectSettings;
 
 /**

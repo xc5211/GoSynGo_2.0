@@ -1,7 +1,6 @@
-package edu.scu.gsgapp.activity;
+package edu.scu.gsgapp.fragment;
 
 import android.app.Fragment;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,9 +25,9 @@ import java.util.Locale;
 
 import edu.scu.gsgapp.GsgApplication;
 import edu.scu.gsgapp.R;
-import edu.scu.gsgapp.adaptor.CalendarAdapter;
-import edu.scu.gsgapp.adaptor.Utility;
-import edu.scu.gsgapp.adaptor.UndecidedEventAdapter;
+import edu.scu.gsgapp.adapter.dashboard.calendar.CalendarAdapter;
+import edu.scu.gsgapp.adapter.dashboard.calendar.Utility;
+import edu.scu.gsgapp.adapter.dashboard.calendar.UndecidedEventAdapter;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventUndecided;

@@ -1,4 +1,4 @@
-package edu.scu.gsgapp.adaptor;
+package edu.scu.gsgapp.adapter.dashboard.events;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

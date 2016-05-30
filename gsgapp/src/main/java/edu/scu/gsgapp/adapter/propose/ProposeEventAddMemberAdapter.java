@@ -1,4 +1,4 @@
-package edu.scu.gsgapp.adaptor;
+package edu.scu.gsgapp.adapter.propose;
 
 import android.content.Context;
 import android.view.LayoutInflater;

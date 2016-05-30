@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.scu.gsgapp.R;
-import edu.scu.gsgapp.adaptor.MemberHorizontalViewAdapter;
+import edu.scu.gsgapp.adapter.dashboard.events.MemberHorizontalViewAdapter;
 import edu.scu.model.Event;
 import edu.scu.model.EventMemberDetail;
 

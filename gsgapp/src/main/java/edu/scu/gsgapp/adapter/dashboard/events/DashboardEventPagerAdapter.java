@@ -1,14 +1,9 @@
-package edu.scu.gsgapp.activity;
+package edu.scu.gsgapp.adapter.dashboard.events;
 
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-
-import java.util.List;
-
-import edu.scu.gsgapp.R;
-import edu.scu.model.Event;
 
 
 /**

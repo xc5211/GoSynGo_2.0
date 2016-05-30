@@ -1,4 +1,4 @@
-package edu.scu.gsgapp.activity;
+package edu.scu.gsgapp.adapter.dashboard.events;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;

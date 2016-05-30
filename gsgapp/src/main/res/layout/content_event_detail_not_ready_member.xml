@@ -133,7 +133,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:id="@+id/event_detail_not_ready_member_day_calendar_container"
-            android:name="edu.scu.gsgapp.activity.DashboardCalendarFragment"
+            android:name="edu.scu.gsgapp.fragment.DashboardCalendarFragment"
             tools:layout="@layout/content_propose_event">
         </fragment>
     </LinearLayout>

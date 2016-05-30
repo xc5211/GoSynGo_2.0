@@ -1,4 +1,4 @@
-package edu.scu.gsgapp.adaptor;
+package edu.scu.gsgapp.adapter.dashboard.calendar;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;

@@ -18,7 +18,7 @@ import java.util.List;
 
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.gsgapp.R;
-import edu.scu.gsgapp.adaptor.ProposeEventAddMemberAdapter;
+import edu.scu.gsgapp.adapter.propose.ProposeEventAddMemberAdapter;
 import edu.scu.model.Event;
 
 /**

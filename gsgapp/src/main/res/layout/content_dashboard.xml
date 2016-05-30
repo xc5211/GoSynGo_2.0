@@ -28,7 +28,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_weight="5"
         android:id="@+id/dashboard_container"
-        android:name="edu.scu.gsgapp.activity.DashboardCalendarFragment"
+        android:name="edu.scu.gsgapp.fragment.DashboardCalendarFragment"
         tools:layout="@layout/fragment_dashboard_calendar">
     </fragment>
 

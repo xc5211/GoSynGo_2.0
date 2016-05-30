@@ -1,4 +1,4 @@
-package edu.scu.gsgapp.activity;
+package edu.scu.gsgapp.fragment;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -15,6 +15,7 @@ import android.widget.Toast;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.gsgapp.GsgApplication;
 import edu.scu.gsgapp.R;
+import edu.scu.gsgapp.activity.LoginActivity;
 
 /**
  * Created by chuanxu on 5/15/16.

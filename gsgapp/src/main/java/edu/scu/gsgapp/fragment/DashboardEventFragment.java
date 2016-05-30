@@ -1,4 +1,4 @@
-package edu.scu.gsgapp.activity;
+package edu.scu.gsgapp.fragment;
 
 import android.app.Fragment;
 import android.content.Intent;
@@ -16,6 +16,9 @@ import java.util.List;
 
 import edu.scu.gsgapp.GsgApplication;
 import edu.scu.gsgapp.R;
+import edu.scu.gsgapp.activity.EventDetailActivity;
+import edu.scu.gsgapp.adapter.dashboard.events.DashboardEventPagerAdapter;
+import edu.scu.gsgapp.adapter.dashboard.events.EventListViewAdapter;
 import edu.scu.model.Event;
 import edu.scu.model.enumeration.StatusEvent;
 
