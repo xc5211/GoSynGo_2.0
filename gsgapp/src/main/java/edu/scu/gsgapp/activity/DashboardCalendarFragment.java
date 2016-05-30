@@ -78,7 +78,7 @@ public class DashboardCalendarFragment extends Fragment {
         RecyclerView undecidedEventRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_dashboard_calenar_undecided_event);
         List<EventUndecided> undecidedEventList = gsgApplication.getAppAction().getUndecidedEventList();
 
-        UndecidedEventAdapter undecidedEventAdapter = new UndecidedEventAdapter(undecidedEventList);
+        UndecidedEventAdapter undecidedEventAdapter = new UndecidedEventAdapter(view.getContext(), gsgApplication.getAppAction(), undecidedEventList);
         undecidedEventRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         undecidedEventRecyclerView.setAdapter(undecidedEventAdapter);
 

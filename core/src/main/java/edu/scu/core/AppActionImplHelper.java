@@ -9,6 +9,7 @@ import java.util.List;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.EventUndecided;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
@@ -140,4 +141,13 @@ public class AppActionImplHelper {
         return baseEventMemberDetail;
     }
 
+    public static EventUndecided getUndecidedEvent(List<EventUndecided> undecidedEventList, String eventId) {
+        for (EventUndecided undecided : undecidedEventList) {
+            if (undecided.eventId.equals(eventId)) {
+                return undecided;
+            }
+        }
+        assert false;
+        return null;
+    }
 }

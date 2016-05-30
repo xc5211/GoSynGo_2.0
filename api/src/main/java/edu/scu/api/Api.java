@@ -62,7 +62,7 @@ public interface Api {
 
     public ApiResponse<EventMemberDetail> selectEventTimestampsAsMember(EventMemberDetail eventMemberDetail);
 
-    public ApiResponse<Person> acceptEvent(Person member, Event undecidedEvent, String memberId);
+    public ApiResponse<Person> acceptEvent(Person member, String eventId, String memberId);
 
     public ApiResponse<EventMemberDetail> declineEvent(EventMemberDetail eventMemberDetail);
 
@@ -91,9 +91,9 @@ public interface Api {
 
     public void subscribeEventChannel(String channelName, String personId, AsyncCallback<List<Message>> channelMsgResponder, AsyncCallback<Subscription> subscriptionResponder);
 
-    public void publishEventChannelMessage(String channelName, String publisherId, String receiverId, Message message);
+    public void publishEventChannelMessage(String channelName, String publisherId, boolean fromLeader, String receiverId, Message message);
 
-    public void publishEventChannelMessage(String channelName, String publisherId, List<String> receiverIds, Message message);
+    public void publishEventChannelMessage(String channelName, String publisherId, boolean fromLeader, List<String> receiverIds, Message message);
 
     public void publishEventChannelMemberStatus(String channelName, String publisherId, String leaderId, int memberStatus);
 

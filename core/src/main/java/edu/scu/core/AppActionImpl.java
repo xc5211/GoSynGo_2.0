@@ -601,55 +601,17 @@ public class AppActionImpl implements AppAction {
 
     // TODO[test]
     @Override
-    public void acceptEvent(final Event undecidedEvent, final String leaderId, final ActionCallbackListener<Boolean> listener) {
+    public void acceptEvent(final String eventId, final String leaderId, final ActionCallbackListener<Boolean> listener) {
 
         final String memberId = hostPerson.getObjectId();
-        final String eventId = undecidedEvent.getObjectId();
-
-//        AsyncCallback<List<Message>> channelMsgResponderForMember = new AsyncCallback<List<Message>>() {
-//
-//            @Override
-//            public void handleResponse(List<Message> messages) {
-//                // TODO[later]: no need to support member monitor channel yet
-////                String memberId;
-////                Map<String, String> msgHeader;
-////                EventMemberDetail eventMemberDetail;
-////
-////                for (Message message : messages) {
-////                    memberId = message.getPublisherId();
-////                    msgHeader = message.getHeaders();
-////                    eventMemberDetail = hostPerson.getEventMemberMemberDetail(eventId, memberId);
-////
-////                    if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_STATUS.getKeyName()).equals("true")) {
-////                        int memberStatus = (int) message.getData();
-////                        eventMemberDetail.setStatusMember(memberStatus);
-////                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_PROPOSED_TIME.getKeyName()).equals("true")) {
-////                        List<MemberProposedTimestamp> memberProposedTimestamps = (List<MemberProposedTimestamp>) message.getData();
-////                        eventMemberDetail.setProposedTimestamps(memberProposedTimestamps);
-////                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_SELECTED_TIME.getKeyName()).equals("true")) {
-////                        List<MemberSelectedTimestamp> memberSelectedTimestamps = (List<MemberSelectedTimestamp>) message.getData();
-////                        eventMemberDetail.setSelectedTimestamps(memberSelectedTimestamps);
-////                    } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_MINS_TO_ARRIVE.getKeyName()).equals("true")) {
-////                        int estimateInMin = (int) message.getData();
-////                        eventMemberDetail.setMinsToArrive(estimateInMin);
-////                    } else {
-////                        assert false;
-////                    }
-////                }
-//
-//            }
-//
-//            @Override
-//            public void handleFault(BackendlessFault backendlessFault) {
-//            }
-//        };
+        final EventUndecided undecidedEvent = AppActionImplHelper.getUndecidedEvent(undecidedEventList, eventId);
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
                 Person updatedPerson = (Person) bundle.getSerializable(Person.SERIALIZE_KEY);
-                Event acceptedEvent = updatedPerson.getEventAsMember(eventId);
+                Event acceptedEvent = updatedPerson.getEventsAsMember().get(0);//.getEventAsMember(eventId);
                 boolean isSuccess = hostPerson.getEventsAsMember().add(acceptedEvent);
                 if (isSuccess) {
                     undecidedEventList.remove(undecidedEvent);
@@ -662,7 +624,7 @@ public class AppActionImpl implements AppAction {
         });
 
         Person baseMember = AppActionImplHelper.getBasePerson(hostPerson);
-        AcceptEventAsyncTask acceptTask = new AcceptEventAsyncTask(api, listener, handler, baseMember, undecidedEvent, memberId);
+        AcceptEventAsyncTask acceptTask = new AcceptEventAsyncTask(api, listener, handler, baseMember, eventId, memberId);
         acceptTask.execute();
 
         // Handle messaging
@@ -691,10 +653,10 @@ public class AppActionImpl implements AppAction {
 
     // TODO[test]
     @Override
-    public void declineEvent(final Event undecidedEvent, final String leaderId, final ActionCallbackListener<Boolean> listener) {
+    public void declineEvent(final String eventId, final String leaderId, final ActionCallbackListener<Boolean> listener) {
 
         final String memberId = hostPerson.getObjectId();
-        final String eventId = undecidedEvent.getObjectId();
+        final EventUndecided undecidedEvent = AppActionImplHelper.getUndecidedEvent(undecidedEventList, eventId);
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override

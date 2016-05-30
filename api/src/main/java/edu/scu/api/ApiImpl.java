@@ -248,16 +248,27 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<Person> acceptEvent(Person member, Event undecidedEvent, String memberId) {
+    public ApiResponse<Person> acceptEvent(Person member, String eventId, String memberId) {
+
+        // Get target event
+        Event undecidedEvent = null;
+        try {
+            undecidedEvent = Backendless.Data.of(Event.class).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        assert undecidedEvent != null;
 
         // Load undecidedEvent
         ArrayList<String> relationProps = new ArrayList<>();
         relationProps.add( "eventMemberDetail" );
+        relationProps.add( "eventMemberDetail.member" );
         try {
             Backendless.Data.of(Event.class).loadRelations(undecidedEvent, relationProps);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
+        // TODO[later]: pass the fully loaded eventMemberDetail below to host member in order to show event member details
         EventMemberDetail eventMemberDetail = undecidedEvent.getEventMemberDetail(memberId);
 
         // Event changes member status
@@ -266,11 +277,17 @@ public class ApiImpl implements Api {
         eventMemberDetails.add(eventMemberDetail);
         undecidedEvent.setEventMemberDetail(eventMemberDetails);
 
+        // Trigger server logic as server monitors EventMemberDetail table
+        try {
+            eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
         // Member accepts the event
         List<Event> eventsAsMember = new ArrayList<>();
         eventsAsMember.add(undecidedEvent);
         member.setEventsAsMember(eventsAsMember);
-
         try {
             member = Backendless.Data.of(Person.class).save(member);
         } catch (BackendlessException exception) {
@@ -386,37 +403,43 @@ public class ApiImpl implements Api {
 
     @Override
     public void registerEventChannelMessaging(String channelName) {
+        Date expireDate = new Date();
+        expireDate.setTime(System.currentTimeMillis() + 10 * 365 * 24 * 60 * 60 * 1000);
         Backendless.Messaging.registerDevice(GoogleProjectSettings.GOOGLE_PROJECT_NUMBER, channelName);
     }
 
     @Override
     public void subscribeDefaultChannel(String personId, AsyncCallback<List<Message>> defaultChannelMsgResponder, AsyncCallback<Subscription> subscriptionResponder) {
         SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
-        subscriptionOptions.setSelector("'" + personId + "' = 'true'");
+        String selector = "receiverId" + personId.replace("-", "") + " = 'true'";
+        subscriptionOptions.setSelector(selector);
         Backendless.Messaging.subscribe(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscriptionOptions);
     }
 
     @Override
     public void subscribeEventChannel(String channelName, String personId, AsyncCallback<List<Message>> channelMsgResponder, AsyncCallback<Subscription> subscriptionResponder) {
         SubscriptionOptions subscriptionOptions = new SubscriptionOptions();
-        subscriptionOptions.setSelector("'" + personId + "' = 'true'");
+        String selector = "receiverId" + personId.replace("-", "") + " = 'true'";
+        subscriptionOptions.setSelector(selector);
         Backendless.Messaging.subscribe(channelName, channelMsgResponder, subscriptionOptions, subscriptionResponder);
     }
 
     @Override
-    public void publishEventChannelMessage(String channelName, String publisherId, String receiverId, Message message) {
+    public void publishEventChannelMessage(String channelName, String publisherId, boolean fromLeader, String receiverId, Message message) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
-        publishOptions.putHeader(receiverId, "true");
+        publishOptions.putHeader("sentFrom", fromLeader ? "leader" : "member");
+        publishOptions.putHeader("receiverId" + receiverId.replace("-", ""), "true");
         Backendless.Messaging.publish(channelName, message, publishOptions);
     }
 
     @Override
-    public void publishEventChannelMessage(String channelName, String publisherId, List<String> receiverIds, Message message) {
+    public void publishEventChannelMessage(String channelName, String publisherId, boolean fromLeader, List<String> receiverIds, Message message) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
+        publishOptions.putHeader("sentFrom", fromLeader ? "leader" : "member");
         for (String memberId : receiverIds) {
-            publishOptions.putHeader(memberId, "true");
+            publishOptions.putHeader("receiverId" + memberId.replace("-", ""), "true");
         }
         Backendless.Messaging.publish(channelName, message, publishOptions);
     }
@@ -425,7 +448,8 @@ public class ApiImpl implements Api {
     public void publishEventChannelMemberStatus(String channelName, String publisherId, String leaderId, int memberStatus) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
-        publishOptions.putHeader(leaderId, "true");
+        publishOptions.putHeader("sentFrom", "member");
+        publishOptions.putHeader("receiverId" + leaderId.replace("-", ""), "true");
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);
         publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_STATUS.getKeyName(), "true");
@@ -447,7 +471,8 @@ public class ApiImpl implements Api {
     public void publishEventChannelMemberSelectedTimestamps(String channelName, String publisherId, String leaderId, List<MemberSelectedTimestamp> memberSelectedTimestamps) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
-        publishOptions.putHeader(leaderId, "true");
+        publishOptions.putHeader("sentFrom", "member");
+        publishOptions.putHeader("receiverId" + leaderId.replace("-", ""), "true");
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);
         publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_SELECTED_TIME.getKeyName(), "true");
@@ -469,7 +494,8 @@ public class ApiImpl implements Api {
     public void publishEventChannelMemberProposedTimestamps(String channelName, String publisherId, String leaderId, List<MemberProposedTimestamp> memberProposedTimestamps) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
-        publishOptions.putHeader(leaderId, "true");
+        publishOptions.putHeader("sentFrom", "member");
+        publishOptions.putHeader("receiverId" + leaderId.replace("-", ""), "true");
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);
         publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_PROPOSED_TIME.getKeyName(), "true");
@@ -491,7 +517,8 @@ public class ApiImpl implements Api {
     public void publishEventChannelMemberEstimateInMin(String channelName, String publisherId, String leaderId, int estimateInMin) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
-        publishOptions.putHeader(leaderId, "true");
+        publishOptions.putHeader("sentFrom", "member");
+        publishOptions.putHeader("receiverId" + leaderId.replace("-", ""), "true");
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);
         publishOptions.putHeader(PublishEventChannelArgKeyName.MEMBER_MINS_TO_ARRIVE.getKeyName(), "true");
@@ -517,7 +544,7 @@ public class ApiImpl implements Api {
         args.put(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), eventId);
         args.put(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), eventLeader.getObjectId());
         args.put(BroadcastEventChannelArgKeyName.EVENT_MANAGEMENT_STATE.getKeyName(), eventManagementState);
-        args.put(BroadcastEventChannelArgKeyName.EVENT_LEADER.getKeyName(), eventLeader.getFirstName() + " " + eventLeader.getLastName());
+        args.put(BroadcastEventChannelArgKeyName.EVENT_LEADER_NAME.getKeyName(), eventLeader.getFirstName() + " " + eventLeader.getLastName());
 
         Backendless.Events.dispatch(dispatchedEventName, args, new AsyncCallback<Map>() {
             @Override

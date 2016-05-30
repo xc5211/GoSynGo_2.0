@@ -8,11 +8,13 @@ public class EventUndecided {
     public String title;
     public String leaderName;
     public String eventId;
+    public String leaderId;
 
-    public EventUndecided(String title, String leaderName, String eventId) {
+    public EventUndecided(String title, String leaderName, String eventId, String leaderId) {
         this.title = title;
         this.leaderName = leaderName;
         this.eventId = eventId;
+        this.leaderId = leaderId;
     }
 
     public String eventId() {

@@ -31,37 +31,52 @@ public class EventChannelMessageLeaderResponder implements AsyncCallback<List<Me
     @Override
     public void handleResponse(List<Message> messages) {
 
-        String memberId;
         Map<String, String> msgHeader;
         Object msg;
         for (Message message : messages) {
-            memberId = message.getPublisherId();
+
             msgHeader = message.getHeaders();
             msg = message.getData();
 
-            String eventId = msgHeader.get(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName());
-            Event targetEvent = leader.getEventAsLeader(eventId);
-            EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(memberId);
-
-            // Assume only leader receives message from event channel
-            // So no receiver check
-            if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_STATUS.getKeyName()).equals("true")) {
-                int memberStatus = (int) msg;
-                targetEventMemberDetail.setStatusMember(memberStatus);
-            } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_SELECTED_TIME.getKeyName()).equals("true")) {
-                List<MemberSelectedTimestamp> memberSelectedTimestamps = (List<MemberSelectedTimestamp>) msg;
-                targetEventMemberDetail.setSelectedTimestamps(memberSelectedTimestamps);
-            } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_PROPOSED_TIME.getKeyName()).equals("true")) {
-                List<MemberProposedTimestamp> memberProposedTimestamps = (List<MemberProposedTimestamp>) msg;
-                targetEventMemberDetail.setProposedTimestamps(memberProposedTimestamps);
-            } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_MINS_TO_ARRIVE.getKeyName()).equals("true")) {
-                int estimateInMin = (int) msg;
-                targetEventMemberDetail.setMinsToArrive(estimateInMin);
+            // Handle server or member message
+            String from = msgHeader.get("sentFrom");
+            if (from.equals("member")) {
+                String memberId = message.getPublisherId();
+                handleMemberMessage(memberId, msgHeader, msg);
+            } else if (from.equals("server")) {
+                handleServerMessage(msgHeader, msg);
             } else {
                 assert false;
             }
-
         }
+
+    }
+
+    private void handleMemberMessage(String memberId, Map<String, String> msgHeader, Object msg) {
+
+        String eventId = msgHeader.get(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName());
+        Event targetEvent = leader.getEventAsLeader(eventId);
+        EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(memberId);
+
+        if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_STATUS.getKeyName()).equals("true")) {
+            int memberStatus = (int) msg;
+            targetEventMemberDetail.setStatusMember(memberStatus);
+        } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_SELECTED_TIME.getKeyName()).equals("true")) {
+            List<MemberSelectedTimestamp> memberSelectedTimestamps = (List<MemberSelectedTimestamp>) msg;
+            targetEventMemberDetail.setSelectedTimestamps(memberSelectedTimestamps);
+        } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_PROPOSED_TIME.getKeyName()).equals("true")) {
+            List<MemberProposedTimestamp> memberProposedTimestamps = (List<MemberProposedTimestamp>) msg;
+            targetEventMemberDetail.setProposedTimestamps(memberProposedTimestamps);
+        } else if (msgHeader.get(PublishEventChannelArgKeyName.MEMBER_MINS_TO_ARRIVE.getKeyName()).equals("true")) {
+            int estimateInMin = (int) msg;
+            targetEventMemberDetail.setMinsToArrive(estimateInMin);
+        } else {
+            assert false;
+        }
+
+    }
+
+    private void handleServerMessage(Map<String, String> msgHeader, Object msg) {
 
     }
 

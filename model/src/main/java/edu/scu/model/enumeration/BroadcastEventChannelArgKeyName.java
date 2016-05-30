@@ -7,6 +7,8 @@ public enum BroadcastEventChannelArgKeyName {
 
     CHANNEL_NAME("channelName"),
 
+    OBJECT_ID("objectId"),
+
     EVENT_ID("eventId"),
 
     LEADER_ID("leaderId"),
@@ -21,7 +23,7 @@ public enum BroadcastEventChannelArgKeyName {
 
     EVENT_LOCATION("eventLocation"),
 
-    EVENT_LEADER("eventLeader"),
+    EVENT_LEADER_NAME("eventLeaderName"),
 
     MEMBER_ID("memberId"),
 

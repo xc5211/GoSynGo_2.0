@@ -58,8 +58,8 @@ public interface AppAction {
      */
     public void proposeEventTimestampsAsMember(final String eventId, final List<String> proposedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener);
     public void selectEventTimestampsAsMember(final String eventId, final List<String> selectedEventTimestamps, final ActionCallbackListener<EventMemberDetail> listener);
-    public void acceptEvent(final Event undecidedEvent, final String leaderId, final ActionCallbackListener<Boolean> listener);
-    public void declineEvent(final Event undecidedEvent, final String leaderId, final ActionCallbackListener<Boolean> listener);
+    public void acceptEvent(final String eventId, final String leaderId, final ActionCallbackListener<Boolean> listener);
+    public void declineEvent(final String eventId, final String leaderId, final ActionCallbackListener<Boolean> listener);
     public void checkInEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void setMinsToArriveAsMember(final String eventId, final int estimateInMin, final ActionCallbackListener<Integer> listener);
 
