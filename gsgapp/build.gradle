@@ -33,4 +33,5 @@ dependencies {
     compile project(':core')
     compile project(':model')
     compile project(':lib')
+    compile project(':weekviewlib')
 }

@@ -1,1 +1,1 @@
-include ':model', ':api', ':core', ':util', ':gsgapp', ':lib'
+include ':model', ':api', ':core', ':util', ':gsgapp', ':lib', ':weekviewlib'
