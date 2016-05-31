@@ -98,6 +98,8 @@ public class DashboardEventFragment extends Fragment {
         for (Event event : events) {
             if (event.getEventMemberDetail(gsgApplication.getAppAction().getHostPerson().getObjectId()) == null) {
                 eventLeaderMap.put(event, true);
+            } else {
+                eventLeaderMap.put(event, false);
             }
         }
         return eventLeaderMap;
