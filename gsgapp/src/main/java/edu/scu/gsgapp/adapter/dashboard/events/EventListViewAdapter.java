@@ -6,9 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Map;
 
 import edu.scu.gsgapp.R;
 import edu.scu.model.Event;
@@ -19,10 +21,12 @@ import edu.scu.model.enumeration.StatusEvent;
  */
 public class EventListViewAdapter extends ArrayAdapter<Event> {
 
+    private final Map<Event, Boolean> eventLeaderMap;
     private final List<Event> events;
 
-    public EventListViewAdapter(Context context, @LayoutRes int resource, List<Event> events) {
+    public EventListViewAdapter(Context context, @LayoutRes int resource, List<Event> events, Map<Event, Boolean> eventLeaderMap) {
         super(context, resource, events);
+        this.eventLeaderMap = eventLeaderMap;
         this.events = events;
     }
 
@@ -42,20 +46,24 @@ public class EventListViewAdapter extends ArrayAdapter<Event> {
         final Event event = events.get(position);
 
         if (position == 1) {
+
             rowView = inflater.inflate(R.layout.fragment_event_ready_view_pager_custom_row, parent, false);
-            TextView textViewTime = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_event_row_time);
-            textViewTime.setText(event.getTimestamp().toString());
 
-            TextView textViewTitle = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_title);
-            textViewTitle.setText(event.getTitle());
+            TextView titleTextView = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_title);
+            titleTextView.setText(event.getTitle());
 
-            TextView textViewStatus = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_status);
-            String statusString = getStatusString(event);
-            textViewStatus.setText(statusString);
+            TextView timeTextView = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_event_row_time);
+            timeTextView.setText(event.getTimestamp().toString());
 
+            // Check if host is leader for "current" event
+            if (this.eventLeaderMap.get(event)) {
+                ImageView leaderImageView = (ImageView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_is_leader);
+                leaderImageView.setImageResource(R.drawable.icon_king_leader);
+            }
         } else if (position == 0) {
 
             rowView = inflater.inflate(R.layout.fragment_event_not_ready_view_pager_custom_row, parent, false);
+
             TextView textViewTitle = (TextView) rowView.findViewById(R.id.text_view_fragment_event_not_ready_view_pager_custom_row_event_title);
             textViewTitle.setText(event.getTitle());
 
@@ -63,6 +71,11 @@ public class EventListViewAdapter extends ArrayAdapter<Event> {
             String statusString = getStatusString(event);
             textViewStatus.setText(statusString);
 
+            // Check if host is leader for "current" event
+            if (this.eventLeaderMap.get(event)) {
+                ImageView leaderImageView = (ImageView) rowView.findViewById(R.id.text_view_fragment_event_not_ready_view_pager_custom_row_event_is_leader);
+                leaderImageView.setImageResource(R.drawable.icon_king_leader);
+            }
         } else {
             assert false;
         }
@@ -79,7 +92,7 @@ public class EventListViewAdapter extends ArrayAdapter<Event> {
         } else if (event.getStatusEvent() == StatusEvent.Past.getStatus()) {
             statusString = "Past";
         } else if (event.getStatusEvent() == StatusEvent.Tentative.getStatus()) {
-            statusString = "Tentative";
+            statusString = "Draft";
         } else if (event.getStatusEvent() == StatusEvent.Pending.getStatus()) {
             statusString = "Pending";
         } else {

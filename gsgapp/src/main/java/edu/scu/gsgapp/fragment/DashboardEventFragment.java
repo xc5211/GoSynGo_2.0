@@ -12,7 +12,9 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.scu.gsgapp.GsgApplication;
 import edu.scu.gsgapp.R;
@@ -45,10 +47,13 @@ public class DashboardEventFragment extends Fragment {
         List<Event> eventsReady = pagesEvents[0];
         List<Event> eventsNotReady = pagesEvents[1];
 
+        Map<Event, Boolean> eventReadyLeaderMap = getEventLeaderMap(eventsReady);
+        Map<Event, Boolean> eventNotReadyLeaderMap = getEventLeaderMap(eventsNotReady);
+
         ListView eventsReadyListView = (ListView) inflater.inflate(R.layout.fragment_event_listing, null).findViewById(R.id.list_view_fragment_event);
         ListView eventsNotReadyListView = (ListView) inflater.inflate(R.layout.fragment_event_listing, null).findViewById(R.id.list_view_fragment_event);
 
-        eventsReadyListView.setAdapter(new EventListViewAdapter(container.getContext(), R.layout.fragment_event_ready_view_pager_custom_row, eventsReady));
+        eventsReadyListView.setAdapter(new EventListViewAdapter(container.getContext(), R.layout.fragment_event_ready_view_pager_custom_row, eventsReady, eventReadyLeaderMap));
         eventsReadyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -64,7 +69,7 @@ public class DashboardEventFragment extends Fragment {
             }
         });
 
-        eventsNotReadyListView.setAdapter(new EventListViewAdapter(container.getContext(), R.layout.fragment_event_not_ready_view_pager_custom_row, eventsNotReady));
+        eventsNotReadyListView.setAdapter(new EventListViewAdapter(container.getContext(), R.layout.fragment_event_not_ready_view_pager_custom_row, eventsNotReady, eventNotReadyLeaderMap));
         eventsNotReadyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -86,6 +91,16 @@ public class DashboardEventFragment extends Fragment {
 
         viewPager.setAdapter(new DashboardEventPagerAdapter(pagesView));
         return view;
+    }
+
+    private Map<Event, Boolean> getEventLeaderMap(List<Event> events) {
+        Map<Event, Boolean> eventLeaderMap = new HashMap<>();
+        for (Event event : events) {
+            if (event.getEventMemberDetail(gsgApplication.getAppAction().getHostPerson().getObjectId()) == null) {
+                eventLeaderMap.put(event, true);
+            }
+        }
+        return eventLeaderMap;
     }
 
     private List<Event>[] getPagesEvents() {

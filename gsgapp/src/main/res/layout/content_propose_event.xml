@@ -124,8 +124,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:gravity="right"
-        android:weightSum="1"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layout_marginLeft="7dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginEnd="7dp">
 
         <EditText
             android:layout_width="wrap_content"
@@ -133,9 +136,10 @@
             android:inputType="textEmailAddress"
             android:ems="10"
             android:id="@+id/edit_text_propose_event_add_member_email"
-            android:text="                                    @gmail.com"
-            android:layout_weight="1.08" />
-
+            android:hint="Enter member email"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_gravity="center_vertical" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -149,7 +153,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
-        android:layout_marginLeft="12dp">
+        android:layout_marginLeft="7dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginEnd="7dp">
 
         <GridView
             android:id="@+id/gridview_show_members"
@@ -157,7 +164,6 @@
             android:layout_height="match_parent"
             android:layout_margin="0dp"
             android:gravity="center"
-            android:horizontalSpacing="10dp"
             android:numColumns="4"
             android:verticalSpacing="10dp"
             android:columnWidth="20dp"
@@ -165,7 +171,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
