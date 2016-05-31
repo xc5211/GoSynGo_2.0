@@ -96,21 +96,20 @@ public class ProposeEventActivity extends GsgBaseActivity {
                 //evnetId
                 String memberEmail = emailEdit.getText().toString().trim();
 
-
                 final ProgressDialog progressDialog = ProgressDialog.show( ProposeEventActivity.this, "", "Adding member...", true );
                 appAction.addEventMember(eventId, memberEmail, new ActionCallbackListener<Event>() {
                     @Override
                     public void onSuccess(Event data) {
+                        progressDialog.cancel();
                         String name = data.getEventMemberDetail().get(0).getMember().getFirstName();
                         proposeEventAddMemberAdapter.personNames.add(name);
                         gridView.setAdapter(proposeEventAddMemberAdapter);
-                        progressDialog.cancel();
                     }
 
                     @Override
                     public void onFailure(String message) {
-                        Toast.makeText(context, "Fail: " + message, Toast.LENGTH_SHORT).show();
                         progressDialog.cancel();
+                        Toast.makeText(context, "Fail: " + message, Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -129,9 +128,14 @@ public class ProposeEventActivity extends GsgBaseActivity {
 
             @Override
             public void onClick(View v) {
+
+                final ProgressDialog progressDialog = ProgressDialog.show( ProposeEventActivity.this, "", "Cancelling...", true );
+
                 getAppAction().cancelEvent(eventId, new ActionCallbackListener<Boolean>() {
                     @Override
                     public void onSuccess(Boolean data) {
+                        progressDialog.cancel();
+
                         if (data == true) {
                             Toast.makeText(context, "Cancel successfully!", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(ProposeEventActivity.this, DashboardActivity.class);
@@ -144,6 +148,7 @@ public class ProposeEventActivity extends GsgBaseActivity {
 
                     @Override
                     public void onFailure(String message) {
+                        progressDialog.cancel();
                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
                     }
                 });

@@ -164,6 +164,9 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+
+                final ProgressDialog progressDialog = ProgressDialog.show( DashboardActivity.this, "", "Connecting...", true );
+
                 Intent intent = null;
                 switch(item.getItemId()) {
                     case R.id.menu_dashboard_toolbar_add_event:
@@ -172,6 +175,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
                         appAction.proposeEvent(new ActionCallbackListener<Event>() {
                             @Override
                             public void onSuccess(Event data) {
+                                progressDialog.cancel();
                                 Intent intent = new Intent(DashboardActivity.this, ProposeEventActivity.class);
                                 intent.putExtra("eventId", data.getObjectId());
                                 startActivity(intent);
@@ -179,6 +183,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
 
                             @Override
                             public void onFailure(String message) {
+                                progressDialog.cancel();
                                 Toast.makeText(context, "Failed: " + message,Toast.LENGTH_SHORT).show();
                             }
                         });
