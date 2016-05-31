@@ -73,7 +73,7 @@ public class ProposeEventActivity extends GsgBaseActivity {
         durationSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.durationSpinner.setAdapter(durationSpinnerArrayAdapter);
 
-        this.reminderSpinner = (Spinner) findViewById(R.id.spinner_event_detail_not_ready_leader_reminder);
+        this.reminderSpinner = (Spinner) findViewById(R.id.spinner_propose_event_reminder);
         Integer[] reminders = { 0, 15, 30, 45, 60 };
         ArrayAdapter<Integer> remindSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, reminders);
         remindSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
