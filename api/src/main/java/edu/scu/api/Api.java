@@ -64,7 +64,7 @@ public interface Api {
 
     public ApiResponse<Person> acceptEvent(Person member, String eventId, String memberId);
 
-    public ApiResponse<EventMemberDetail> declineEvent(EventMemberDetail eventMemberDetail);
+    public ApiResponse<EventMemberDetail> declineEvent(String eventId, String memberId);
 
     public ApiResponse<EventMemberDetail> checkInEvent(EventMemberDetail eventMemberDetail);
 

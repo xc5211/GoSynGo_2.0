@@ -28,6 +28,7 @@ import edu.scu.core.task.AcceptEventAsyncTask;
 import edu.scu.core.task.AddEventInformationAsyncTask;
 import edu.scu.core.task.AddEventMemberAsyncTask;
 import edu.scu.core.task.CancelEventAsyncTask;
+import edu.scu.core.task.DeclineEventAsyncTask;
 import edu.scu.core.task.InitiateEventAsyncTask;
 import edu.scu.core.task.LoginAsyncTask;
 import edu.scu.core.task.LogoutAsyncTask;
@@ -602,17 +603,15 @@ public class AppActionImpl implements AppAction {
     @Override
     public void acceptEvent(final String eventId, final String leaderId, final ActionCallbackListener<Boolean> listener) {
 
-        final String memberId = hostPerson.getObjectId();
-        final EventUndecided undecidedEvent = AppActionImplHelper.getUndecidedEvent(undecidedEventList, eventId);
-
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
                 Person updatedPerson = (Person) bundle.getSerializable(Person.SERIALIZE_KEY);
-                Event acceptedEvent = updatedPerson.getEventsAsMember().get(0);//.getEventAsMember(eventId);
+                Event acceptedEvent = updatedPerson.getEventsAsMember().get(0);
                 boolean isSuccess = hostPerson.getEventsAsMember().add(acceptedEvent);
                 if (isSuccess) {
+                    EventUndecided undecidedEvent = AppActionImplHelper.getUndecidedEvent(undecidedEventList, eventId);
                     undecidedEventList.remove(undecidedEvent);
                     listener.onSuccess(true);
                 } else {
@@ -623,6 +622,7 @@ public class AppActionImpl implements AppAction {
         });
 
         Person baseMember = AppActionImplHelper.getBasePerson(hostPerson);
+        String memberId = hostPerson.getObjectId();
         AcceptEventAsyncTask acceptTask = new AcceptEventAsyncTask(api, listener, handler, baseMember, eventId, memberId);
         acceptTask.execute();
 
@@ -650,28 +650,24 @@ public class AppActionImpl implements AppAction {
         //timer.cancel();
     }
 
-    // TODO[test]
     @Override
     public void declineEvent(final String eventId, final String leaderId, final ActionCallbackListener<Boolean> listener) {
-
-        final String memberId = hostPerson.getObjectId();
-        final EventUndecided undecidedEvent = AppActionImplHelper.getUndecidedEvent(undecidedEventList, eventId);
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
-//                EventMemberDetail updatedEventMemberDetail = (EventMemberDetail) bundle.getSerializable(EventMemberDetail.SERIALIZE_KEY);
-
+                EventUndecided undecidedEvent = AppActionImplHelper.getUndecidedEvent(undecidedEventList, eventId);
                 undecidedEventList.remove(undecidedEvent);
+                listener.onSuccess(true);
                 return false;
             }
         });
 
-        // TODO: notify server event is declined in DeclineEventAsyncTask
-//        DeclineEventAsyncTask declineEvent = new DeclineEventAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId(), targetEventMemberDetail);
-//        declineEvent.execute();
+        DeclineEventAsyncTask declineEvent = new DeclineEventAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId());
+        declineEvent.execute();
 
+        String memberId = hostPerson.getObjectId();
         try {
             api.publishEventChannelMemberStatus(eventId, memberId, leaderId, StatusMember.Declined.getStatus());
         } catch (BackendlessException e) {

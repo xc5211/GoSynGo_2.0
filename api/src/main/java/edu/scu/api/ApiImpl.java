@@ -297,8 +297,30 @@ public class ApiImpl implements Api {
     }
 
     @Override
-    public ApiResponse<EventMemberDetail> declineEvent(EventMemberDetail eventMemberDetail) {
+    public ApiResponse<EventMemberDetail> declineEvent(String eventId, String memberId) {
 
+        // Get target event
+        Event event = null;
+        try {
+            event = Backendless.Data.of(Event.class).findById(eventId);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        assert event != null;
+
+        // Load target event with event member detail
+        ArrayList<String> relationProps = new ArrayList<>();
+        relationProps.add( "eventMemberDetail" );
+        relationProps.add( "eventMemberDetail.member" );
+        try {
+            Backendless.Data.of(Event.class).loadRelations(event, relationProps);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        // Get target EventMemberDetail object
+        EventMemberDetail eventMemberDetail = event.getEventMemberDetail(memberId);
+        eventMemberDetail.setStatusMember(StatusMember.Declined.getStatus());
         try {
             eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
         } catch (BackendlessException exception) {
