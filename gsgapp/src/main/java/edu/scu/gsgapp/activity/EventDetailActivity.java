@@ -94,14 +94,14 @@ public class EventDetailActivity extends GsgBaseActivity {
                 this.noteEditText.setText(event.getNote());
 
                 this.durationSpinner = (Spinner) findViewById(R.id.spinner_event_detail_not_ready_leader_duration);
-                Integer[] durations = { 30, 45, 60, 90, 120};
+                Integer[] durations = { 30, 45, 60, 90, 120 };
                 ArrayAdapter<Integer> durationSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, durations);
                 durationSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 this.durationSpinner.setAdapter(durationSpinnerArrayAdapter);
 
                 this.reminderSpinner = (Spinner) findViewById(R.id.spinner_event_detail_not_ready_leader_reminder);
                 Integer[] reminders = { 0, 15, 30, 45, 60 };
-                ArrayAdapter<Integer> remindSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, durations);
+                ArrayAdapter<Integer> remindSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, reminders);
                 remindSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 this.reminderSpinner.setAdapter(remindSpinnerArrayAdapter);
 
