@@ -120,7 +120,7 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
                         .setContentTitle(title)
                         .setContentText(message)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-                        .addAction(0, "View", contentIntent)
+                        //.addAction(0, "View", contentIntent)
                         .setAutoCancel(true)
                         .setDefaults(new NotificationCompat().DEFAULT_VIBRATE)
                         .setDefaults(new NotificationCompat().DEFAULT_SOUND);
@@ -170,7 +170,7 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
             String eventTitle = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_TITLE.getKeyName());
             String eventNote = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_NOTE.getKeyName());
             String eventLocation = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_LOCATION.getKeyName());
-            String eventLeader = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_LEADER.getKeyName());
+            String eventLeader = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_LEADER_NAME.getKeyName());
 
             // TODO: timer
             //appAction.startMemberInvitationTimer(appAction, eventId);
@@ -179,7 +179,7 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
             nextIntent.putExtra(BroadcastEventChannelArgKeyName.EVENT_TITLE.getKeyName(), eventTitle);
             nextIntent.putExtra(BroadcastEventChannelArgKeyName.EVENT_NOTE.getKeyName(), eventNote);
             nextIntent.putExtra(BroadcastEventChannelArgKeyName.EVENT_LOCATION.getKeyName(), eventLocation);
-            nextIntent.putExtra(BroadcastEventChannelArgKeyName.EVENT_LEADER.getKeyName(), eventLeader);
+            nextIntent.putExtra(BroadcastEventChannelArgKeyName.EVENT_LEADER_NAME.getKeyName(), eventLeader);
         } else if (eventManagementState.equals(EventManagementState.REMIND_TO_VOTE.getStatus())) {
             // TODO: handle member receives vote notification
             nextIntent = new Intent(context, DashboardActivity.class);
