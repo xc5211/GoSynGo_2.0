@@ -352,7 +352,7 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final String note, final ActionCallbackListener<Event> listener) {
+    public void sendEventInvitation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final String note, final ActionCallbackListener<Event> listener) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
         Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
@@ -362,6 +362,7 @@ public class AppActionImpl implements AppAction {
         targetEventInProgress.setHasReminder(hasReminder);
         targetEventInProgress.setReminderInMin(reminderInMin);
         targetEventInProgress.setNote(note == null ? "" : note);
+        targetEventInProgress.setStatusEvent(StatusEvent.Pending.getStatus());
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
@@ -375,6 +376,7 @@ public class AppActionImpl implements AppAction {
                 targetEvent.setHasReminder(updatedEvent.getHasReminder());
                 targetEvent.setReminderInMin(updatedEvent.getReminderInMin());
                 targetEvent.setNote(updatedEvent.getNote());
+                targetEvent.setStatusEvent(updatedEvent.getStatusEvent());
                 listener.onSuccess(null);
                 return true;
             }
@@ -382,30 +384,6 @@ public class AppActionImpl implements AppAction {
 
         AddEventInformationAsyncTask addEventInformationAsyncTask = new AddEventInformationAsyncTask(api, listener, handler, targetEventInProgress);
         addEventInformationAsyncTask.execute();
-    }
-
-    @Override
-    public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener) {
-
-        // Handle data
-        final Event targetEvent = hostPerson.getEventAsLeader(eventId);
-        Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
-        targetEventInProgress.setStatusEvent(StatusEvent.Pending.getStatus());
-
-        Handler handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(android.os.Message msg) {
-                Bundle bundle = msg.getData();
-                Event updatedEvent = (Event) bundle.getSerializable(Event.SERIALIZE_KEY);
-
-                targetEvent.setStatusEvent(updatedEvent.getStatusEvent());
-                listener.onSuccess(null);
-                return true;
-            }
-        });
-
-        SendEventInvitationAsyncTask sendEventInvitationAsyncTask = new SendEventInvitationAsyncTask(api, listener, handler, targetEventInProgress);
-        sendEventInvitationAsyncTask.execute();
 
         // Handle messaging
         final EventChannelMessageLeaderResponder channelMsgLeaderResponder = new EventChannelMessageLeaderResponder(hostPerson);

@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Time"
-            android:id="@+id/text_view_fragment_event_ready_view_pager_custom_event_row_time"/>
+            android:id="@+id/text_view_fragment_event_ready_view_pager_custom_row_event_time"/>
     </LinearLayout>
 
 </LinearLayout>

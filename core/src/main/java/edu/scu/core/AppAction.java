@@ -47,8 +47,7 @@ public interface AppAction {
     public void proposeEvent(final ActionCallbackListener<Event> listener);
     public void addEventMember(final String eventId, final String memberEmail, final ActionCallbackListener<Event> listener);
     public void removeEventMember(final String eventId, final String memberId, final ActionCallbackListener<Event> listener);
-    public void addEventInformation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final String note, final ActionCallbackListener<Event> listener);
-    public void sendEventInvitation(final String eventId, final ActionCallbackListener<Event> listener);
+    public void sendEventInvitation(final String eventId, final String title, final String location, final int durationInMin, final boolean hasReminder, final int reminderInMin, final String note, final ActionCallbackListener<Event> listener);
     public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp);
     public void cancelEvent(final String eventId, final ActionCallbackListener<Boolean> listener);
     public void proposeEventTimestampsAsLeader(final String eventId, final List<String> proposedEventTimestamps, final ActionCallbackListener<EventLeaderDetail> listener);

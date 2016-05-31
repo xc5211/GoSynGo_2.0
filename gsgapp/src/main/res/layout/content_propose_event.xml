@@ -23,38 +23,56 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1">
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Title"
-            android:id="@+id/textView_propose_event_title" />
-
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="Title:"
+            android:id="@+id/textView_propose_event_title"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_weight="1"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
+            android:gravity="center_vertical" />
         <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/edit_text_propose_event_title" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/edit_text_propose_event_title"
+            android:layout_weight="4"
+            android:gravity="center" />
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="7dp"
+        android:layout_marginRight="7dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <ImageView
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:text="Location"
-            android:id="@+id/textView_propose_event_location" />
-
+            android:id="@+id/image_view_propose_event_location"
+            android:src="@drawable/temp_map_icon"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"/>
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/edit_text_propose_event_location"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:hint="Location:"
+            android:text="300H, Lucas Hall, 455 El Camino Real"
+            android:layout_weight="4"
+            android:textSize="14sp"/>
     </LinearLayout>
 
     <LinearLayout
@@ -62,48 +80,29 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1">
+        android:gravity="center_vertical"
+        android:layout_weight="1"
+        android:layout_marginEnd="7dp"
+        android:layout_marginRight="7dp">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Note"
-            android:id="@+id/textView_propose_event_note" />
-
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Note: "
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="7dp"
+            android:layout_marginStart="7dp"/>
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/edit_text_propose_event_note"
-            android:layout_weight="1" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1">
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Alert"
-            android:id="@+id/checkbox_propose_event_reminder"
-            android:checked="true" />
-        <EditText
-            android:layout_width="74dp"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/edit_text_propose_event_reminder"
-            android:hint="minutes ahead"
-            android:layout_weight="0.03" />
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/edit_text_propose_event_duration"
-            android:layout_weight="0.03"
-            android:hint="duration in min" />
+            android:layout_weight="4"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:text="Please bring your own laptop" />
     </LinearLayout>
 
     <LinearLayout
@@ -112,14 +111,63 @@
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"
-        android:gravity="center_horizontal">
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Duration: "
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="7dp"
+            android:layout_marginStart="7dp"/>
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/spinner_propose_event_duration"
+            android:layout_weight="1"
+            android:gravity="left|center_vertical">
+        </Spinner>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Remind ahead:"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical" />
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/spinner_propose_event_reminder"
+            android:layout_weight="1"
+            android:gravity="left|center_vertical">
+        </Spinner>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:layout_marginEnd="7dp"
+        android:layout_marginRight="7dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Starting date "
+            android:text="Earliest date "
             android:id="@+id/textView_propose_starting_date"
-            android:textSize="20dp" />
+            android:textSize="14dp"
+            android:textStyle="bold"
+            android:layout_marginLeft="7dp"
+            android:layout_marginStart="7dp"
+            android:layout_gravity="center_vertical" />
         <DatePicker
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -189,14 +237,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Send Invitation"
-            android:id="@+id/button_propose_event_send_invitation"
-            android:layout_weight="1" />
+            android:id="@+id/button_propose_event_send_invitation"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical|center_horizontal">
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancel "
-            android:id="@+id/button_propose_event_cancel"
-            android:layout_weight="1" />
+            android:id="@+id/button_propose_event_cancel" />
     </LinearLayout>
 
 </LinearLayout>

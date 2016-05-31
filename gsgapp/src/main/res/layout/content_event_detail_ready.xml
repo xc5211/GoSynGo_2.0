@@ -62,7 +62,7 @@
             android:layout_gravity="center_vertical"
             android:textSize="16sp"
             android:text="300H, Lucas Hall, 455 El Camino Real"
-            android:layout_weight="0.73" />
+            android:layout_weight="1" />
     </LinearLayout>
 
     <LinearLayout
@@ -125,7 +125,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Time: "
+            android:text="Time:"
             android:textSize="16sp"
             android:textStyle="bold"
             android:gravity="center_vertical" />
@@ -149,7 +149,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Remind ahead: "
+            android:text="Remind ahead:"
             android:textSize="16sp"
             android:textStyle="bold"
             android:gravity="center_vertical" />

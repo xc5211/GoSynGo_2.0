@@ -33,7 +33,6 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView2"
             android:src="@drawable/temp_map_icon"
             android:layout_marginStart="7dp"
             android:layout_marginLeft="7dp"/>
@@ -147,28 +146,24 @@
         <ImageView
             android:layout_width="64dp"
             android:layout_height="63dp"
-            android:id="@+id/imageView"
             android:src="@drawable/temp_participant2"
             android:layout_marginRight="5dp" />
 
         <ImageView
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:id="@+id/imageView3"
             android:src="@drawable/temp_participant1"
             android:layout_marginRight="5dp" />
 
         <ImageView
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:id="@+id/imageView4"
             android:src="@drawable/temp_participant3"
             android:layout_marginRight="5dp" />
 
         <ImageView
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:id="@+id/imageView5"
             android:src="@drawable/temp_participant4"
             android:layout_marginRight="5dp" />
     </LinearLayout>

@@ -52,7 +52,7 @@ public class EventListViewAdapter extends ArrayAdapter<Event> {
             TextView titleTextView = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_title);
             titleTextView.setText(event.getTitle());
 
-            TextView timeTextView = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_event_row_time);
+            TextView timeTextView = (TextView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_time);
             timeTextView.setText(event.getTimestamp().toString());
 
             // Check if host is leader for "current" event
