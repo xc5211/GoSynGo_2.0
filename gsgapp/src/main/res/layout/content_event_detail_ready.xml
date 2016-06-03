@@ -166,36 +166,35 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="6">
+        android:layout_weight="2">
 
-        <ImageView
-            android:layout_width="64dp"
-            android:layout_height="63dp"
-            android:id="@+id/imageView"
-            android:src="@drawable/temp_participant2"
-            android:layout_marginRight="5dp" />
-
-        <ImageView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:id="@+id/imageView3"
-            android:src="@drawable/temp_participant1"
-            android:layout_marginRight="5dp" />
-
-        <ImageView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:id="@+id/imageView4"
-            android:src="@drawable/temp_participant3"
-            android:layout_marginRight="5dp" />
-
-        <ImageView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:id="@+id/imageView5"
-            android:src="@drawable/temp_participant4"
-            android:layout_marginRight="5dp" />
+        <android.support.v17.leanback.widget.HorizontalGridView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/event_detail_ready_event_member_grid_view"/>
     </LinearLayout>
+
+        <!--<ImageView-->
+            <!--android:layout_width="64dp"-->
+            <!--android:layout_height="64dp"-->
+            <!--android:id="@+id/imageView3"-->
+            <!--android:src="@drawable/temp_participant1"-->
+            <!--android:layout_marginRight="5dp" />-->
+
+        <!--<ImageView-->
+            <!--android:layout_width="64dp"-->
+            <!--android:layout_height="64dp"-->
+            <!--android:id="@+id/imageView4"-->
+            <!--android:src="@drawable/temp_participant3"-->
+            <!--android:layout_marginRight="5dp" />-->
+
+        <!--<ImageView-->
+            <!--android:layout_width="64dp"-->
+            <!--android:layout_height="64dp"-->
+            <!--android:id="@+id/imageView5"-->
+            <!--android:src="@drawable/temp_participant4"-->
+            <!--android:layout_marginRight="5dp" />-->
+    <!--</LinearLayout>-->
 
     <LinearLayout
         android:orientation="horizontal"

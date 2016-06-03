@@ -9,10 +9,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.scu.core.ActionCallbackListener;
 import edu.scu.gsgapp.R;
 import edu.scu.gsgapp.adapter.dashboard.events.MemberHorizontalViewAdapter;
 import edu.scu.model.Event;
@@ -35,8 +37,19 @@ public class EventDetailActivity extends GsgBaseActivity {
     private Button cancelButton;
 
     // Member not ready
+    private TextView locationTextView;
+    private TextView noteTextView;
+    private TextView durationTextView;
+    private TextView reminderTextView;
+    private Button deleteButton;
 
     // Ready
+    private TextView titleReadyTextView;
+    private TextView locationReadyTextView;
+    private TextView noteReadyTextView;
+    private TextView durationReadyTextView;
+    private TextView timeReadyTextView;
+    private TextView reminderReadyTextView;
 
 
     private Event event;
@@ -117,10 +130,57 @@ public class EventDetailActivity extends GsgBaseActivity {
                 break;
 
             case "memberNotReady":
+                ((TextView) findViewById(R.id.toolbar_event_detail_not_ready_member_title)).setText(event.getTitle());
+
+                this.locationTextView = (TextView) findViewById(R.id.text_view_event_detail_not_ready_member_location);
+                this.locationTextView.setText(event.getLocation());
+
+                this.noteTextView = (TextView) findViewById(R.id.text_view_event_detail_not_ready_member_note);
+                this.noteTextView.setText(event.getNote());
+
+                this.durationTextView = (TextView) findViewById(R.id.text_view_event_detail_not_ready_member_duration);
+                this.durationTextView.setText(event.getDurationInMin().toString());
+
+                this.memberHorizontalView = (HorizontalGridView) findViewById(R.id.event_detail_not_ready_member_event_member_grid_view);
+                List<String> memberListInMember = new ArrayList<>();
+                for(EventMemberDetail eventMemberDetail : event.getEventMemberDetail()) {
+                    memberListInMember.add(eventMemberDetail.getMember().getFirstName());
+                }
+                MemberHorizontalViewAdapter adapterInmember = new MemberHorizontalViewAdapter(this, memberListInMember);
+                this.memberHorizontalView.setAdapter(adapterInmember);
+
+                this.deleteButton = (Button) findViewById(R.id.button_event_detail_not_ready_member_delete);
 
                 break;
 
             default:    // "leaderReady" || "memberReady"
+                ((TextView) findViewById(R.id.toolbar_event_detail_ready_title)).setText(event.getTitle());
+
+                this.titleReadyTextView = (TextView) findViewById(R.id.text_view_event_detail_ready_title);
+                this.titleReadyTextView.setText(event.getTitle());
+
+                this.locationReadyTextView = (TextView) findViewById(R.id.text_view_event_detail_ready_location);
+                this.locationReadyTextView.setText((event.getLocation()));
+
+                this.noteReadyTextView = (TextView) findViewById(R.id.text_view_event_detail_ready_note);
+                this.noteReadyTextView.setText(event.getNote());
+
+                this.durationReadyTextView = (TextView) findViewById(R.id.text_view_event_detail_ready_duration);
+                this.durationReadyTextView.setText(event.getDurationInMin().toString());
+
+                this.timeReadyTextView = (TextView) findViewById(R.id.text_view_event_detail_ready_time);
+                this.timeReadyTextView.setText(event.getTimestamp().toString());
+
+                this.reminderReadyTextView = (TextView) findViewById(R.id.text_view_event_detail_ready_reminder);
+                this.reminderReadyTextView.setText(event.getReminderInMin().toString());
+
+                this.memberHorizontalView = (HorizontalGridView) findViewById(R.id.event_detail_ready_event_member_grid_view);
+                List<String> memberListInReady = new ArrayList<>();
+                for(EventMemberDetail eventMemberDetail : event.getEventMemberDetail()) {
+                    memberListInReady.add(eventMemberDetail.getMember().getFirstName());
+                }
+                MemberHorizontalViewAdapter adapterInReady = new MemberHorizontalViewAdapter(this, memberListInReady);
+                this.memberHorizontalView.setAdapter(adapterInReady);
 
                 break;
         }
@@ -137,6 +197,22 @@ public class EventDetailActivity extends GsgBaseActivity {
 
         switch (eventDetailProperty) {
             case "leaderNotReady":
+                super.appAction.cancelEvent(event.getObjectId(),new ActionCallbackListener<Boolean>() {
+
+                    @Override
+                    public void onSuccess(Boolean data) {
+
+                        Toast.makeText(context, "Cancel invitation successfully!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(EventDetailActivity.this, DashboardActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(String message) {
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                    }
+                });
 
                 break;
             case "memberNotReady":
