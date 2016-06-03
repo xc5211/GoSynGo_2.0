@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v17.leanback.widget.HorizontalGridView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +21,7 @@ import edu.scu.gsgapp.R;
 import edu.scu.gsgapp.adapter.dashboard.events.MemberHorizontalViewAdapter;
 import edu.scu.gsgapp.adapter.propose.ProposeEventAddMemberAdapter;
 import edu.scu.model.Event;
+import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
 
 /**
@@ -36,7 +38,8 @@ public class EventDetailActivity extends GsgBaseActivity {
     private Spinner durationSpinner;
     private Spinner reminderSpinner;
     private HorizontalGridView memberHorizontalViewForLeader;
-    private Button cancelButton;
+    private Button nextButton;
+    private Button cancelEventButton;
 
     // Member not ready
     private TextView locationTextView;
@@ -44,7 +47,7 @@ public class EventDetailActivity extends GsgBaseActivity {
     private TextView durationTextView;
     private TextView reminderTextView;
     private HorizontalGridView memberHorizontalViewForMember;
-    private Button deleteButton;
+    private Button leaveButton;
 
     // Ready
     private TextView titleReadyTextView;
@@ -54,7 +57,6 @@ public class EventDetailActivity extends GsgBaseActivity {
     private TextView timeReadyTextView;
     private TextView reminderReadyTextView;
     private GridView eventRedyGridview;
-
 
     private Event event;
 
@@ -101,7 +103,6 @@ public class EventDetailActivity extends GsgBaseActivity {
 
         switch (eventDetailProperty) {
             case "leaderNotReady":
-
                 ((TextView) findViewById(R.id.toolbar_event_detail_not_ready_leader_title)).setText(event.getTitle());
 
                 this.locationEditText = (EditText) findViewById(R.id.edit_text_event_detail_not_ready_leader_location);
@@ -130,7 +131,14 @@ public class EventDetailActivity extends GsgBaseActivity {
                 MemberHorizontalViewAdapter adapter = new MemberHorizontalViewAdapter(this, memberList);
                 this.memberHorizontalViewForLeader.setAdapter(adapter);
 
-                this.cancelButton = (Button) findViewById(R.id.button_event_detail_not_ready_leader_cancel);
+                this.nextButton = (Button) findViewById(R.id.button_event_detail_not_ready_leader_next);
+                if (event.getEventLeaderDetail().getProposedTimestamps().isEmpty()) {
+                    this.nextButton.setText("Start time vote");
+                } else {
+                    this.nextButton.setText("Notify final time");
+                }
+
+                this.cancelEventButton = (Button) findViewById(R.id.button_event_detail_not_ready_leader_cancel);
                 break;
 
             case "memberNotReady":
@@ -153,8 +161,7 @@ public class EventDetailActivity extends GsgBaseActivity {
                 MemberHorizontalViewAdapter adapterInmember = new MemberHorizontalViewAdapter(this, memberListInMember);
                 this.memberHorizontalViewForMember.setAdapter(adapterInmember);
 
-                this.deleteButton = (Button) findViewById(R.id.button_event_detail_not_ready_member_delete);
-
+                this.leaveButton = (Button) findViewById(R.id.button_event_detail_not_ready_member_leave);
                 break;
 
             default:    // "leaderReady" || "memberReady"
@@ -182,7 +189,6 @@ public class EventDetailActivity extends GsgBaseActivity {
                 }
                 ProposeEventAddMemberAdapter adapterInReady = new ProposeEventAddMemberAdapter(this, memberListInReady);
                 this.eventRedyGridview.setAdapter(adapterInReady);
-
                 break;
         }
     }
@@ -198,26 +204,35 @@ public class EventDetailActivity extends GsgBaseActivity {
 
         switch (eventDetailProperty) {
             case "leaderNotReady":
-                super.appAction.cancelEvent(event.getObjectId(),new ActionCallbackListener<Boolean>() {
 
+                this.nextButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onSuccess(Boolean data) {
+                    public void onClick(View v) {
 
-                        Toast.makeText(context, "Cancel invitation successfully!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(EventDetailActivity.this, DashboardActivity.class);
-                        startActivity(intent);
-                        finish();
+                        if (event.getEventLeaderDetail().getProposedTimestamps().isEmpty()) {
+                            proposeEventTimestampsAsLeader();
+                        } else {
+                            initiateEvent();
+                        }
                     }
+                });
 
+                this.cancelEventButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onFailure(String message) {
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                    public void onClick(View v) {
+                        cancelEvent();
                     }
                 });
 
                 break;
             case "memberNotReady":
 
+                this.leaveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        memberLeaveEvent();
+                    }
+                });
                 break;
             default:    // "leaderReady" || "memberReady"
 
@@ -227,6 +242,65 @@ public class EventDetailActivity extends GsgBaseActivity {
 
     private void initListenerCommon() {
 
+    }
+
+    private void proposeEventTimestampsAsLeader() {
+
+        // TODO: get time from calendar fragment
+        List<String> proposedEventTimestamps = new ArrayList<>();
+        proposedEventTimestamps.add("2016/05/20 8:00:00");
+        proposedEventTimestamps.add("2016/05/20 8:15:00");
+
+        appAction.proposeEventTimestampsAsLeader(event.getObjectId(), proposedEventTimestamps, new ActionCallbackListener<EventLeaderDetail>() {
+            @Override
+            public void onSuccess(EventLeaderDetail data) {
+                Toast.makeText(getApplicationContext(), "Propose time success", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void initiateEvent() {
+
+        super.appAction.initiateEvent(event.getObjectId(), event.getTimestamp(), new ActionCallbackListener<Integer>() {
+            @Override
+            public void onSuccess(Integer data) {
+                Toast.makeText(getApplicationContext(), "Initiate event success", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void cancelEvent() {
+
+        super.appAction.cancelEvent(event.getObjectId(),new ActionCallbackListener<Boolean>() {
+
+            @Override
+            public void onSuccess(Boolean data) {
+
+                Toast.makeText(context, "Event cancelled", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(EventDetailActivity.this, DashboardActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onFailure(String message) {
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void memberLeaveEvent() {
+        // TODO[later]
     }
 
 }

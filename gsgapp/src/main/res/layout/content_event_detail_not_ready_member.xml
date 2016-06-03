@@ -158,10 +158,10 @@
         android:gravity="center_vertical|center_horizontal">
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Delete and Leave"
-            android:id="@+id/button_event_detail_not_ready_member_delete"
+            android:id="@+id/button_event_detail_not_ready_member_leave"
             android:background="#fe2f0b"
             android:textSize="14sp"
             android:gravity="center" />

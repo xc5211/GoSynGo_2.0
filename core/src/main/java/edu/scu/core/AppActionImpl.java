@@ -412,7 +412,7 @@ public class AppActionImpl implements AppAction {
 
     // TODO[test]
     @Override
-    public void initiateEvent(final String eventId, final ActionCallbackListener<Integer> listener, final Date eventFinalTimestamp) {
+    public void initiateEvent(final String eventId, final Date eventFinalTimestamp, final ActionCallbackListener<Integer> listener) {
 
         final Event targetEvent = hostPerson.getEventAsLeader(eventId);
         Event targetEventInProgress = AppActionImplHelper.getBaseEvent(targetEvent);
@@ -504,6 +504,8 @@ public class AppActionImpl implements AppAction {
 
         ProposeEventTimestampsAsLeaderAsyncTask proposeEventTimestampsAsLeaderAsyncTask = new ProposeEventTimestampsAsLeaderAsyncTask(api, listener, handler, eventId, targetEventLeaderDetailInProgress);
         proposeEventTimestampsAsLeaderAsyncTask.execute();
+
+        // TODO: notifiaction to all members
     }
 
     // TODO[test]
