@@ -14,12 +14,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.gsgapp.R;
 import edu.scu.gsgapp.adapter.dashboard.events.MemberHorizontalViewAdapter;
 import edu.scu.gsgapp.adapter.propose.ProposeEventAddMemberAdapter;
+import edu.scu.gsgapp.fragment.FragmentDateCommunicator;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
@@ -27,7 +29,7 @@ import edu.scu.model.EventMemberDetail;
 /**
  * Created by chuanxu on 5/26/16.
  */
-public class EventDetailActivity extends GsgBaseActivity {
+public class EventDetailActivity extends GsgBaseActivity implements FragmentDateCommunicator {
 
     // Common
     private Toolbar toolbar;
@@ -59,6 +61,8 @@ public class EventDetailActivity extends GsgBaseActivity {
     private GridView eventRedyGridview;
 
     private Event event;
+    private List<Date> leaderProposedTimestamps;
+    private Date eventTimestamp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -132,6 +136,7 @@ public class EventDetailActivity extends GsgBaseActivity {
                 this.memberHorizontalViewForLeader.setAdapter(adapter);
 
                 this.nextButton = (Button) findViewById(R.id.button_event_detail_not_ready_leader_next);
+                this.nextButton.setEnabled(false);
                 if (event.getEventLeaderDetail().getProposedTimestamps().isEmpty()) {
                     this.nextButton.setText("Start time vote");
                 } else {
@@ -266,7 +271,7 @@ public class EventDetailActivity extends GsgBaseActivity {
 
     private void initiateEvent() {
 
-        super.appAction.initiateEvent(event.getObjectId(), event.getTimestamp(), new ActionCallbackListener<Integer>() {
+        super.appAction.initiateEvent(event.getObjectId(), eventTimestamp, new ActionCallbackListener<Integer>() {
             @Override
             public void onSuccess(Integer data) {
                 Toast.makeText(getApplicationContext(), "Initiate event success", Toast.LENGTH_SHORT).show();
@@ -301,6 +306,28 @@ public class EventDetailActivity extends GsgBaseActivity {
 
     private void memberLeaveEvent() {
         // TODO[later]
+    }
+
+    @Override
+    public void updateSelectedDates(List<Date> selectedDates) {
+
+        if (event.getEventLeaderDetail().getProposedTimestamps().isEmpty()) {
+            // Vote time
+            if (!selectedDates.isEmpty()) {
+                this.leaderProposedTimestamps = selectedDates;
+                this.nextButton.setEnabled(true);
+            } else {
+                this.nextButton.setEnabled(false);
+            }
+        } else {
+            // Final time
+            if (!selectedDates.isEmpty() && selectedDates.size() == 1) {
+                this.eventTimestamp = selectedDates.get(0);
+                this.nextButton.setEnabled(true);
+            } else {
+                this.nextButton.setEnabled(false);
+            }
+        }
     }
 
 }
