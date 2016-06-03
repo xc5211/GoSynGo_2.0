@@ -25,6 +25,7 @@ public class TestEventActivity extends GsgBaseActivity {
     private Button addEventInfoButton;
     private Button leaderProposeTimeButton;
     private Button sendEventInvitationButton;
+    private Button cancelEventButton;
 
     private static String eventId = "61B5F3F8-6A3A-577F-FF6D-AA41F09CE100";
 
@@ -44,6 +45,7 @@ public class TestEventActivity extends GsgBaseActivity {
         addEventInfoButton = (Button) findViewById(R.id.button_add_event_info);
         leaderProposeTimeButton = (Button) findViewById(R.id.button_leader_propose_time);
         sendEventInvitationButton = (Button) findViewById(R.id.button_send_invitation);
+        cancelEventButton = (Button) findViewById(R.id.button_cancel_event);
     }
 
     private void initListener() {
@@ -112,18 +114,18 @@ public class TestEventActivity extends GsgBaseActivity {
                 int reminderInMin = 30;
                 String note = null;
 
-                appAction.addEventInformation(eventId, title, location, durationInMin, hasReminder, reminderInMin, note, new ActionCallbackListener<Event>() {
-
-                    @Override
-                    public void onSuccess(Event data) {
-                        Toast.makeText(getApplicationContext(), "Add event info success", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onFailure(String message) {
-                        Toast.makeText(getApplicationContext(), "Add event info fail", Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                appAction.addEventInformation(eventId, title, location, durationInMin, hasReminder, reminderInMin, note, new ActionCallbackListener<Event>() {
+//
+//                    @Override
+//                    public void onSuccess(Event data) {
+//                        Toast.makeText(getApplicationContext(), "Add event info success", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                    @Override
+//                    public void onFailure(String message) {
+//                        Toast.makeText(getApplicationContext(), "Add event info fail", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
             }
         });
 
@@ -153,15 +155,33 @@ public class TestEventActivity extends GsgBaseActivity {
             @Override
             public void onClick(View v) {
 
-                appAction.sendEventInvitation(eventId, new ActionCallbackListener<Event>() {
+//                appAction.sendEventInvitation(eventId, new ActionCallbackListener<Event>() {
+//                    @Override
+//                    public void onSuccess(Event data) {
+//                        Toast.makeText(getApplicationContext(), "Send invitation success", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                    @Override
+//                    public void onFailure(String message) {
+//                        Toast.makeText(getApplicationContext(), "Send invitation fail", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+            }
+        });
+
+        cancelEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                appAction.cancelEvent("eventId", new ActionCallbackListener<Boolean>() {
                     @Override
-                    public void onSuccess(Event data) {
-                        Toast.makeText(getApplicationContext(), "Send invitation success", Toast.LENGTH_SHORT).show();
+                    public void onSuccess(Boolean data) {
+                        Toast.makeText(getApplicationContext(), "Cancel event success", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onFailure(String message) {
-                        Toast.makeText(getApplicationContext(), "Send invitation fail", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Cancel event fail", Toast.LENGTH_SHORT).show();
                     }
                 });
             }

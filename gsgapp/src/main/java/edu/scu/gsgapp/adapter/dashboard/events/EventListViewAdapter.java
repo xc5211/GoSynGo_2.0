@@ -21,11 +21,13 @@ import edu.scu.model.enumeration.StatusEvent;
  */
 public class EventListViewAdapter extends ArrayAdapter<Event> {
 
+    private boolean isReadyEventAdapter;
     private final Map<Event, Boolean> eventLeaderMap;
     private final List<Event> events;
 
-    public EventListViewAdapter(Context context, @LayoutRes int resource, List<Event> events, Map<Event, Boolean> eventLeaderMap) {
+    public EventListViewAdapter(Context context, @LayoutRes int resource, boolean isReadyEventAdapter, List<Event> events, Map<Event, Boolean> eventLeaderMap) {
         super(context, resource, events);
+        this.isReadyEventAdapter = isReadyEventAdapter;
         this.eventLeaderMap = eventLeaderMap;
         this.events = events;
     }
@@ -45,7 +47,7 @@ public class EventListViewAdapter extends ArrayAdapter<Event> {
 
         final Event event = events.get(position);
 
-        if (position == 1) {
+        if (isReadyEventAdapter) {
 
             rowView = inflater.inflate(R.layout.fragment_event_ready_view_pager_custom_row, parent, false);
 
@@ -60,7 +62,7 @@ public class EventListViewAdapter extends ArrayAdapter<Event> {
                 ImageView leaderImageView = (ImageView) rowView.findViewById(R.id.text_view_fragment_event_ready_view_pager_custom_row_event_is_leader);
                 leaderImageView.setImageResource(R.drawable.icon_king_leader);
             }
-        } else if (position == 0) {
+        } else {
 
             rowView = inflater.inflate(R.layout.fragment_event_not_ready_view_pager_custom_row, parent, false);
 
@@ -76,8 +78,6 @@ public class EventListViewAdapter extends ArrayAdapter<Event> {
                 ImageView leaderImageView = (ImageView) rowView.findViewById(R.id.text_view_fragment_event_not_ready_view_pager_custom_row_event_is_leader);
                 leaderImageView.setImageResource(R.drawable.icon_king_leader);
             }
-        } else {
-            assert false;
         }
         return rowView;
     }
