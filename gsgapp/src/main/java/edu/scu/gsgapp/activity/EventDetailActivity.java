@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +18,7 @@ import java.util.List;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.gsgapp.R;
 import edu.scu.gsgapp.adapter.dashboard.events.MemberHorizontalViewAdapter;
+import edu.scu.gsgapp.adapter.propose.ProposeEventAddMemberAdapter;
 import edu.scu.model.Event;
 import edu.scu.model.EventMemberDetail;
 
@@ -27,13 +29,13 @@ public class EventDetailActivity extends GsgBaseActivity {
 
     // Common
     private Toolbar toolbar;
-    private HorizontalGridView memberHorizontalView;
 
     // Leader not ready
     private EditText locationEditText;
     private EditText noteEditText;
     private Spinner durationSpinner;
     private Spinner reminderSpinner;
+    private HorizontalGridView memberHorizontalViewForLeader;
     private Button cancelButton;
 
     // Member not ready
@@ -41,6 +43,7 @@ public class EventDetailActivity extends GsgBaseActivity {
     private TextView noteTextView;
     private TextView durationTextView;
     private TextView reminderTextView;
+    private HorizontalGridView memberHorizontalViewForMember;
     private Button deleteButton;
 
     // Ready
@@ -50,6 +53,7 @@ public class EventDetailActivity extends GsgBaseActivity {
     private TextView durationReadyTextView;
     private TextView timeReadyTextView;
     private TextView reminderReadyTextView;
+    private GridView eventRedyGridview;
 
 
     private Event event;
@@ -118,13 +122,13 @@ public class EventDetailActivity extends GsgBaseActivity {
                 remindSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 this.reminderSpinner.setAdapter(remindSpinnerArrayAdapter);
 
-                this.memberHorizontalView = (HorizontalGridView) findViewById(R.id.event_detail_not_ready_leader_event_member_grid_view);
+                this.memberHorizontalViewForLeader = (HorizontalGridView) findViewById(R.id.event_detail_not_ready_leader_event_member_grid_view);
                 List<String> memberList = new ArrayList<>();
                 for(EventMemberDetail eventMemberDetail : event.getEventMemberDetail()) {
                     memberList.add(eventMemberDetail.getMember().getFirstName());
                 }
                 MemberHorizontalViewAdapter adapter = new MemberHorizontalViewAdapter(this, memberList);
-                this.memberHorizontalView.setAdapter(adapter);
+                this.memberHorizontalViewForLeader.setAdapter(adapter);
 
                 this.cancelButton = (Button) findViewById(R.id.button_event_detail_not_ready_leader_cancel);
                 break;
@@ -141,13 +145,13 @@ public class EventDetailActivity extends GsgBaseActivity {
                 this.durationTextView = (TextView) findViewById(R.id.text_view_event_detail_not_ready_member_duration);
                 this.durationTextView.setText(event.getDurationInMin().toString());
 
-                this.memberHorizontalView = (HorizontalGridView) findViewById(R.id.event_detail_not_ready_member_event_member_grid_view);
+                this.memberHorizontalViewForMember = (HorizontalGridView) findViewById(R.id.event_detail_not_ready_member_event_member_grid_view);
                 List<String> memberListInMember = new ArrayList<>();
                 for(EventMemberDetail eventMemberDetail : event.getEventMemberDetail()) {
                     memberListInMember.add(eventMemberDetail.getMember().getFirstName());
                 }
                 MemberHorizontalViewAdapter adapterInmember = new MemberHorizontalViewAdapter(this, memberListInMember);
-                this.memberHorizontalView.setAdapter(adapterInmember);
+                this.memberHorizontalViewForMember.setAdapter(adapterInmember);
 
                 this.deleteButton = (Button) findViewById(R.id.button_event_detail_not_ready_member_delete);
 
@@ -155,9 +159,6 @@ public class EventDetailActivity extends GsgBaseActivity {
 
             default:    // "leaderReady" || "memberReady"
                 ((TextView) findViewById(R.id.toolbar_event_detail_ready_title)).setText(event.getTitle());
-
-                this.titleReadyTextView = (TextView) findViewById(R.id.text_view_event_detail_ready_title);
-                this.titleReadyTextView.setText(event.getTitle());
 
                 this.locationReadyTextView = (TextView) findViewById(R.id.text_view_event_detail_ready_location);
                 this.locationReadyTextView.setText((event.getLocation()));
@@ -174,13 +175,13 @@ public class EventDetailActivity extends GsgBaseActivity {
                 this.reminderReadyTextView = (TextView) findViewById(R.id.text_view_event_detail_ready_reminder);
                 this.reminderReadyTextView.setText(event.getReminderInMin().toString());
 
-                this.memberHorizontalView = (HorizontalGridView) findViewById(R.id.event_detail_ready_event_member_grid_view);
+                this.eventRedyGridview = (GridView) findViewById(R.id.gridview_event_detail_ready);
                 List<String> memberListInReady = new ArrayList<>();
                 for(EventMemberDetail eventMemberDetail : event.getEventMemberDetail()) {
                     memberListInReady.add(eventMemberDetail.getMember().getFirstName());
                 }
-                MemberHorizontalViewAdapter adapterInReady = new MemberHorizontalViewAdapter(this, memberListInReady);
-                this.memberHorizontalView.setAdapter(adapterInReady);
+                ProposeEventAddMemberAdapter adapterInReady = new ProposeEventAddMemberAdapter(this, memberListInReady);
+                this.eventRedyGridview.setAdapter(adapterInReady);
 
                 break;
         }
