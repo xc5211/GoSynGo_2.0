@@ -450,15 +450,15 @@ public class AppActionImpl implements AppAction {
         } else {
             // Invitation has been sent out -> take care of cancellation on server side
 
+            String channelName = eventId;
             try {
                 // TODO[later]: unregister from channel
                 // TODO[later]: notify member
                 // TODO[later]: member unregister from channel
-                api.broadcastEventChannel(GoogleProjectSettings.DEFAULT_CHANNEL, eventId, hostPerson, EventManagementState.CANCEL_EVENT.getStatus());
+                api.broadcastEventChannel(channelName, eventId, hostPerson, EventManagementState.CANCEL_EVENT.getStatus());
             } catch (BackendlessException e) {
                 e.printStackTrace();
             }
-
         }
 
     }
@@ -488,7 +488,12 @@ public class AppActionImpl implements AppAction {
         ProposeEventTimestampsAsLeaderAsyncTask proposeEventTimestampsAsLeaderAsyncTask = new ProposeEventTimestampsAsLeaderAsyncTask(api, listener, handler, eventId, targetEventLeaderDetailInProgress);
         proposeEventTimestampsAsLeaderAsyncTask.execute();
 
-        // TODO: notifiaction to all members
+        String channelName = eventId;
+        try {
+            api.broadcastEventChannel(channelName, eventId, hostPerson, EventManagementState.REMIND_TO_VOTE.getStatus());
+        } catch (BackendlessException e) {
+            e.printStackTrace();
+        }
     }
 
     // TODO[test]
@@ -498,18 +503,12 @@ public class AppActionImpl implements AppAction {
         final Event targetEvent = hostPerson.getEventAsMember(eventId);
         final EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
         EventMemberDetail targetEventMemberDetailInProgress = AppActionImplHelper.getBaseEventMemberDetail(targetEventMemberDetail);
+
         List<MemberProposedTimestamp> proposeEventTimestampsAsMember = AppActionImplHelper.proposeEventTimestampsAsMember(eventId, hostPerson.getObjectId(), proposedEventTimestamps);
         targetEventMemberDetailInProgress.setProposedTimestamps(proposeEventTimestampsAsMember);
 
-        // TODO[not done yet]: get leaderId
-        String leaderId = null;
-        for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-            if (eventAsMember.getObjectId().equals(eventId)) {
-                targetEventMemberDetailInProgress = eventAsMember.getEventMemberDetail().get(0);
-                leaderId = eventAsMember.getEventLeaderDetail().getLeader().getObjectId();
-                break;
-            }
-        }
+        // TODO[test]: get leaderId
+        String leaderId = targetEventMemberDetail.getLeaderId();
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
@@ -525,6 +524,12 @@ public class AppActionImpl implements AppAction {
 
         ProposeEventTimestampsAsMemberAsyncTask proposeEventTimestampsAsMemberAsyncTask = new ProposeEventTimestampsAsMemberAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId(), leaderId, targetEventMemberDetailInProgress);
         proposeEventTimestampsAsMemberAsyncTask.execute();
+
+        try {
+            api.publishEventChannelMemberProposedTimestamps(eventId, hostPerson.getObjectId(), leaderId, proposeEventTimestampsAsMember);
+        } catch (BackendlessException e) {
+            e.printStackTrace();
+        }
     }
 
     // TODO[test]
@@ -534,18 +539,12 @@ public class AppActionImpl implements AppAction {
         final Event targetEvent = hostPerson.getEventAsMember(eventId);
         final EventMemberDetail targetEventMemberDetail = targetEvent.getEventMemberDetail(hostPerson.getObjectId());
         EventMemberDetail targetEventMemberDetailInProgress = AppActionImplHelper.getBaseEventMemberDetail(targetEventMemberDetail);
+
         List<MemberSelectedTimestamp> selectEventTimestampsAsMember = AppActionImplHelper.selectEventTimestampsAsMember(eventId, hostPerson.getObjectId(), selectedEventTimestamps);
         targetEventMemberDetailInProgress.setSelectedTimestamps(selectEventTimestampsAsMember);
 
-        // TODO[not done yet]: get leaderId
-        String leaderId = null;
-        for (Event eventAsMember : hostPerson.getEventsAsMember()) {
-            if (eventAsMember.getObjectId().equals(eventId)) {
-                targetEventMemberDetailInProgress = eventAsMember.getEventMemberDetail().get(0);
-                leaderId = eventAsMember.getEventLeaderDetail().getLeader().getObjectId();
-                break;
-            }
-        }
+        // TODO[test]: get leaderId
+        String leaderId = targetEventMemberDetail.getLeaderId();
 
         Handler handler = new Handler(new Handler.Callback() {
             @Override
@@ -561,6 +560,12 @@ public class AppActionImpl implements AppAction {
 
         SelectEventTimestampsAsMemberAsyncTask selectEventTimestampsAsMemberAsyncTask = new SelectEventTimestampsAsMemberAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId(), leaderId, targetEventMemberDetailInProgress);
         selectEventTimestampsAsMemberAsyncTask.execute();
+
+        try {
+            api.publishEventChannelMemberSelectedTimestamps(eventId, hostPerson.getObjectId(), leaderId, selectEventTimestampsAsMember);
+        } catch (BackendlessException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
