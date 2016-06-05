@@ -1,11 +1,12 @@
 package edu.scu.gsgapp.adapter.dashboard.calendar;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -13,86 +14,76 @@ import java.util.List;
 import edu.scu.core.ActionCallbackListener;
 import edu.scu.core.AppAction;
 import edu.scu.gsgapp.R;
-import edu.scu.gsgapp.databinding.UndecidedEventRowBinding;
 import edu.scu.model.EventUndecided;
 
 /**
- * Created by Blood on 2016/5/22.
+ * Created by chuanxu on 6/3/16.
  */
-public class UndecidedEventAdapter extends RecyclerView.Adapter<UndecidedEventObjectHolder> {
+public class UndecidedEventAdapter extends ArrayAdapter<EventUndecided> {
 
-    private Context context;
     private AppAction appAction;
     private List<EventUndecided> undecidedEventList;
 
-    public UndecidedEventAdapter(Context context, AppAction appAction, List<EventUndecided> undecidedEventList) {
-        this.context = context;
+    public UndecidedEventAdapter(Context context, int resource, AppAction appAction, List<EventUndecided> undecidedEventList) {
+        super(context, resource, undecidedEventList);
         this.appAction = appAction;
         this.undecidedEventList = undecidedEventList;
     }
 
     @Override
-    public UndecidedEventObjectHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        UndecidedEventRowBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
-                R.layout.undecided_event_row, parent, false);
-        return new UndecidedEventObjectHolder(binding);
-    }
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View row = inflater.inflate(R.layout.undecided_event_row, null);
 
-    @Override
-    public void onBindViewHolder(UndecidedEventObjectHolder holder, final int position) {
+        final EventUndecided undecidedEvent = undecidedEventList.get(position);
 
-        EventUndecided undecidedEvent = this.undecidedEventList.get(position);
-        final String title = undecidedEvent.title;
-        final String leaderName = undecidedEvent.leaderName;
-        final String eventId = undecidedEvent.eventId;
-        final String leaderId = undecidedEvent.leaderId;
+        TextView titleTextView = (TextView) row.findViewById(R.id.undecided_event_row_event_title);
+        titleTextView.setText(undecidedEvent.title);
 
-        View.OnClickListener acceptOnClickListener = new View.OnClickListener() {
+        TextView leaderNameTextView = (TextView) row.findViewById(R.id.undecided_event_row_leader_name);
+        leaderNameTextView.setText(undecidedEvent.leaderName);
+
+        ImageButton declineButton = (ImageButton) row.findViewById(R.id.button_decline_new);
+        declineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                appAction.acceptEvent(eventId, leaderId, new ActionCallbackListener<Boolean>() {
+                appAction.declineEvent(undecidedEvent.eventId, undecidedEvent.leaderId, new ActionCallbackListener<Boolean>() {
                     @Override
                     public void onSuccess(Boolean data) {
-                        Toast.makeText(context, "Accepted event success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Declined event success", Toast.LENGTH_SHORT).show();
                         notifyDataSetChanged();
                     }
 
                     @Override
                     public void onFailure(String message) {
-                        Toast.makeText(context, "Accepted event fail", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Declined event fail", Toast.LENGTH_SHORT).show();
                     }
                 });
-
             }
-        };
+        });
 
-        View.OnClickListener declineOnClickListener = new View.OnClickListener() {
+        ImageButton acceptButton = (ImageButton) row.findViewById(R.id.button_accept_new);
+        acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                appAction.declineEvent(eventId, leaderId, new ActionCallbackListener<Boolean>() {
+                appAction.acceptEvent(undecidedEvent.eventId, undecidedEvent.leaderId, new ActionCallbackListener<Boolean>() {
                     @Override
                     public void onSuccess(Boolean data) {
-                        Toast.makeText(context, "Declined event success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Accepted event success", Toast.LENGTH_SHORT).show();
                         notifyDataSetChanged();
                     }
 
                     @Override
                     public void onFailure(String message) {
-                        Toast.makeText(context, "Declined event fail", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Accepted event fail", Toast.LENGTH_SHORT).show();
                     }
                 });
-
             }
-        };
+        });
 
-        holder.bindConnection(this.undecidedEventList.get(position), acceptOnClickListener, declineOnClickListener);
-    }
-
-    @Override
-    public int getItemCount() {
-        return this.undecidedEventList.size();
+        return row;
     }
 
 }

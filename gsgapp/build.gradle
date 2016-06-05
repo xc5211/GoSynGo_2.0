@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.android.databinding'
 
 android {
     compileSdkVersion 23
@@ -29,7 +28,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:leanback-v17:23.1.0'
-    compile 'com.android.support:recyclerview-v7:23.3.0'
+    // compile 'com.android.support:recyclerview-v7:23.3.0'
     compile project(':core')
     compile project(':model')
     compile project(':lib')
