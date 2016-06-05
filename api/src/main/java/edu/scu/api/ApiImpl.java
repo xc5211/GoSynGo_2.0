@@ -520,6 +520,9 @@ public class ApiImpl implements Api {
     public void publishEventChannelMemberStatus(String channelName, String publisherId, String leaderId, int memberStatus) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
+        publishOptions.putHeader(PublishOptions.ANDROID_TICKER_TEXT_TAG, "Member status update");
+        publishOptions.putHeader(PublishOptions.ANDROID_CONTENT_TITLE_TAG, "GoSynGo");
+        publishOptions.putHeader(PublishOptions.ANDROID_CONTENT_TEXT_TAG, "Member responded to your invitation");
         publishOptions.putHeader("sentFrom", "member");
         publishOptions.putHeader("receiverId" + leaderId.replace("-", ""), "true");
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
@@ -543,6 +546,9 @@ public class ApiImpl implements Api {
     public void publishEventChannelMemberSelectedTimestamps(String channelName, String publisherId, String leaderId, List<MemberSelectedTimestamp> memberSelectedTimestamps) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
+        publishOptions.putHeader(PublishOptions.ANDROID_TICKER_TEXT_TAG, "Member selected time");
+        publishOptions.putHeader(PublishOptions.ANDROID_CONTENT_TITLE_TAG, "GoSynGo");
+        publishOptions.putHeader(PublishOptions.ANDROID_CONTENT_TEXT_TAG, "Member selected time");
         publishOptions.putHeader("sentFrom", "member");
         publishOptions.putHeader("receiverId" + leaderId.replace("-", ""), "true");
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
@@ -566,6 +572,9 @@ public class ApiImpl implements Api {
     public void publishEventChannelMemberProposedTimestamps(String channelName, String publisherId, String leaderId, List<MemberProposedTimestamp> memberProposedTimestamps) {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
+        publishOptions.putHeader(PublishOptions.ANDROID_TICKER_TEXT_TAG, "Member proposed time");
+        publishOptions.putHeader(PublishOptions.ANDROID_CONTENT_TITLE_TAG, "GoSynGo");
+        publishOptions.putHeader(PublishOptions.ANDROID_CONTENT_TEXT_TAG, "Member proposed time");
         publishOptions.putHeader("sentFrom", "member");
         publishOptions.putHeader("receiverId" + leaderId.replace("-", ""), "true");
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
@@ -590,6 +599,9 @@ public class ApiImpl implements Api {
         PublishOptions publishOptions = new PublishOptions();
         publishOptions.setPublisherId(publisherId);
         publishOptions.putHeader("sentFrom", "member");
+        publishOptions.putHeader(PublishOptions.ANDROID_TICKER_TEXT_TAG, "Member arrival estimate");
+        publishOptions.putHeader(PublishOptions.ANDROID_CONTENT_TITLE_TAG, "GoSynGo");
+        publishOptions.putHeader(PublishOptions.ANDROID_CONTENT_TEXT_TAG, "Member estimated arrival time");
         publishOptions.putHeader("receiverId" + leaderId.replace("-", ""), "true");
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.EVENT_ID.getKeyName(), channelName);
         publishOptions.putHeader(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName(), leaderId);

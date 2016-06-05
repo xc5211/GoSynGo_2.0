@@ -17,9 +17,11 @@ import edu.scu.model.enumeration.BroadcastEventChannelArgKeyName;
  */
 public class DefaultChannelMessageResponder implements AsyncCallback<List<Message>> {
 
+    private static String selector;
     private List<EventUndecided> undecidedEventList;
 
-    public DefaultChannelMessageResponder(List<EventUndecided> undecidedEventList) {
+    public DefaultChannelMessageResponder(List<EventUndecided> undecidedEventList, String hostPersonObjectId) {
+        selector = "receiverId" + hostPersonObjectId.replace("-", "");
         this.undecidedEventList = undecidedEventList;
     }
 
@@ -35,6 +37,11 @@ public class DefaultChannelMessageResponder implements AsyncCallback<List<Messag
             msg = message.getData();
             Map<String, Object> eventDataMap = ((Map<String, Object>) message.getData());
             assert msgHeader.get("sentFrom").equals("server");
+            String receiverIdValue = msgHeader.get(selector);
+            if (receiverIdValue == null) {
+                continue;
+            }
+            assert receiverIdValue.equals("true");
 
             String title = (String) msgHeader.get(BroadcastEventChannelArgKeyName.EVENT_TITLE.getKeyName());
             String leaderName = (String) eventDataMap.get(BroadcastEventChannelArgKeyName.EVENT_LEADER_NAME.getKeyName());

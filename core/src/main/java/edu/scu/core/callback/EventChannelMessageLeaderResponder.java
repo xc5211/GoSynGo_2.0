@@ -22,9 +22,11 @@ import edu.scu.model.enumeration.PublishEventChannelArgKeyName;
  */
 public class EventChannelMessageLeaderResponder implements AsyncCallback<List<Message>> {
 
+    private static String selector;
     private Person leader;
 
     public EventChannelMessageLeaderResponder(Person leader) {
+        selector = "receiverId" + leader.getObjectId().replace("-", "");
         this.leader = leader;
     }
 
@@ -37,6 +39,11 @@ public class EventChannelMessageLeaderResponder implements AsyncCallback<List<Me
 
             msgHeader = message.getHeaders();
             msg = message.getData();
+            String receiverIdValue = msgHeader.get(selector);
+            if (receiverIdValue == null) {
+                continue;
+            }
+            assert receiverIdValue.equals("true");
 
             // Handle server or member message
             String from = msgHeader.get("sentFrom");

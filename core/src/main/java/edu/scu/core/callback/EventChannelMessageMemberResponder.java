@@ -12,6 +12,14 @@ import java.util.Map;
  */
 public class EventChannelMessageMemberResponder implements AsyncCallback<List<Message>> {
 
+    private static String selector;
+    private String memberId;
+
+    public EventChannelMessageMemberResponder(String memberPersonObjectId) {
+        selector = "receiverId" + memberPersonObjectId.replace("-", "");
+        this.memberId = memberPersonObjectId;
+    }
+
     @Override
     public void handleResponse(List<Message> messages) {
 
@@ -21,6 +29,11 @@ public class EventChannelMessageMemberResponder implements AsyncCallback<List<Me
 
             msgHeader = message.getHeaders();
             msg = message.getData();
+            String receiverIdValue = msgHeader.get(selector);
+            if (receiverIdValue == null) {
+                continue;
+            }
+            assert receiverIdValue.equals("true");
 
             // Handle server or member message
             String from = msgHeader.get("sentFrom");

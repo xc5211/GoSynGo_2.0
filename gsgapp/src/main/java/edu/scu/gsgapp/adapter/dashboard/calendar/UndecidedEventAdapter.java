@@ -1,5 +1,6 @@
 package edu.scu.gsgapp.adapter.dashboard.calendar;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +32,7 @@ public class UndecidedEventAdapter extends ArrayAdapter<EventUndecided> {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = inflater.inflate(R.layout.undecided_event_row, null);
 
@@ -49,15 +50,19 @@ public class UndecidedEventAdapter extends ArrayAdapter<EventUndecided> {
             public void onClick(View v) {
 
                 appAction.declineEvent(undecidedEvent.eventId, undecidedEvent.leaderId, new ActionCallbackListener<Boolean>() {
+
+                    final ProgressDialog progressDialog = ProgressDialog.show( parent.getContext(), "", "Declining...", true );
                     @Override
                     public void onSuccess(Boolean data) {
-                        Toast.makeText(getContext(), "Declined event success", Toast.LENGTH_SHORT).show();
+                        progressDialog.cancel();
+                        Toast.makeText(getContext(), "Decline event success", Toast.LENGTH_SHORT).show();
                         notifyDataSetChanged();
                     }
 
                     @Override
                     public void onFailure(String message) {
-                        Toast.makeText(getContext(), "Declined event fail", Toast.LENGTH_SHORT).show();
+                        progressDialog.cancel();
+                        Toast.makeText(getContext(), "Decline event fail", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -69,15 +74,19 @@ public class UndecidedEventAdapter extends ArrayAdapter<EventUndecided> {
             public void onClick(View v) {
 
                 appAction.acceptEvent(undecidedEvent.eventId, undecidedEvent.leaderId, new ActionCallbackListener<Boolean>() {
+
+                    final ProgressDialog progressDialog = ProgressDialog.show( parent.getContext(), "", "Accepting...", true );
                     @Override
                     public void onSuccess(Boolean data) {
-                        Toast.makeText(getContext(), "Accepted event success", Toast.LENGTH_SHORT).show();
+                        progressDialog.cancel();
+                        Toast.makeText(getContext(), "Accept event success", Toast.LENGTH_SHORT).show();
                         notifyDataSetChanged();
                     }
 
                     @Override
                     public void onFailure(String message) {
-                        Toast.makeText(getContext(), "Accepted event fail", Toast.LENGTH_SHORT).show();
+                        progressDialog.cancel();
+                        Toast.makeText(getContext(), "Accept event fail", Toast.LENGTH_SHORT).show();
                     }
                 });
             }

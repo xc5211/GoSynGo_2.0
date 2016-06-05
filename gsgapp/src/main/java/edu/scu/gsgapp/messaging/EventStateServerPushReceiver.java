@@ -95,9 +95,20 @@ public class EventStateServerPushReceiver extends BackendlessBroadcastReceiver {
     private AppAction appAction;
     private Person hostPerson;
     private String hostPersonId;
+    private String selector;
 
     @Override
     public boolean onMessage(Context context, Intent intent) {
+
+        gsgApplication = ((GsgApplication) context.getApplicationContext());
+        hostPersonId = gsgApplication.getAppAction().getHostPerson().getObjectId();
+        selector = "receiverId" + hostPersonId.replace("-", "");
+
+        String receiverIdValue = intent.getStringExtra(selector);
+        if (receiverIdValue == null) {
+            return false;
+        }
+        assert receiverIdValue.equals("true");
 
 //        // Handle server or leader triggered event
 //        String eventManagementState = intent.getStringExtra(BroadcastEventChannelArgKeyName.EVENT_MANAGEMENT_STATE.getKeyName());

@@ -595,7 +595,7 @@ public class AppActionImpl implements AppAction {
         acceptTask.execute();
 
         // Handle messaging
-        final EventChannelMessageMemberResponder channelMsgMemberResponder = new EventChannelMessageMemberResponder();
+        final EventChannelMessageMemberResponder channelMsgMemberResponder = new EventChannelMessageMemberResponder(memberId);
         AsyncCallback<Subscription> subscriptionResponder = new AsyncCallback<Subscription>() {
             @Override
             public void handleResponse(Subscription response) {
