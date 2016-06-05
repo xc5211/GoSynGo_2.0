@@ -28,6 +28,9 @@ import edu.scu.model.Event;
  */
 public class ProposeEventActivity extends GsgBaseActivity {
 
+    private static String[] durations = { "30 min", "60 min", "90 min", "120 min" };
+    private static String[] reminders = { "No reminder", "15 min", "30 min", "45 min", "60 min" };
+
     private String eventId;
 
     private EditText titleEdit;
@@ -68,14 +71,12 @@ public class ProposeEventActivity extends GsgBaseActivity {
         this.noteEdit = (EditText) findViewById(R.id.edit_text_propose_event_note);
 
         this.durationSpinner = (Spinner) findViewById(R.id.spinner_propose_event_duration);
-        Integer[] durations = { 30, 45, 60, 90, 120};
-        ArrayAdapter<Integer> durationSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, durations);
+        ArrayAdapter<String> durationSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, durations);
         durationSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.durationSpinner.setAdapter(durationSpinnerArrayAdapter);
 
         this.reminderSpinner = (Spinner) findViewById(R.id.spinner_propose_event_reminder);
-        Integer[] reminders = { 0, 15, 30, 45, 60 };
-        ArrayAdapter<Integer> remindSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, reminders);
+        ArrayAdapter<String> remindSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, reminders);
         remindSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.reminderSpinner.setAdapter(remindSpinnerArrayAdapter);
 
@@ -129,8 +130,7 @@ public class ProposeEventActivity extends GsgBaseActivity {
             public void onClick(View v) {
 
                 final ProgressDialog progressDialog = ProgressDialog.show( ProposeEventActivity.this, "", "Cancelling...", true );
-
-                getAppAction().cancelEvent(eventId, new ActionCallbackListener<Boolean>() {
+                appAction.cancelEvent(eventId, new ActionCallbackListener<Boolean>() {
                     @Override
                     public void onSuccess(Boolean data) {
                         progressDialog.cancel();
@@ -160,11 +160,10 @@ public class ProposeEventActivity extends GsgBaseActivity {
         final ProgressDialog progressDialog = ProgressDialog.show( ProposeEventActivity.this, "", "Sending...", true );
         String title = this.titleEdit.getText().toString();
         String location = this.locationEdit.getText().toString();
-        // TODO: next two lines
-        int durationInMin = 30;
-        int reminderInMin = 30;
+        int durationInMin = getDurationInMin();
+        int reminderInMin = getReminderInMin();
         String note = this.noteEdit.getText().toString();
-        boolean hasReminder = (reminderInMin == 0) ? false : true;
+        boolean hasReminder = reminderInMin != 0;
         Date date = getDateFromDatePicker(datePicker);
 
         super.appAction.sendEventInvitation(eventId, title, location, durationInMin, hasReminder, reminderInMin, note, new ActionCallbackListener<Event>() {
@@ -184,6 +183,35 @@ public class ProposeEventActivity extends GsgBaseActivity {
 
             }
         });
+    }
+
+    private int getDurationInMin() {
+
+        int durationInMin = 0;
+        int spinnerIndex = this.durationSpinner.getSelectedItemPosition();
+        switch (spinnerIndex) {
+            case 0: durationInMin = 30; break;
+            case 1: durationInMin = 60; break;
+            case 2: durationInMin = 90; break;
+            case 3: durationInMin = 120; break;
+            default: assert false;
+        }
+        return durationInMin;
+    }
+
+    private int getReminderInMin() {
+
+        int reminderInMin = 0;
+        int spinnerIndex = this.reminderSpinner.getSelectedItemPosition();
+        switch (spinnerIndex) {
+            case 0: reminderInMin = 0; break;
+            case 1: reminderInMin = 15; break;
+            case 2: reminderInMin = 30; break;
+            case 3: reminderInMin = 45; break;
+            case 4: reminderInMin = 60; break;
+            default: assert false;
+        }
+        return reminderInMin;
     }
 
     //sichao
