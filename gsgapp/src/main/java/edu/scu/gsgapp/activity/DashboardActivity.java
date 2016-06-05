@@ -48,14 +48,17 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
 
-        initWidgetable();
-        initListener();
-        initFragment();
-
-        getData();
+        syncHostInformation();
         startDefaultChannelSubscriptionAsycTask();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+//        syncHostInformation();
+//        startDefaultChannelSubscriptionAsycTask();
     }
 
     private void startDefaultChannelSubscriptionAsycTask() {
@@ -107,7 +110,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         subscriptionOptions.setSelector(selector);
 
         // Resubscribe default channel
-        DefaultChannelMessageResponder defaultChannelMsgResponder = new DefaultChannelMessageResponder(appAction.getUndecidedEventList());
+        DefaultChannelMessageResponder defaultChannelMsgResponder = new DefaultChannelMessageResponder(appAction.getHostPerson().getEventsUndecided());
         resubscribeChannel(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscriptionOptions);
 
         // Resubscribe all event channels as leader
@@ -129,12 +132,12 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
             @Override
             public void handleResponse(Subscription subscription) {
                 appAction.addToChannelMap(channelName, channelMessageResponder, subscription);
-                Toast.makeText(context, "Resubscribe to channel success: " + channelName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Resubscribe success: " + channelName, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void handleFault(BackendlessFault backendlessFault) {
-                Toast.makeText(context, "Resubscribe to channel fail: " + backendlessFault.getCode(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Resubscribe fail: " + backendlessFault.getCode(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -143,16 +146,19 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
     public void onRefresh() {
         // TODO: clear old data
 
-
-        //getData();
+        // syncHostInformation();
     }
 
-    private void initFragment() {
+    private void init() {
+        setContentView(R.layout.activity_dashboard);
+        initWidget();
+        initListener();
+
         DashboardCalendarFragment dashboardCalendarFragment = new DashboardCalendarFragment();
-        getFragmentManager().beginTransaction().replace(R.id.dashboard_container, dashboardCalendarFragment).commit();
+        getFragmentManager().beginTransaction().add(R.id.dashboard_container, dashboardCalendarFragment).commit();
     }
 
-    private void initWidgetable() {
+    private void initWidget() {
 //        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
 //        swipeRefreshLayout.setOnRefreshListener(this);
 //        listView = (ListView) findViewById(R.id.list_view);
@@ -289,10 +295,6 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         });
     }
 
-    private void getData() {
-        syncHostInformation();
-    }
-
     private void syncHostInformation() {
 
         final ProgressDialog progressDialog = ProgressDialog.show( DashboardActivity.this, "", "Sync with server...", true );
@@ -303,6 +305,7 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
                 progressDialog.cancel();
                 Toast.makeText(context, "Sync with server success", Toast.LENGTH_SHORT).show();
                 isSyncFinish = true;
+                init();
             }
 
             @Override

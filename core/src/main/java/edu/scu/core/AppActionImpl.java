@@ -38,7 +38,6 @@ import edu.scu.core.task.ProposeEventTimestampsAsMemberAsyncTask;
 import edu.scu.core.task.RegisterAsyncTask;
 import edu.scu.core.task.RemoveEventMemberAsyncTask;
 import edu.scu.core.task.SelectEventTimestampsAsMemberAsyncTask;
-import edu.scu.core.task.SendEventInvitationAsyncTask;
 import edu.scu.core.task.SetMinsToArriveAsMemberAsyncTask;
 import edu.scu.core.task.SyncHostInformationAsyncTask;
 import edu.scu.core.task.messaging.ChannelSubscription;
@@ -62,7 +61,6 @@ public class AppActionImpl implements AppAction {
 
     private static String hostUserId;
     private static Person hostPerson;
-    private static List<EventUndecided> undecidedEventList = new ArrayList<>();
     private static Map<String, ChannelSubscription> channelMap = new HashMap();
 
     private Api api;
@@ -82,16 +80,6 @@ public class AppActionImpl implements AppAction {
     }
 
     @Override
-    public Map<String, ChannelSubscription> getChannelMap() {
-        return channelMap;
-    }
-
-    @Override
-    public List<EventUndecided> getUndecidedEventList() {
-        return undecidedEventList;
-    }
-
-    @Override
     public void setHostUserId(String hostUserId) {
         AppActionImpl.hostUserId = hostUserId;
     }
@@ -99,11 +87,6 @@ public class AppActionImpl implements AppAction {
     @Override
     public void setHostPerson(Person hostPerson) {
         AppActionImpl.hostPerson = hostPerson;
-    }
-
-    @Override
-    public void setChannelMap(Map<String, ChannelSubscription> channelMap) {
-        AppActionImpl.channelMap = channelMap;
     }
 
     @Override
@@ -591,8 +574,8 @@ public class AppActionImpl implements AppAction {
                 Event acceptedEvent = updatedPerson.getEventsAsMember().get(0);
                 boolean isSuccess = hostPerson.getEventsAsMember().add(acceptedEvent);
                 if (isSuccess) {
-                    EventUndecided undecidedEvent = AppActionImplHelper.getUndecidedEvent(undecidedEventList, eventId);
-                    undecidedEventList.remove(undecidedEvent);
+                    EventUndecided undecidedEvent = hostPerson.getEventUndecided(eventId);
+                    hostPerson.getEventsUndecided().remove(undecidedEvent);
                     listener.onSuccess(true);
                 } else {
                     listener.onFailure(String.valueOf(R.string.local_update_error));
@@ -636,18 +619,19 @@ public class AppActionImpl implements AppAction {
         Handler handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(android.os.Message msg) {
-                Bundle bundle = msg.getData();
-                EventUndecided undecidedEvent = AppActionImplHelper.getUndecidedEvent(undecidedEventList, eventId);
-                undecidedEventList.remove(undecidedEvent);
+                EventUndecided undecidedEvent = hostPerson.getEventUndecided(eventId);
+                hostPerson.getEventsUndecided().remove(undecidedEvent);
                 listener.onSuccess(true);
                 return false;
             }
         });
 
-        DeclineEventAsyncTask declineEvent = new DeclineEventAsyncTask(api, listener, handler, eventId, hostPerson.getObjectId());
+        Person baseMember = AppActionImplHelper.getBasePerson(hostPerson);
+        String memberId = hostPerson.getObjectId();
+        DeclineEventAsyncTask declineEvent = new DeclineEventAsyncTask(api, listener, handler, baseMember, eventId, memberId);
         declineEvent.execute();
 
-        String memberId = hostPerson.getObjectId();
+        // Handle messaging
         try {
             api.publishEventChannelMemberStatus(eventId, memberId, leaderId, StatusMember.Declined.getStatus());
         } catch (BackendlessException e) {
@@ -698,6 +682,17 @@ public class AppActionImpl implements AppAction {
             public boolean handleMessage(android.os.Message msg) {
                 Bundle bundle = msg.getData();
                 Person syncedPerson = (Person) bundle.getSerializable(Person.SERIALIZE_KEY);
+                assert syncedPerson != null;
+
+                if (syncedPerson.getEventsAsLeader() == null) {
+                    syncedPerson.setEventsAsLeader(new ArrayList<Event>());
+                }
+                if (syncedPerson.getEventsAsMember() == null) {
+                    syncedPerson.setEventsAsMember(new ArrayList<Event>());
+                }
+                if (syncedPerson.getEventsUndecided() == null) {
+                    syncedPerson.setEventsUndecided(new ArrayList<EventUndecided>());
+                }
 
                 hostPerson = syncedPerson;
                 listener.onSuccess(null);

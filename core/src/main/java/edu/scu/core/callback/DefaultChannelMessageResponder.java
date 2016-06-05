@@ -36,22 +36,16 @@ public class DefaultChannelMessageResponder implements AsyncCallback<List<Messag
             Map<String, Object> eventDataMap = ((Map<String, Object>) message.getData());
             assert msgHeader.get("sentFrom").equals("server");
 
-//            Event undecidedEvent = new Event();
-//            undecidedEvent.setTitle((String) eventDataMap.get("title"));
-//            undecidedEvent.setNote((String) eventDataMap.get("note"));
-//            undecidedEvent.setLocation((String) eventDataMap.get("location"));
-//            undecidedEvent.setDurationInMin((Integer) eventDataMap.get("durationInMin"));
-//            undecidedEvent.setStatusEvent((Integer) eventDataMap.get("statusEvent"));
-//            undecidedEvent.setHasReminder((Boolean) eventDataMap.get("hasReminder"));
-//            undecidedEvent.setReminderInMin((Integer) eventDataMap.get("reminderInMin"));
-//            undecidedEvent.setObjectId((String) eventDataMap.get("objectId"));
-//            undecidedEvent.setOwnerId((String) eventDataMap.get("ownerId"));
-
             String title = (String) msgHeader.get(BroadcastEventChannelArgKeyName.EVENT_TITLE.getKeyName());
             String leaderName = (String) eventDataMap.get(BroadcastEventChannelArgKeyName.EVENT_LEADER_NAME.getKeyName());
             String eventId = (String) eventDataMap.get(BroadcastEventChannelArgKeyName.OBJECT_ID.getKeyName());
             String leaderId = (String) eventDataMap.get(BroadcastEventChannelArgKeyName.LEADER_ID.getKeyName());
-            undecidedEventList.add(new EventUndecided(title, leaderName, eventId, leaderId));
+            EventUndecided eventUndecided = new EventUndecided();
+            eventUndecided.setTitle(title);
+            eventUndecided.setLeaderName(leaderName);
+            eventUndecided.setEventId(eventId);
+            eventUndecided.setLeaderId(leaderId);
+            undecidedEventList.add(eventUndecided);
         }
     }
 

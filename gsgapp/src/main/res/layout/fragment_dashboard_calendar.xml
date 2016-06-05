@@ -76,17 +76,11 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         android:layout_weight="3">
-        <!-- <TextView
-            android:id="@+id/tvView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:text=""/> -->
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="5dp" />
-
+        <!--
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -94,12 +88,11 @@
             android:id="@+id/recyclerview_dashboard_calenar_undecided_event"
             android:dividerHeight="5dp">
         </android.support.v7.widget.RecyclerView>
-        <!--<fragment
+        -->
+        <ListView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/dashboard_calendar_undecided_event_container"
-            tools:layout="@layout/fragment_dashboard_calendar_undecided_event">
-        </fragment>-->
+            android:layout_height="wrap_content"
+            android:id="@+id/listview_undecided_event" />
 
     </LinearLayout>
 

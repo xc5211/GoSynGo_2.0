@@ -1,21 +1,23 @@
 package edu.scu.model;
 
+import java.io.Serializable;
+import java.util.Date;
+
 /**
  * Created by chuanxu on 5/27/16.
  */
-public class EventUndecided {
+public class EventUndecided implements Serializable {
+
+    public static String SERIALIZE_KEY = "eventUndecided";
 
     public String title;
     public String leaderName;
     public String eventId;
     public String leaderId;
-
-    public EventUndecided(String title, String leaderName, String eventId, String leaderId) {
-        this.title = title;
-        this.leaderName = leaderName;
-        this.eventId = eventId;
-        this.leaderId = leaderId;
-    }
+    private String objectId;
+    private String ownerId;
+    private Date updated;
+    private Date created;
 
     public String eventId() {
         return this.eventId;
@@ -31,6 +33,42 @@ public class EventUndecided {
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    public void setLeaderId(String leaderId) {
+        this.leaderId = leaderId;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
+
+    public java.util.Date getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
 }

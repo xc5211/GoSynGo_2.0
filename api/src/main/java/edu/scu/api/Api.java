@@ -21,19 +21,13 @@ import edu.scu.model.Person;
  */
 public interface Api {
 
-    // no response, event/message,can be used for more than one api: ApiResponseVoid
-    // return Boolean,ApiResponseBoolean
-    // ApiResponseRegister
-    // ApiResponseLogin
-
     /**
      * As user
       */
-    // String: userId
     public ApiResponse<Person> register(String userEmail, String password, String firstName, String lastName);
-    // Boolean: True/False
+
     public ApiResponse<String> login(String userEmail, String password, boolean stayLoggedIn);
-    //Boolean:True/False
+
     public ApiResponse<Void> logout();
 
     public ApiResponse<Void> importGoogleCalendar(String personId);
@@ -64,7 +58,7 @@ public interface Api {
 
     public ApiResponse<Person> acceptEvent(Person member, String eventId, String memberId);
 
-    public ApiResponse<EventMemberDetail> declineEvent(String eventId, String memberId);
+    public ApiResponse<EventMemberDetail> declineEvent(Person member, String eventId, String memberId);
 
     public ApiResponse<EventMemberDetail> checkInEvent(EventMemberDetail eventMemberDetail);
 

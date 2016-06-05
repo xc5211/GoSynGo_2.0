@@ -25,11 +25,8 @@ public interface AppAction {
      */
     public String getHostUserId();
     public Person getHostPerson();
-    public Map<String, ChannelSubscription> getChannelMap();
-    public List<EventUndecided> getUndecidedEventList();
     public void setHostUserId(String hostUserId);
     public void setHostPerson(Person person);
-    public void setChannelMap(Map<String, ChannelSubscription> channelMap);
     public void addToChannelMap(String channelName, AsyncCallback<List<Message>> channelMsgResponder, Subscription subscription);
 
     /**

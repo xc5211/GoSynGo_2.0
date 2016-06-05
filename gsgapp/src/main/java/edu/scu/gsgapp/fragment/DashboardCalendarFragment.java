@@ -26,6 +26,7 @@ import java.util.Locale;
 import edu.scu.gsgapp.GsgApplication;
 import edu.scu.gsgapp.R;
 import edu.scu.gsgapp.adapter.dashboard.calendar.CalendarAdapter;
+import edu.scu.gsgapp.adapter.dashboard.calendar.UndecidedEventAdapterNew;
 import edu.scu.gsgapp.adapter.dashboard.calendar.Utility;
 import edu.scu.gsgapp.adapter.dashboard.calendar.UndecidedEventAdapter;
 import edu.scu.model.Event;
@@ -56,7 +57,7 @@ public class DashboardCalendarFragment extends Fragment {
     //sichao for grid view
     private ListView undecidedEventListView;
     private UndecidedEventAdapter undecidedEventAdapter;
-    private List<Event> undecidedEventList = new ArrayList<Event>();
+    private List<Event> undecidedEventList = new ArrayList<>();
     public final static int LIST_LENGTH = 10;
 
     @Override
@@ -71,15 +72,19 @@ public class DashboardCalendarFragment extends Fragment {
 
         //Person hostPerson = (Person) getArguments().getSerializable(Person.SERIALIZE_KEY);
 
-        // TODO: setup calendarView & listView
+// Binding code below @Deprecated
+//        RecyclerView undecidedEventRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_dashboard_calenar_undecided_event);
+//        List<EventUndecided> undecidedEventList = gsgApplication.getAppAction().getUndecidedEventList();
+//
+//        UndecidedEventAdapter undecidedEventAdapter = new UndecidedEventAdapter(view.getContext(), gsgApplication.getAppAction(), undecidedEventList);
+//        undecidedEventRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+//        undecidedEventRecyclerView.setAdapter(undecidedEventAdapter);
 
+        ListView undecidedEventListView = (ListView) view.findViewById(R.id.listview_undecided_event);
+        List<EventUndecided> undecidedList = gsgApplication.getAppAction().getHostPerson().getEventsUndecided();
 
-        RecyclerView undecidedEventRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_dashboard_calenar_undecided_event);
-        List<EventUndecided> undecidedEventList = gsgApplication.getAppAction().getUndecidedEventList();
-
-        UndecidedEventAdapter undecidedEventAdapter = new UndecidedEventAdapter(view.getContext(), gsgApplication.getAppAction(), undecidedEventList);
-        undecidedEventRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        undecidedEventRecyclerView.setAdapter(undecidedEventAdapter);
+        UndecidedEventAdapterNew undecidedEventAdapterNew = new UndecidedEventAdapterNew(view.getContext(), R.layout.undecided_event_row_new, gsgApplication.getAppAction(), undecidedList);
+        undecidedEventListView.setAdapter(undecidedEventAdapterNew);
 
 
 
@@ -174,6 +179,23 @@ public class DashboardCalendarFragment extends Fragment {
         //initEventList();
         initUndecidedEventList();
         return view;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // TODO: sync person
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // TODO: save person
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
 

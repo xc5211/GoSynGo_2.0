@@ -25,6 +25,7 @@ import edu.scu.api.query.BackendlessQueryHelper;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.EventUndecided;
 import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.MemberProposedTimestamp;
 import edu.scu.model.MemberSelectedTimestamp;
@@ -161,7 +162,6 @@ public class ApiImpl implements Api {
         List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
         eventMemberDetails.add(eventMemberDetail);
         event.setEventMemberDetail(eventMemberDetails);
-
         try {
             event = Backendless.Data.of(Event.class).save(event);
         } catch (BackendlessException exception) {
@@ -251,31 +251,63 @@ public class ApiImpl implements Api {
     public ApiResponse<Person> acceptEvent(Person member, String eventId, String memberId) {
 
         // Get target event
-        Event undecidedEvent = null;
+        Event event = null;
         try {
-            undecidedEvent = Backendless.Data.of(Event.class).findById(eventId);
+            event = Backendless.Data.of(Event.class).findById(eventId);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-        assert undecidedEvent != null;
+        assert event != null;
 
-        // Load undecidedEvent
+        // Load undecidedEvent with eventMemberDetail
         ArrayList<String> relationProps = new ArrayList<>();
         relationProps.add( "eventMemberDetail" );
         relationProps.add( "eventMemberDetail.member" );
         try {
-            Backendless.Data.of(Event.class).loadRelations(undecidedEvent, relationProps);
+            Backendless.Data.of(Event.class).loadRelations(event, relationProps);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
         // TODO[later]: pass the fully loaded eventMemberDetail below to host member in order to show event member details
-        EventMemberDetail eventMemberDetail = undecidedEvent.getEventMemberDetail(memberId);
+        EventMemberDetail eventMemberDetail = event.getEventMemberDetail(memberId);
 
-        // Event changes member status
+        // Change member status
         List<EventMemberDetail> eventMemberDetails = new ArrayList<>();
         eventMemberDetail.setStatusMember(StatusMember.Accept.getStatus());
         eventMemberDetails.add(eventMemberDetail);
-        undecidedEvent.setEventMemberDetail(eventMemberDetails);
+        event.setEventMemberDetail(eventMemberDetails);
+
+        // Member accepts the event
+        List<Event> eventsAsMember = new ArrayList<>();
+        eventsAsMember.add(event);
+        member.setEventsAsMember(eventsAsMember);
+
+        // Load member with undecidedEvent
+        relationProps = new ArrayList<>();
+        relationProps.add( "eventsUndecided" );
+        try {
+            Backendless.Data.of(Person.class).loadRelations(member, relationProps);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        List<EventUndecided> eventUndecidedList = member.getEventsUndecided();
+
+        // Get target undecidedEvent
+        EventUndecided undecidedEvent = null;
+        for (EventUndecided undecided : eventUndecidedList) {
+            if (undecided.eventId.equals(eventId)) {
+                undecidedEvent = undecided;
+                break;
+            }
+        }
+        assert undecidedEvent != null;
+
+        // Remove target undecidedEvent from EventUndecided table
+        try {
+             Backendless.Data.of(EventUndecided.class).remove(undecidedEvent);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
 
         // Trigger server logic as server monitors EventMemberDetail table
         try {
@@ -283,21 +315,11 @@ public class ApiImpl implements Api {
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
-
-        // Member accepts the event
-        List<Event> eventsAsMember = new ArrayList<>();
-        eventsAsMember.add(undecidedEvent);
-        member.setEventsAsMember(eventsAsMember);
-        try {
-            member = Backendless.Data.of(Person.class).save(member);
-        } catch (BackendlessException exception) {
-            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
-        }
         return new ApiResponse<>(SUCCESS_EVENT, "Accepted event", member);
     }
 
     @Override
-    public ApiResponse<EventMemberDetail> declineEvent(String eventId, String memberId) {
+    public ApiResponse<EventMemberDetail> declineEvent(Person member, String eventId, String memberId) {
 
         // Get target event
         Event event = null;
@@ -308,7 +330,7 @@ public class ApiImpl implements Api {
         }
         assert event != null;
 
-        // Load target event with event member detail
+        // Load undecidedEvent with event member detail
         ArrayList<String> relationProps = new ArrayList<>();
         relationProps.add( "eventMemberDetail" );
         relationProps.add( "eventMemberDetail.member" );
@@ -323,6 +345,33 @@ public class ApiImpl implements Api {
         eventMemberDetail.setStatusMember(StatusMember.Declined.getStatus());
         try {
             eventMemberDetail = Backendless.Data.of(EventMemberDetail.class).save(eventMemberDetail);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+
+        // Load member with undecidedEvent
+        relationProps = new ArrayList<>();
+        relationProps.add( "eventsUndecided" );
+        try {
+            Backendless.Data.of(Person.class).loadRelations(member, relationProps);
+        } catch (BackendlessException exception) {
+            return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
+        }
+        List<EventUndecided> eventUndecidedList = member.getEventsUndecided();
+
+        // Get target undecidedEvent
+        EventUndecided undecidedEvent = null;
+        for (EventUndecided undecided : eventUndecidedList) {
+            if (undecided.getObjectId().equals(eventId)) {
+                undecidedEvent = undecided;
+                break;
+            }
+        }
+        assert undecidedEvent != null;
+
+        // Remove target undecidedEvent from EventUndecided table
+        try {
+            Backendless.Data.of(EventUndecided.class).remove(undecidedEvent);
         } catch (BackendlessException exception) {
             return new ApiResponse<>(FAIL_EVENT, "Error code: " + exception.getCode());
         }
@@ -394,6 +443,7 @@ public class ApiImpl implements Api {
         relationProps.add( "contacts" );
         relationProps.add( "eventsAsLeader" );
         relationProps.add( "eventsAsMember" );
+        relationProps.add( "eventsUndecided" );
 
         //second level
         relationProps.add( "eventsAsLeader.eventLeaderDetail" );
@@ -426,7 +476,7 @@ public class ApiImpl implements Api {
     @Override
     public void registerEventChannelMessaging(String channelName) {
         Date expireDate = new Date();
-        expireDate.setTime(System.currentTimeMillis() + 10 * 365 * 24 * 60 * 60 * 1000);
+        expireDate.setTime(System.currentTimeMillis() + 30 * 24 * 60 * 60 * 1000);
         Backendless.Messaging.registerDevice(GoogleProjectSettings.GOOGLE_PROJECT_NUMBER, channelName);
     }
 

@@ -93,6 +93,7 @@ public class AppActionImplHelper {
         basePerson.setContacts(new ArrayList<Person>());
         basePerson.setEventsAsLeader(new ArrayList<Event>());
         basePerson.setEventsAsMember(new ArrayList<Event>());
+        basePerson.setEventsUndecided(new ArrayList<EventUndecided>());
         return basePerson;
     }
 

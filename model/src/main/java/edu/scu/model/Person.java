@@ -16,6 +16,7 @@ public class Person implements Serializable {
     private Boolean isGoogleCalendarImported;
     private List<Event> eventsAsLeader;
     private List<Event> eventsAsMember;
+    private List<EventUndecided> eventsUndecided;
     private List<Person> contacts;
     private String objectId;
     private java.util.Date created;
@@ -128,6 +129,14 @@ public class Person implements Serializable {
         this.eventsAsMember = eventsAsMember;
     }
 
+    public List<EventUndecided> getEventsUndecided() {
+        return eventsUndecided;
+    }
+
+    public void setEventsUndecided(List<EventUndecided> eventsUndecided) {
+        this.eventsUndecided = eventsUndecided;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -234,6 +243,15 @@ public class Person implements Serializable {
         return false;
     }
 
+    private boolean hasEventUndecided(EventUndecided event) {
+        for (EventUndecided eventUndecided : this.eventsUndecided) {
+            if (eventUndecided.eventId.equals(event.eventId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean addEventAsMember(Event event) {
         if (!hasEventAsMember(event)) {
             return this.eventsAsMember.add(event);
@@ -244,6 +262,20 @@ public class Person implements Serializable {
     public boolean removeEventAsMember(Event event) {
         if (hasEventAsMember(event)) {
             return this.eventsAsMember.remove(event);
+        }
+        return false;
+    }
+
+    public boolean addEventUndecided(EventUndecided event) {
+        if (!hasEventUndecided(event)) {
+            return this.eventsUndecided.add(event);
+        }
+        return false;
+    }
+
+    public boolean removeEventUndecided(EventUndecided event) {
+        if (hasEventUndecided(event)) {
+            return this.eventsUndecided.remove(event);
         }
         return false;
     }
@@ -325,7 +357,6 @@ public class Person implements Serializable {
                 return eventAsLeader;
             }
         }
-        assert false;
         return null;
     }
 
@@ -333,6 +364,16 @@ public class Person implements Serializable {
         for (Event eventAsMember : this.eventsAsMember) {
             if (eventAsMember.getObjectId().equals(eventId)) {
                 return eventAsMember;
+            }
+        }
+        assert false;
+        return null;
+    }
+
+    public EventUndecided getEventUndecided(String eventId) {
+        for (EventUndecided eventUndecided : this.eventsUndecided) {
+            if (eventUndecided.eventId.equals(eventId)) {
+                return eventUndecided;
             }
         }
         assert false;
