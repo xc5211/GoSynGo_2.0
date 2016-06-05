@@ -44,7 +44,8 @@
             android:layout_height="match_parent"
             android:id="@+id/edit_text_propose_event_title"
             android:layout_weight="4"
-            android:gravity="center" />
+            android:gravity="center"
+            android:singleLine="true"/>
     </LinearLayout>
 
     <LinearLayout

@@ -20,8 +20,8 @@
             app:columnGap="8dp"
             app:noOfVisibleDays="3"
             app:headerRowBackgroundColor="@color/toolbar"
-            app:dayBackgroundColor="#B0C4DE"
-            app:todayBackgroundColor="#1848adff"
+            app:dayBackgroundColor="#b4b0c4de"
+            app:todayBackgroundColor="#8248adff"
             app:headerColumnBackground="#ffffffff"
             app:todayHeaderTextColor="@color/accent" />
 

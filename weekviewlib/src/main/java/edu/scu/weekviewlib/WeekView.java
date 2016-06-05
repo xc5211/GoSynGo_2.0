@@ -487,7 +487,7 @@ public class WeekView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
         // Draw the header row.
@@ -805,7 +805,7 @@ public class WeekView extends View {
                             bottom > mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom
                             ) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
-                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
+                        //mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     }
@@ -849,7 +849,8 @@ public class WeekView extends View {
                             bottom > 0
                             ) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
-                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
+                        //int color = mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor();
+                       //mEventBackgroundPaint.setColor(color);
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     }
@@ -1572,8 +1573,8 @@ public class WeekView extends View {
      * <p>
      *     <b>Note:</b> Use {@link #setDateTimeInterpreter(DateTimeInterpreter)} instead.
      * </p>
-     * @param length Supported values are {@link com.alamkanak.weekview.WeekView#LENGTH_SHORT} and
-     * {@link com.alamkanak.weekview.WeekView#LENGTH_LONG}.
+     * @param length Supported values are {@link edu.scu.weekviewlib.WeekView#LENGTH_SHORT} and
+     * {@link edu.scu.weekviewlib.WeekView#LENGTH_LONG}.
      */
     @Deprecated
     public void setDayNameLength(int length) {
@@ -2006,7 +2007,7 @@ public class WeekView extends View {
 
     public interface EventLongPressListener {
         /**
-         * Similar to {@link com.alamkanak.weekview.WeekView.EventClickListener} but with a long press.
+         * Similar to {@link edu.scu.weekviewlib.WeekView.EventClickListener} but with a long press.
          * @param event: event clicked.
          * @param eventRect: view containing the clicked event.
          */
@@ -2023,7 +2024,7 @@ public class WeekView extends View {
 
     public interface EmptyViewLongPressListener {
         /**
-         * Similar to {@link com.alamkanak.weekview.WeekView.EmptyViewClickListener} but with long press.
+         * Similar to {@link edu.scu.weekviewlib.WeekView.EmptyViewClickListener} but with long press.
          * @param time: {@link Calendar} object set with the date and time of the long pressed position on the view.
          */
         void onEmptyViewLongPress(Calendar time);

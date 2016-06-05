@@ -13,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,7 @@ import edu.scu.core.ActionCallbackListener;
 import edu.scu.gsgapp.R;
 import edu.scu.gsgapp.adapter.dashboard.events.MemberHorizontalViewAdapter;
 import edu.scu.gsgapp.adapter.propose.ProposeEventAddMemberAdapter;
+import edu.scu.gsgapp.fragment.BaseWeekViewFragment;
 import edu.scu.gsgapp.fragment.FragmentDateCommunicator;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
@@ -63,7 +65,7 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
     private Event event;
     private List<Date> leaderProposedTimestamps;
     private Date eventTimestamp;
-
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,11 +84,15 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
                 setContentView(R.layout.activity_event_detail_not_ready_leader);
                 initWidgetable(eventDetailProperty);
                 initListener(eventDetailProperty);
+                BaseWeekViewFragment baseWeekViewFragmentLeader = new BaseWeekViewFragment();
+                getSupportFragmentManager().beginTransaction().add(R.id.event_detail_not_ready_leader_day_calendar_container, baseWeekViewFragmentLeader).commit();
                 break;
             case "memberNotReady":
                 setContentView(R.layout.activity_event_detail_not_ready_member);
                 initWidgetable(eventDetailProperty);
                 initListener(eventDetailProperty);
+                BaseWeekViewFragment baseWeekViewFragmentMember = new BaseWeekViewFragment();
+                getSupportFragmentManager().beginTransaction().add(R.id.event_detail_not_ready_member_day_calendar_container, baseWeekViewFragmentMember).commit();
                 break;
             default:    // "leaderReady" || "memberReady"
                 setContentView(R.layout.activity_event_detail_ready);
@@ -94,6 +100,8 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
                 initListener(eventDetailProperty);
                 break;
         }
+
+
     }
 
     private boolean isEventLeader(String eventId) {
@@ -251,10 +259,11 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
 
     private void proposeEventTimestampsAsLeader() {
 
-        // TODO: get time from calendar fragment
         List<String> proposedEventTimestamps = new ArrayList<>();
-        proposedEventTimestamps.add("2016/05/20 8:00:00");
-        proposedEventTimestamps.add("2016/05/20 8:15:00");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        for(Date date: leaderProposedTimestamps) {
+            proposedEventTimestamps.add(sdf.format(date));
+        }
 
         appAction.proposeEventTimestampsAsLeader(event.getObjectId(), proposedEventTimestamps, new ActionCallbackListener<EventLeaderDetail>() {
             @Override
@@ -313,8 +322,8 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
 
         if (event.getEventLeaderDetail().getProposedTimestamps().isEmpty()) {
             // Vote time
+            this.leaderProposedTimestamps = selectedDates;
             if (!selectedDates.isEmpty()) {
-                this.leaderProposedTimestamps = selectedDates;
                 this.nextButton.setEnabled(true);
             } else {
                 this.nextButton.setEnabled(false);
@@ -328,6 +337,21 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
                 this.nextButton.setEnabled(false);
             }
         }
+
+        BaseWeekViewFragment baseWeekViewFragmentLeader = new BaseWeekViewFragment();
+        Bundle bundle = new Bundle();
+        ArrayList<String> encodedDates = encodeDate(leaderProposedTimestamps);
+        bundle.putStringArrayList("encodedDates", encodedDates);
+        baseWeekViewFragmentLeader.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.event_detail_not_ready_leader_day_calendar_container, baseWeekViewFragmentLeader).commit();
     }
 
+    private ArrayList<String> encodeDate(List<Date> leaderProposedTimestamps) {
+        ArrayList<String> encodedDates = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for(Date date: leaderProposedTimestamps) {
+            encodedDates.add(sdf.format(date));
+        }
+        return encodedDates;
+    }
 }
