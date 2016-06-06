@@ -56,6 +56,7 @@ public class UndecidedEventAdapter extends ArrayAdapter<EventUndecided> {
                     public void onSuccess(Boolean data) {
                         progressDialog.cancel();
                         Toast.makeText(getContext(), "Decline event success", Toast.LENGTH_SHORT).show();
+                        undecidedEventList.remove(undecidedEvent);
                         notifyDataSetChanged();
                     }
 
@@ -80,6 +81,7 @@ public class UndecidedEventAdapter extends ArrayAdapter<EventUndecided> {
                     public void onSuccess(Boolean data) {
                         progressDialog.cancel();
                         Toast.makeText(getContext(), "Accept event success", Toast.LENGTH_SHORT).show();
+                        undecidedEventList.remove(undecidedEvent);
                         notifyDataSetChanged();
                     }
 
