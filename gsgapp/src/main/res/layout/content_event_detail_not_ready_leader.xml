@@ -97,13 +97,13 @@
             android:gravity="center_vertical"
             android:layout_marginLeft="7dp"
             android:layout_marginStart="7dp"/>
-        <Spinner
+        <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:id="@+id/spinner_event_detail_not_ready_leader_duration"
+            android:id="@+id/text_view_event_detail_not_ready_leader_duration"
             android:layout_weight="1"
             android:gravity="left|center_vertical">
-        </Spinner>
+        </TextView>
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -112,13 +112,13 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:gravity="center_vertical" />
-        <Spinner
+        <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:id="@+id/spinner_event_detail_not_ready_leader_reminder"
+            android:id="@+id/text_view_event_detail_not_ready_leader_reminder"
             android:layout_weight="1"
             android:gravity="left|center_vertical">
-        </Spinner>
+        </TextView>
     </LinearLayout>
 
     <LinearLayout
