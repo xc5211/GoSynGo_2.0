@@ -28,6 +28,7 @@ import edu.scu.gsgapp.fragment.FragmentDateCommunicator;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.LeaderProposedTimestamp;
 import edu.scu.model.Person;
 
 /**
@@ -76,6 +77,11 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
     //for member usage
     private List<Date> memberViewLeaderProposedTimestamps;
     private List<Date> memberViewMemberProposedTimestamps;
+    //for leader proposed check
+    public final static int LEADER_PROPOSED = 200;
+    public final static int LEADER_NOT_PROPOSED = 201;
+    private int ifLeaderProposed;
+
 
 
     private Date eventTimestamp;
@@ -98,11 +104,26 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
                 setContentView(R.layout.activity_event_detail_not_ready_leader);
                 initWidgetable(eventDetailProperty);
                 initListener(eventDetailProperty);
+
                 // sichao
                 BaseWeekViewFragment baseWeekViewFragmentLeader = new BaseWeekViewFragment();
                 Bundle bundleLeader = new Bundle();
+
+                if(event.getEventLeaderDetail().getProposedTimestamps().isEmpty()) {
+                    ifLeaderProposed = EventDetailActivity.LEADER_NOT_PROPOSED;
+                } else {
+                    ifLeaderProposed = EventDetailActivity.LEADER_PROPOSED;
+                    leaderViewLeaderProposedTimestamps = new ArrayList<>();
+                    for(LeaderProposedTimestamp timestamp: event.getEventLeaderDetail().getProposedTimestamps()) {
+                        leaderViewLeaderProposedTimestamps.add(timestamp.getTimestamp());
+                    }
+                }
+
                 bundleLeader.putInt("hostRole", EventDetailActivity.FOR_LEADER);
                 bundleLeader.putString("eventTitle", event.getTitle());
+                bundleLeader.putInt("ifLeaderProposed", ifLeaderProposed);
+                ArrayList<String> leaderViewLeaderProposedEncodedDates = encodeDate(leaderViewLeaderProposedTimestamps);
+                bundleLeader.putStringArrayList("leaderViewLeaderProposedEncodedDates", leaderViewLeaderProposedEncodedDates);
                 baseWeekViewFragmentLeader.setArguments(bundleLeader);
                 getSupportFragmentManager().beginTransaction().add(R.id.event_detail_not_ready_leader_day_calendar_container, baseWeekViewFragmentLeader).commit();
                 break;
@@ -381,9 +402,10 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
 
         BaseWeekViewFragment baseWeekViewFragmentLeader = new BaseWeekViewFragment();
         Bundle bundle = new Bundle();
-        ArrayList<String> leaderViewLeaderProposedEncodedDates = encodeDate(leaderViewLeaderProposedTimestamps);
         bundle.putInt("hostRole", EventDetailActivity.FOR_LEADER);
         bundle.putString("eventTitle", event.getTitle());
+        bundle.putInt("ifLeaderProposed", ifLeaderProposed);
+        ArrayList<String> leaderViewLeaderProposedEncodedDates = encodeDate(leaderViewLeaderProposedTimestamps);
         bundle.putStringArrayList("leaderViewLeaderProposedEncodedDates", leaderViewLeaderProposedEncodedDates);
         baseWeekViewFragmentLeader.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.event_detail_not_ready_leader_day_calendar_container, baseWeekViewFragmentLeader).commit();
@@ -423,11 +445,17 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
     }
 
     private ArrayList<String> encodeDate(List<Date> proposedTimestamps) {
-        ArrayList<String> encodedDates = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        for(Date date: proposedTimestamps) {
-            encodedDates.add(sdf.format(date));
+        if (proposedTimestamps != null) {
+            ArrayList<String> encodedDates = new ArrayList<>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            for(Date date: proposedTimestamps) {
+                encodedDates.add(sdf.format(date));
+            }
+
+            return encodedDates;
+
+        } else {
+            return null;
         }
-        return encodedDates;
     }
 }

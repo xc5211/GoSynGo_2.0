@@ -60,6 +60,11 @@ public class BaseWeekViewFragment extends Fragment implements
     List<Date> memberViewLeaderSelectedDates = new ArrayList<>();
     List<Date> memberViewMemberSelectedDates = new ArrayList<>();
 
+    //for leader proposed check
+    public final static int LEADER_PROPOSED = 200;
+    public final static int LEADER_NOT_PROPOSED = 201;
+    private int ifLeaderProposed;
+
     private FragmentDateCommunicator fragmentDateCommunicator;
 
     @Override
@@ -72,10 +77,10 @@ public class BaseWeekViewFragment extends Fragment implements
         //no matter for leader of member, all need initiate their ready events
         allReadyEvents = getAllReadyEvents();
 
-
-        //check is leader or member, confirm the hostRole
+        //check is leader or member, confirm the hostRole, confirm ifLeaderProposed
         hostRole = getArguments().getInt("hostRole");
         eventTitle = getArguments().getString("eventTitle");
+        ifLeaderProposed = getArguments().getInt("ifLeaderProposed");
 
         switch (hostRole) {
             case BaseWeekViewFragment.FOR_LEADER:
@@ -149,6 +154,23 @@ public class BaseWeekViewFragment extends Fragment implements
         }
     }
 
+    private void drawMemberSelectedDates() {
+
+        for(int i = 0; i < memberViewMemberSelectedDates.size(); i++) {
+
+            Date timestamp = memberViewMemberSelectedDates.get(i);
+            Calendar startTime = Calendar.getInstance();
+            startTime.setTime(timestamp);
+            startTime.add(Calendar.HOUR, 0);
+
+            Calendar endTime = (Calendar) startTime.clone();
+            endTime.add(Calendar.MINUTE, 90);
+            WeekViewEvent weekViewEvent = new WeekViewEvent(i, eventTitle, startTime, endTime);
+            weekViewEvent.setColor(getResources().getColor(R.color.event_color_01));
+            weekViewEvents.add(weekViewEvent);
+        }
+    }
+
     @Override
     public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
 
@@ -159,6 +181,7 @@ public class BaseWeekViewFragment extends Fragment implements
                 break;
             case BaseWeekViewFragment.FOR_MEMBER:
                 drawAllReadyEvents();
+                drawMemberSelectedDates();
                 break;
         }
 
@@ -173,11 +196,17 @@ public class BaseWeekViewFragment extends Fragment implements
 
     @Override
     public void onEventLongPress(WeekViewEvent weekViewEvent, RectF eventRect) {
-        //Toast.makeText(getContext(), "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
+
         switch (hostRole) {
             case BaseWeekViewFragment.FOR_LEADER:
-                leaderViewLeaderSelectedDates.remove(weekViewEvent.getStartTime().getTime());
-                fragmentDateCommunicator.updateLeaderSelectedDates(leaderViewLeaderSelectedDates);
+
+                if(ifLeaderProposed == BaseWeekViewFragment.LEADER_NOT_PROPOSED) {
+                    leaderViewLeaderSelectedDates.remove(weekViewEvent.getStartTime().getTime());
+                    fragmentDateCommunicator.updateLeaderSelectedDates(leaderViewLeaderSelectedDates);
+                } else {
+                    Toast.makeText(getContext(), "Long pressed event: " + weekViewEvent.getName(), Toast.LENGTH_SHORT).show();
+                }
+
                 break;
             case BaseWeekViewFragment.FOR_MEMBER:
                 break;
@@ -202,8 +231,13 @@ public class BaseWeekViewFragment extends Fragment implements
 
         switch (hostRole) {
             case BaseWeekViewFragment.FOR_LEADER:
-                leaderViewLeaderSelectedDates.add(date);
-                fragmentDateCommunicator.updateLeaderSelectedDates(leaderViewLeaderSelectedDates);
+                if(ifLeaderProposed == BaseWeekViewFragment.LEADER_NOT_PROPOSED) {
+                    leaderViewLeaderSelectedDates.add(date);
+                    fragmentDateCommunicator.updateLeaderSelectedDates(leaderViewLeaderSelectedDates);
+                } else {
+                    Toast.makeText(getContext(), "You had Finished Propose TimeStamps, Please wait for members' votes", Toast.LENGTH_SHORT).show();
+                }
+
                 break;
             case BaseWeekViewFragment.FOR_MEMBER:
                 break;
