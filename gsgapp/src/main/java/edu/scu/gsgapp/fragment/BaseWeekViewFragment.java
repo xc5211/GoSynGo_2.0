@@ -40,12 +40,25 @@ public class BaseWeekViewFragment extends Fragment implements
     private static final int TYPE_THREE_DAY_VIEW = 2;
     private static final int TYPE_WEEK_VIEW = 3;
     private static final int TYPE_FIVE_DAY_VIEW = 5;
+    public static final int FOR_LEADER = 100;
+    public static final int FOR_MEMBER = 101;
+
     private int mWeekViewType = TYPE_FIVE_DAY_VIEW;
     private WeekView mWeekView;
 
+    private int hostRole;
     List<WeekViewEvent> weekViewEvents = new ArrayList<WeekViewEvent>();
     List<Event> allReadyEvents;
-    List<Date> selectedDates = new ArrayList<>();
+    String eventTitle;
+
+    //for leader usage
+    List<Date> leaderViewLeaderSelectedDates = new ArrayList<>();
+    List<Date> leaderViewMemberSelectedDates = new ArrayList<>();
+    List<Date> leaderViewAllMemberSelectedDates = new ArrayList<>();
+
+    //for member usage
+    List<Date> memberViewLeaderSelectedDates = new ArrayList<>();
+    List<Date> memberViewMemberSelectedDates = new ArrayList<>();
 
     private FragmentDateCommunicator fragmentDateCommunicator;
 
@@ -56,9 +69,22 @@ public class BaseWeekViewFragment extends Fragment implements
         mWeekView = (WeekView) view.findViewById(R.id.event_detail_fragment_weekView);
         setDayDisplayType(TYPE_FIVE_DAY_VIEW);
 
+        //no matter for leader of member, all need initiate their ready events
         allReadyEvents = getAllReadyEvents();
-        if(getArguments() != null) {
-            selectedDates = decodeDate(getArguments().getStringArrayList("encodedDates"));
+
+
+        //check is leader or member, confirm the hostRole
+        hostRole = getArguments().getInt("hostRole");
+        eventTitle = getArguments().getString("eventTitle");
+
+        switch (hostRole) {
+            case BaseWeekViewFragment.FOR_LEADER:
+                if(getArguments().getStringArrayList("leaderViewLeaderProposedEncodedDates") != null) {
+                    leaderViewLeaderSelectedDates = decodeDate(getArguments().getStringArrayList("leaderViewLeaderProposedEncodedDates"));
+                }
+                break;
+            case BaseWeekViewFragment.FOR_MEMBER:
+                break;
         }
 
         // The week view has infinite scrolling horizontally. We have to provide the events of a
@@ -87,8 +113,7 @@ public class BaseWeekViewFragment extends Fragment implements
         return view;
     }
 
-    @Override
-    public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+    private void drawAllReadyEvents() {
 
         for(int i = 0; i < allReadyEvents.size(); i++) {
 
@@ -102,21 +127,39 @@ public class BaseWeekViewFragment extends Fragment implements
             endTime.add(Calendar.MINUTE, readyEvent.getDurationInMin());
             WeekViewEvent weekViewEvent = new WeekViewEvent(i, readyEvent.getTitle(), startTime, endTime);
             weekViewEvent.setColor(getResources().getColor(R.color.event_color_02));
+            //weekViewEvent.setColor(R.color.event_color_02);
             weekViewEvents.add(weekViewEvent);
         }
+    }
 
-        for(int i = 0; i < selectedDates.size(); i++) {
+    private void drawLeaderSelectedDates() {
 
-            Date timestamp = selectedDates.get(i);
+        for(int i = 0; i < leaderViewLeaderSelectedDates.size(); i++) {
+
+            Date timestamp = leaderViewLeaderSelectedDates.get(i);
             Calendar startTime = Calendar.getInstance();
             startTime.setTime(timestamp);
             startTime.add(Calendar.HOUR, 0);
 
             Calendar endTime = (Calendar) startTime.clone();
             endTime.add(Calendar.MINUTE, 90);
-            WeekViewEvent weekViewEvent = new WeekViewEvent(i, "", startTime, endTime);
+            WeekViewEvent weekViewEvent = new WeekViewEvent(i, eventTitle, startTime, endTime);
             weekViewEvent.setColor(getResources().getColor(R.color.event_color_03));
             weekViewEvents.add(weekViewEvent);
+        }
+    }
+
+    @Override
+    public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+
+        switch (hostRole) {
+            case BaseWeekViewFragment.FOR_LEADER:
+                drawAllReadyEvents();
+                drawLeaderSelectedDates();
+                break;
+            case BaseWeekViewFragment.FOR_MEMBER:
+                drawAllReadyEvents();
+                break;
         }
 
         return weekViewEvents;
@@ -124,15 +167,21 @@ public class BaseWeekViewFragment extends Fragment implements
 
     @Override
     public void onEventClick(WeekViewEvent event, RectF eventRect) {
-        //Toast.makeText(getContext(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
-        //weekViewEvents.remove(event);
+        Toast.makeText(getContext(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
     public void onEventLongPress(WeekViewEvent weekViewEvent, RectF eventRect) {
         //Toast.makeText(getContext(), "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
-        selectedDates.remove(weekViewEvent.getStartTime().getTime());
-        fragmentDateCommunicator.updateSelectedDates(selectedDates);
+        switch (hostRole) {
+            case BaseWeekViewFragment.FOR_LEADER:
+                leaderViewLeaderSelectedDates.remove(weekViewEvent.getStartTime().getTime());
+                fragmentDateCommunicator.updateLeaderSelectedDates(leaderViewLeaderSelectedDates);
+                break;
+            case BaseWeekViewFragment.FOR_MEMBER:
+                break;
+        }
     }
 
     @Override
@@ -149,10 +198,16 @@ public class BaseWeekViewFragment extends Fragment implements
             time.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY) + 1);
         }
 
-        //Toast.makeText(getContext(),  getEventTitle(time), Toast.LENGTH_SHORT).show();
         Date date = time.getTime();
-        selectedDates.add(date);
-        fragmentDateCommunicator.updateSelectedDates(selectedDates);
+
+        switch (hostRole) {
+            case BaseWeekViewFragment.FOR_LEADER:
+                leaderViewLeaderSelectedDates.add(date);
+                fragmentDateCommunicator.updateLeaderSelectedDates(leaderViewLeaderSelectedDates);
+                break;
+            case BaseWeekViewFragment.FOR_MEMBER:
+                break;
+        }
     }
 
     protected String getEventTitle(Calendar time) {

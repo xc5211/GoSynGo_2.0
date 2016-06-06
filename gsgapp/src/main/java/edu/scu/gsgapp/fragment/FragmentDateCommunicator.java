@@ -8,6 +8,6 @@ import java.util.List;
  */
 public interface FragmentDateCommunicator {
 
-    void updateSelectedDates(List<Date> selectedDates);
-
+    void updateLeaderSelectedDates(List<Date> leaderSelectedDates);
+    void updateMemberSelectedDates(List<Date> memberSelectedDates);
 }

@@ -1,5 +1,6 @@
 package edu.scu.gsgapp.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v17.leanback.widget.HorizontalGridView;
@@ -27,11 +28,16 @@ import edu.scu.gsgapp.fragment.FragmentDateCommunicator;
 import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
+import edu.scu.model.Person;
 
 /**
  * Created by chuanxu on 5/26/16.
  */
 public class EventDetailActivity extends GsgBaseActivity implements FragmentDateCommunicator {
+
+    //host role to weekView fragment
+    public static final int FOR_LEADER = 100;
+    public static final int FOR_MEMBER = 101;
 
     // Common
     private Toolbar toolbar;
@@ -63,7 +69,15 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
     private GridView eventRedyGridview;
 
     private Event event;
-    private List<Date> leaderProposedTimestamps;
+    //for leader usage
+    private List<Date> leaderViewLeaderProposedTimestamps;
+    private List<Date> leaderViewMemberProposedTimestamps;
+    private List<Date> leaderViewAllMemberProposedTimestamps;
+    //for member usage
+    private List<Date> memberViewLeaderProposedTimestamps;
+    private List<Date> memberViewMemberProposedTimestamps;
+
+
     private Date eventTimestamp;
     
     @Override
@@ -84,14 +98,25 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
                 setContentView(R.layout.activity_event_detail_not_ready_leader);
                 initWidgetable(eventDetailProperty);
                 initListener(eventDetailProperty);
+                // sichao
                 BaseWeekViewFragment baseWeekViewFragmentLeader = new BaseWeekViewFragment();
+                Bundle bundleLeader = new Bundle();
+                bundleLeader.putInt("hostRole", EventDetailActivity.FOR_LEADER);
+                bundleLeader.putString("eventTitle", event.getTitle());
+                baseWeekViewFragmentLeader.setArguments(bundleLeader);
                 getSupportFragmentManager().beginTransaction().add(R.id.event_detail_not_ready_leader_day_calendar_container, baseWeekViewFragmentLeader).commit();
                 break;
+
             case "memberNotReady":
                 setContentView(R.layout.activity_event_detail_not_ready_member);
                 initWidgetable(eventDetailProperty);
                 initListener(eventDetailProperty);
+                //sichao
                 BaseWeekViewFragment baseWeekViewFragmentMember = new BaseWeekViewFragment();
+                Bundle bundleMember = new Bundle();
+                bundleMember.putInt("hostRole", EventDetailActivity.FOR_MEMBER);
+                bundleMember.putString("eventTitle", event.getTitle());
+                baseWeekViewFragmentMember.setArguments(bundleMember);
                 getSupportFragmentManager().beginTransaction().add(R.id.event_detail_not_ready_member_day_calendar_container, baseWeekViewFragmentMember).commit();
                 break;
             default:    // "leaderReady" || "memberReady"
@@ -261,18 +286,25 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
 
         List<String> proposedEventTimestamps = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        for(Date date: leaderProposedTimestamps) {
+        for(Date date: leaderViewLeaderProposedTimestamps) {
             proposedEventTimestamps.add(sdf.format(date));
         }
 
         appAction.proposeEventTimestampsAsLeader(event.getObjectId(), proposedEventTimestamps, new ActionCallbackListener<EventLeaderDetail>() {
+
+            final ProgressDialog progressDialog = ProgressDialog.show( EventDetailActivity.this, "", "Sending...", true );
             @Override
             public void onSuccess(EventLeaderDetail data) {
+                progressDialog.cancel();
                 Toast.makeText(getApplicationContext(), "Propose time success", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(EventDetailActivity.this, DashboardActivity.class);
+                startActivity(intent);
+                finish();
             }
 
             @Override
             public void onFailure(String message) {
+                progressDialog.cancel();
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -281,13 +313,20 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
     private void initiateEvent() {
 
         super.appAction.initiateEvent(event.getObjectId(), eventTimestamp, new ActionCallbackListener<Integer>() {
+
+            final ProgressDialog progressDialog = ProgressDialog.show( EventDetailActivity.this, "", "Initiating...", true );
             @Override
             public void onSuccess(Integer data) {
+                progressDialog.cancel();
                 Toast.makeText(getApplicationContext(), "Initiate event success", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(EventDetailActivity.this, DashboardActivity.class);
+                startActivity(intent);
+                finish();
             }
 
             @Override
             public void onFailure(String message) {
+                progressDialog.cancel();
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -297,9 +336,10 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
 
         super.appAction.cancelEvent(event.getObjectId(),new ActionCallbackListener<Boolean>() {
 
+            final ProgressDialog progressDialog = ProgressDialog.show( EventDetailActivity.this, "", "Cancelling...", true );
             @Override
             public void onSuccess(Boolean data) {
-
+                progressDialog.cancel();
                 Toast.makeText(context, "Event cancelled", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(EventDetailActivity.this, DashboardActivity.class);
                 startActivity(intent);
@@ -308,6 +348,7 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
 
             @Override
             public void onFailure(String message) {
+                progressDialog.cancel();
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
             }
         });
@@ -318,20 +359,20 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
     }
 
     @Override
-    public void updateSelectedDates(List<Date> selectedDates) {
+    public void updateLeaderSelectedDates(List<Date> leaderSelectedDates) {
 
         if (event.getEventLeaderDetail().getProposedTimestamps().isEmpty()) {
             // Vote time
-            this.leaderProposedTimestamps = selectedDates;
-            if (!selectedDates.isEmpty()) {
+            this.leaderViewLeaderProposedTimestamps = leaderSelectedDates;
+            if (!leaderSelectedDates.isEmpty()) {
                 this.nextButton.setEnabled(true);
             } else {
                 this.nextButton.setEnabled(false);
             }
         } else {
             // Final time
-            if (!selectedDates.isEmpty() && selectedDates.size() == 1) {
-                this.eventTimestamp = selectedDates.get(0);
+            if (!leaderSelectedDates.isEmpty() && leaderSelectedDates.size() == 1) {
+                this.eventTimestamp = leaderSelectedDates.get(0);
                 this.nextButton.setEnabled(true);
             } else {
                 this.nextButton.setEnabled(false);
@@ -340,16 +381,51 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
 
         BaseWeekViewFragment baseWeekViewFragmentLeader = new BaseWeekViewFragment();
         Bundle bundle = new Bundle();
-        ArrayList<String> encodedDates = encodeDate(leaderProposedTimestamps);
-        bundle.putStringArrayList("encodedDates", encodedDates);
+        ArrayList<String> leaderViewLeaderProposedEncodedDates = encodeDate(leaderViewLeaderProposedTimestamps);
+        bundle.putInt("hostRole", EventDetailActivity.FOR_LEADER);
+        bundle.putString("eventTitle", event.getTitle());
+        bundle.putStringArrayList("leaderViewLeaderProposedEncodedDates", leaderViewLeaderProposedEncodedDates);
         baseWeekViewFragmentLeader.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.event_detail_not_ready_leader_day_calendar_container, baseWeekViewFragmentLeader).commit();
     }
 
-    private ArrayList<String> encodeDate(List<Date> leaderProposedTimestamps) {
+    @Override
+    public void updateMemberSelectedDates(List<Date> memberSelectedDates) {
+
+        EventMemberDetail eventMemberDetail = null;
+        for(EventMemberDetail detail: event.getEventMemberDetail()) {
+            if(detail.getMember().getObjectId() == appAction.getHostPerson().getObjectId()) {
+                eventMemberDetail = detail;
+            }
+        }
+
+        if(eventMemberDetail != null) {
+
+            if(eventMemberDetail.getSelectedTimestamps().isEmpty()) {
+                this.memberViewMemberProposedTimestamps = memberSelectedDates;
+                if (!memberSelectedDates.isEmpty()) {
+                    this.nextButton.setEnabled(true);
+                } else {
+                    this.nextButton.setEnabled(false);
+                }
+            }
+        }
+
+        BaseWeekViewFragment baseWeekViewFragmentMember = new BaseWeekViewFragment();
+        Bundle bundle = new Bundle();
+        ArrayList<String> memberViewMemberProposedEncodedDates = encodeDate(memberViewMemberProposedTimestamps);
+        bundle.putInt("hostRole", EventDetailActivity.FOR_MEMBER);
+        bundle.putString("eventTitle", event.getTitle());
+        bundle.putStringArrayList("memberViewMemberProposedEncodedDates", memberViewMemberProposedEncodedDates);
+        baseWeekViewFragmentMember.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.event_detail_not_ready_member_day_calendar_container, baseWeekViewFragmentMember).commit();
+
+    }
+
+    private ArrayList<String> encodeDate(List<Date> proposedTimestamps) {
         ArrayList<String> encodedDates = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        for(Date date: leaderProposedTimestamps) {
+        for(Date date: proposedTimestamps) {
             encodedDates.add(sdf.format(date));
         }
         return encodedDates;
