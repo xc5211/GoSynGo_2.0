@@ -29,7 +29,6 @@ import edu.scu.model.Event;
 import edu.scu.model.EventLeaderDetail;
 import edu.scu.model.EventMemberDetail;
 import edu.scu.model.LeaderProposedTimestamp;
-import edu.scu.model.Person;
 
 /**
  * Created by chuanxu on 5/26/16.
@@ -46,8 +45,8 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
     // Leader not ready
     private EditText locationEditText;
     private EditText noteEditText;
-    private Spinner durationSpinner;
-    private Spinner reminderSpinner;
+    private TextView durationLeaderTextView;
+    private TextView reminderLeaderTextView;
     private HorizontalGridView memberHorizontalViewForLeader;
     private Button nextButton;
     private Button cancelEventButton;
@@ -56,8 +55,9 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
     private TextView locationTextView;
     private TextView noteTextView;
     private TextView durationTextView;
-    private TextView reminderTextView;
+    private TextView reminderMemberTextView;
     private HorizontalGridView memberHorizontalViewForMember;
+    private Button memberNextButton;
     private Button leaveButton;
 
     // Ready
@@ -132,11 +132,26 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
                 setContentView(R.layout.activity_event_detail_not_ready_member);
                 initWidgetable(eventDetailProperty);
                 initListener(eventDetailProperty);
+
                 //sichao
                 BaseWeekViewFragment baseWeekViewFragmentMember = new BaseWeekViewFragment();
                 Bundle bundleMember = new Bundle();
+
+                if(event.getEventLeaderDetail().getProposedTimestamps().isEmpty()) {
+                    ifLeaderProposed = EventDetailActivity.LEADER_NOT_PROPOSED;
+                } else {
+                    ifLeaderProposed = EventDetailActivity.LEADER_PROPOSED;
+                    memberViewLeaderProposedTimestamps = new ArrayList<>();
+                    for(LeaderProposedTimestamp timestamp: event.getEventLeaderDetail().getProposedTimestamps()) {
+                        memberViewLeaderProposedTimestamps.add(timestamp.getTimestamp());
+                    }
+                }
+
                 bundleMember.putInt("hostRole", EventDetailActivity.FOR_MEMBER);
                 bundleMember.putString("eventTitle", event.getTitle());
+                bundleMember.putInt("ifLeaderProposed", ifLeaderProposed);
+                ArrayList<String> memberViewLeaderProposedEncodedDates = encodeDate(memberViewLeaderProposedTimestamps);
+                bundleMember.putStringArrayList("memberViewLeaderProposedEncodedDates", memberViewLeaderProposedEncodedDates);
                 baseWeekViewFragmentMember.setArguments(bundleMember);
                 getSupportFragmentManager().beginTransaction().add(R.id.event_detail_not_ready_member_day_calendar_container, baseWeekViewFragmentMember).commit();
                 break;
@@ -169,17 +184,12 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
                 this.noteEditText = (EditText) findViewById(R.id.edit_text_event_detail_not_ready_leader_note);
                 this.noteEditText.setText(event.getNote());
 
-                this.durationSpinner = (Spinner) findViewById(R.id.spinner_event_detail_not_ready_leader_duration);
-                Integer[] durations = { 30, 45, 60, 90, 120 };
-                ArrayAdapter<Integer> durationSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, durations);
-                durationSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                this.durationSpinner.setAdapter(durationSpinnerArrayAdapter);
+                this.durationLeaderTextView = (TextView) findViewById(R.id.text_view_event_detail_not_ready_leader_duration);
+                this.durationLeaderTextView.setText(event.getDurationInMin().toString());
 
-                this.reminderSpinner = (Spinner) findViewById(R.id.spinner_event_detail_not_ready_leader_reminder);
-                Integer[] reminders = { 0, 15, 30, 45, 60 };
-                ArrayAdapter<Integer> remindSpinnerArrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, reminders);
-                remindSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                this.reminderSpinner.setAdapter(remindSpinnerArrayAdapter);
+                this.reminderLeaderTextView = (TextView) findViewById(R.id.text_view_event_detail_not_ready_leader_reminder);
+                String reminderLeaderText = event.getHasReminder() ? event.getReminderInMin().toString() : "No reminder";
+                this.reminderLeaderTextView.setText(reminderLeaderText);
 
                 this.memberHorizontalViewForLeader = (HorizontalGridView) findViewById(R.id.event_detail_not_ready_leader_event_member_grid_view);
                 List<String> memberList = new ArrayList<>();
@@ -212,6 +222,10 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
                 this.durationTextView = (TextView) findViewById(R.id.text_view_event_detail_not_ready_member_duration);
                 this.durationTextView.setText(event.getDurationInMin().toString());
 
+                this.reminderMemberTextView = (TextView) findViewById(R.id.text_view_event_detail_not_ready_member_reminder);
+                String reminderMemberText = event.getHasReminder() ? event.getReminderInMin().toString() : "No reminder";
+                this.reminderMemberTextView.setText(reminderMemberText);
+
                 this.memberHorizontalViewForMember = (HorizontalGridView) findViewById(R.id.event_detail_not_ready_member_event_member_grid_view);
                 List<String> memberListInMember = new ArrayList<>();
                 for(EventMemberDetail eventMemberDetail : event.getEventMemberDetail()) {
@@ -219,6 +233,10 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
                 }
                 MemberHorizontalViewAdapter adapterInmember = new MemberHorizontalViewAdapter(this, memberListInMember);
                 this.memberHorizontalViewForMember.setAdapter(adapterInmember);
+
+                this.memberNextButton = (Button) findViewById(R.id.button_event_detail_not_ready_member_next);
+                this.memberNextButton.setEnabled(false);
+                this.memberNextButton.setText("Send my preferred time");
 
                 this.leaveButton = (Button) findViewById(R.id.button_event_detail_not_ready_member_leave);
                 break;
@@ -286,6 +304,13 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
                 break;
             case "memberNotReady":
 
+                this.memberNextButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        selectEventTimestampsAsMember();
+                    }
+                });
+
                 this.leaveButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -301,6 +326,34 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
 
     private void initListenerCommon() {
 
+    }
+
+    private void selectEventTimestampsAsMember() {
+
+        List<String> selectedEventTimestamps = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        for(Date date: memberViewMemberProposedTimestamps) {
+            selectedEventTimestamps.add(sdf.format(date));
+        }
+
+        appAction.proposeEventTimestampsAsMember(event.getObjectId(), selectedEventTimestamps, new ActionCallbackListener<EventMemberDetail>() {
+
+            final ProgressDialog progressDialog = ProgressDialog.show( EventDetailActivity.this, "", "Sending...", true );
+            @Override
+            public void onSuccess(EventMemberDetail data) {
+                progressDialog.cancel();
+                Toast.makeText(getApplicationContext(), "Propose time success", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(EventDetailActivity.this, DashboardActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onFailure(String message) {
+                progressDialog.cancel();
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void proposeEventTimestampsAsLeader() {
@@ -416,7 +469,7 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
 
         EventMemberDetail eventMemberDetail = null;
         for(EventMemberDetail detail: event.getEventMemberDetail()) {
-            if(detail.getMember().getObjectId() == appAction.getHostPerson().getObjectId()) {
+            if(detail.getMember().getObjectId().equals(appAction.getHostPerson().getObjectId())) {
                 eventMemberDetail = detail;
             }
         }
@@ -426,19 +479,25 @@ public class EventDetailActivity extends GsgBaseActivity implements FragmentDate
             if(eventMemberDetail.getSelectedTimestamps().isEmpty()) {
                 this.memberViewMemberProposedTimestamps = memberSelectedDates;
                 if (!memberSelectedDates.isEmpty()) {
-                    this.nextButton.setEnabled(true);
+                    this.memberNextButton.setEnabled(true);
                 } else {
-                    this.nextButton.setEnabled(false);
+                    this.memberNextButton.setEnabled(false);
                 }
             }
         }
 
         BaseWeekViewFragment baseWeekViewFragmentMember = new BaseWeekViewFragment();
         Bundle bundle = new Bundle();
-        ArrayList<String> memberViewMemberProposedEncodedDates = encodeDate(memberViewMemberProposedTimestamps);
         bundle.putInt("hostRole", EventDetailActivity.FOR_MEMBER);
         bundle.putString("eventTitle", event.getTitle());
+        bundle.putInt("ifLeaderProposed", ifLeaderProposed);
+
+        ArrayList<String> memberViewLeaderProposedEncodedDates = encodeDate(memberViewLeaderProposedTimestamps);
+        bundle.putStringArrayList("memberViewLeaderProposedEncodedDates", memberViewLeaderProposedEncodedDates);
+
+        ArrayList<String> memberViewMemberProposedEncodedDates = encodeDate(memberViewMemberProposedTimestamps);
         bundle.putStringArrayList("memberViewMemberProposedEncodedDates", memberViewMemberProposedEncodedDates);
+
         baseWeekViewFragmentMember.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.event_detail_not_ready_member_day_calendar_container, baseWeekViewFragmentMember).commit();
 

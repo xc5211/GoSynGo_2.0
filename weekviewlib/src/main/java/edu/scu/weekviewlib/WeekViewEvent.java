@@ -11,6 +11,12 @@ import static edu.scu.weekviewlib.WeekViewUtil.*;
  * Website: http://april-shower.com
  */
 public class WeekViewEvent {
+
+    public final static int READY_EVENT = 300;
+    public final static int MEMBER_PROPOSED_EVENT = 301;
+    public final static int LEADER_PROPOSED_EVENT = 302;
+    private int weekViewEventStatus;
+
     private long mId;
     private Calendar mStartTime;
     private Calendar mEndTime;
@@ -99,6 +105,10 @@ public class WeekViewEvent {
         this(id, name, null, startTime, endTime);
     }
 
+
+    public int getWeekViewEventStatus() { return weekViewEventStatus; }
+
+    public void setWeekViewEventStatus(int weekViewEventStatus) { this.weekViewEventStatus = weekViewEventStatus; }
 
     public Calendar getStartTime() {
         return mStartTime;

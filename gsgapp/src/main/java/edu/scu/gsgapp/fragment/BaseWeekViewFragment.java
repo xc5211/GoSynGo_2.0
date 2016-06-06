@@ -83,12 +83,20 @@ public class BaseWeekViewFragment extends Fragment implements
         ifLeaderProposed = getArguments().getInt("ifLeaderProposed");
 
         switch (hostRole) {
+
             case BaseWeekViewFragment.FOR_LEADER:
                 if(getArguments().getStringArrayList("leaderViewLeaderProposedEncodedDates") != null) {
                     leaderViewLeaderSelectedDates = decodeDate(getArguments().getStringArrayList("leaderViewLeaderProposedEncodedDates"));
                 }
                 break;
+
             case BaseWeekViewFragment.FOR_MEMBER:
+                if(getArguments().getStringArrayList("memberViewLeaderProposedEncodedDates") != null) {
+                    memberViewLeaderSelectedDates = decodeDate(getArguments().getStringArrayList("memberViewLeaderProposedEncodedDates"));
+                }
+                if(getArguments().getStringArrayList("memberViewMemberProposedEncodedDates") != null) {
+                    memberViewMemberSelectedDates = decodeDate(getArguments().getStringArrayList("memberViewMemberProposedEncodedDates"));
+                }
                 break;
         }
 
@@ -132,16 +140,16 @@ public class BaseWeekViewFragment extends Fragment implements
             endTime.add(Calendar.MINUTE, readyEvent.getDurationInMin());
             WeekViewEvent weekViewEvent = new WeekViewEvent(i, readyEvent.getTitle(), startTime, endTime);
             weekViewEvent.setColor(getResources().getColor(R.color.event_color_02));
-            //weekViewEvent.setColor(R.color.event_color_02);
+            weekViewEvent.setWeekViewEventStatus(WeekViewEvent.READY_EVENT);
             weekViewEvents.add(weekViewEvent);
         }
     }
 
-    private void drawLeaderSelectedDates() {
+    private void drawLeaderSelectedDates(List<Date> leaderSelectedDates) {
 
-        for(int i = 0; i < leaderViewLeaderSelectedDates.size(); i++) {
+        for(int i = 0; i < leaderSelectedDates.size(); i++) {
 
-            Date timestamp = leaderViewLeaderSelectedDates.get(i);
+            Date timestamp = leaderSelectedDates.get(i);
             Calendar startTime = Calendar.getInstance();
             startTime.setTime(timestamp);
             startTime.add(Calendar.HOUR, 0);
@@ -150,15 +158,16 @@ public class BaseWeekViewFragment extends Fragment implements
             endTime.add(Calendar.MINUTE, 90);
             WeekViewEvent weekViewEvent = new WeekViewEvent(i, eventTitle, startTime, endTime);
             weekViewEvent.setColor(getResources().getColor(R.color.event_color_03));
+            weekViewEvent.setWeekViewEventStatus(WeekViewEvent.LEADER_PROPOSED_EVENT);
             weekViewEvents.add(weekViewEvent);
         }
     }
 
-    private void drawMemberSelectedDates() {
+    private void drawMemberSelectedDates(List<Date> memberSelectedDates) {
 
-        for(int i = 0; i < memberViewMemberSelectedDates.size(); i++) {
+        for(int i = 0; i < memberSelectedDates.size(); i++) {
 
-            Date timestamp = memberViewMemberSelectedDates.get(i);
+            Date timestamp = memberSelectedDates.get(i);
             Calendar startTime = Calendar.getInstance();
             startTime.setTime(timestamp);
             startTime.add(Calendar.HOUR, 0);
@@ -167,6 +176,7 @@ public class BaseWeekViewFragment extends Fragment implements
             endTime.add(Calendar.MINUTE, 90);
             WeekViewEvent weekViewEvent = new WeekViewEvent(i, eventTitle, startTime, endTime);
             weekViewEvent.setColor(getResources().getColor(R.color.event_color_01));
+            weekViewEvent.setWeekViewEventStatus(WeekViewEvent.MEMBER_PROPOSED_EVENT);
             weekViewEvents.add(weekViewEvent);
         }
     }
@@ -175,13 +185,16 @@ public class BaseWeekViewFragment extends Fragment implements
     public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
 
         switch (hostRole) {
+
             case BaseWeekViewFragment.FOR_LEADER:
                 drawAllReadyEvents();
-                drawLeaderSelectedDates();
+                drawLeaderSelectedDates(leaderViewLeaderSelectedDates);
                 break;
+
             case BaseWeekViewFragment.FOR_MEMBER:
                 drawAllReadyEvents();
-                drawMemberSelectedDates();
+                drawLeaderSelectedDates(memberViewLeaderSelectedDates);
+                drawMemberSelectedDates(memberViewMemberSelectedDates);
                 break;
         }
 
@@ -191,7 +204,6 @@ public class BaseWeekViewFragment extends Fragment implements
     @Override
     public void onEventClick(WeekViewEvent event, RectF eventRect) {
         Toast.makeText(getContext(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
-
     }
 
     @Override
@@ -209,6 +221,26 @@ public class BaseWeekViewFragment extends Fragment implements
 
                 break;
             case BaseWeekViewFragment.FOR_MEMBER:
+                if(ifLeaderProposed == BaseWeekViewFragment.LEADER_NOT_PROPOSED) {
+                    Toast.makeText(getContext(), "Long pressed event: " + weekViewEvent.getName(), Toast.LENGTH_SHORT).show();
+                } else {
+                    switch (weekViewEvent.getWeekViewEventStatus()) {
+                        //ready events
+                        case WeekViewEvent.READY_EVENT:
+                            Toast.makeText(getContext(), "Long pressed event: " + weekViewEvent.getName(), Toast.LENGTH_SHORT).show();
+                            break;
+                        //leader proposed timeStamps
+                        //TODO: further
+                        case WeekViewEvent.LEADER_PROPOSED_EVENT:
+                            weekViewEvent.setColor(getResources().getColor(R.color.event_color_01));
+                            fragmentDateCommunicator.updateLeaderSelectedDates(memberViewMemberSelectedDates);
+                            break;
+                        //member proposed timeStamps
+                        case WeekViewEvent.MEMBER_PROPOSED_EVENT:
+                            memberViewMemberSelectedDates.remove(weekViewEvent.getStartTime().getTime());
+                            fragmentDateCommunicator.updateMemberSelectedDates(memberViewMemberSelectedDates);
+                    }
+                }
                 break;
         }
     }
@@ -235,11 +267,17 @@ public class BaseWeekViewFragment extends Fragment implements
                     leaderViewLeaderSelectedDates.add(date);
                     fragmentDateCommunicator.updateLeaderSelectedDates(leaderViewLeaderSelectedDates);
                 } else {
-                    Toast.makeText(getContext(), "You had Finished Propose TimeStamps, Please wait for members' votes", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "You had Finished Propose event times, Please wait for members' votes", Toast.LENGTH_SHORT).show();
                 }
 
                 break;
             case BaseWeekViewFragment.FOR_MEMBER:
+                if(ifLeaderProposed == BaseWeekViewFragment.LEADER_NOT_PROPOSED) {
+                    Toast.makeText(getContext(), "Please wait for leader propose event time", Toast.LENGTH_SHORT).show();
+                } else {
+                    memberViewMemberSelectedDates.add(date);
+                    fragmentDateCommunicator.updateMemberSelectedDates(memberViewMemberSelectedDates);
+                }
                 break;
         }
     }
