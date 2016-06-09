@@ -19,6 +19,8 @@ import com.backendless.exceptions.BackendlessFault;
 import com.backendless.messaging.Message;
 import com.backendless.messaging.SubscriptionOptions;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.scu.core.ActionCallbackListener;
@@ -109,35 +111,59 @@ public class DashboardActivity extends GsgBaseActivity implements SwipeRefreshLa
         String selector = "receiverId" + hostPersonObjectId.replace("-", "") + " = 'true'";
         subscriptionOptions.setSelector(selector);
 
+        List<String> channelNames = new ArrayList<>();
+
         // Resubscribe default channel
         DefaultChannelMessageResponder defaultChannelMsgResponder = new DefaultChannelMessageResponder(appAction.getHostPerson().getEventsUndecided(), hostPersonObjectId);
-        resubscribeChannel(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscriptionOptions);
+        subscribeChannel(GoogleProjectSettings.DEFAULT_CHANNEL, defaultChannelMsgResponder, subscriptionOptions);
+        channelNames.add(GoogleProjectSettings.DEFAULT_CHANNEL);
 
         // Resubscribe all event channels as leader
         for (Event event : appAction.getHostPerson().getEventsAsLeader()) {
             EventChannelMessageLeaderResponder channelMessageLeaderResponder = new EventChannelMessageLeaderResponder(appAction.getHostPerson());
-            resubscribeChannel(event.getObjectId(), channelMessageLeaderResponder, subscriptionOptions);
+            subscribeChannel(event.getObjectId(), channelMessageLeaderResponder, subscriptionOptions);
+            channelNames.add(event.getObjectId());
         }
 
         // Resubscribe all event channels as member
         for (Event event : appAction.getHostPerson().getEventsAsMember()) {
             EventChannelMessageMemberResponder channelMessageMemberResponder = new EventChannelMessageMemberResponder(hostPersonObjectId);
-            resubscribeChannel(event.getObjectId(), channelMessageMemberResponder, subscriptionOptions);
+            subscribeChannel(event.getObjectId(), channelMessageMemberResponder, subscriptionOptions);
+            channelNames.add(event.getObjectId());
         }
+
+        registerChannels(channelNames);
     }
 
-    private void resubscribeChannel(final String channelName, final AsyncCallback<List<Message>> channelMessageResponder, SubscriptionOptions subscriptionOptions) {
+    private void subscribeChannel(final String channelName, final AsyncCallback<List<Message>> channelMessageResponder, SubscriptionOptions subscriptionOptions) {
         Backendless.Messaging.subscribe(channelName, channelMessageResponder, subscriptionOptions, new AsyncCallback<Subscription>() {
 
             @Override
             public void handleResponse(Subscription subscription) {
                 appAction.addToChannelMap(channelName, channelMessageResponder, subscription);
-                Toast.makeText(context, "Resubscribe success: " + channelName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Subscribe success: " + channelName, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void handleFault(BackendlessFault backendlessFault) {
-                Toast.makeText(context, "Resubscribe fail: " + backendlessFault.getCode(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Subscribe fail: " + backendlessFault.getCode(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void registerChannels(final List<String> channelNames) {
+
+        Date expireDate = new Date();
+        expireDate.setTime(System.currentTimeMillis() + 500 * 365 * 24 * 60 * 60 * 1000);
+        Backendless.Messaging.registerDevice(GoogleProjectSettings.GOOGLE_PROJECT_NUMBER, channelNames, expireDate, new AsyncCallback<Void>() {
+            @Override
+            public void handleResponse(Void aVoid) {
+                Toast.makeText(context, "Register channels success", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void handleFault(BackendlessFault backendlessFault) {
+                Toast.makeText(context, "Register channels fail", Toast.LENGTH_SHORT).show();
             }
         });
     }
